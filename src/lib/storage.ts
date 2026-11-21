@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
 export interface UploadResult {
   url: string;
@@ -25,6 +26,28 @@ const MIME_MAP: Record<string, string> = {
   '.m4a': 'audio/mp4',
 };
 
+let s3ClientInstance: S3Client | null = null;
+
+function getS3Client(): S3Client | null {
+  const r2AccountId = process.env.R2_ACCOUNT_ID;
+  const r2AccessKey = process.env.R2_ACCESS_KEY_ID;
+  const r2SecretKey = process.env.R2_SECRET_ACCESS_KEY;
+
+  if (!r2AccountId || !r2AccessKey || !r2SecretKey) return null;
+
+  if (!s3ClientInstance) {
+    s3ClientInstance = new S3Client({
+      region: 'auto',
+      endpoint: `https://${r2AccountId}.r2.cloudflarestorage.com`,
+      credentials: {
+        accessKeyId: r2AccessKey,
+        secretAccessKey: r2SecretKey,
+      },
+    });
+  }
+  return s3ClientInstance;
+}
+
 /**
  * Universal Storage Adapter
  * - Local filesystem storage (default for zero-configuration development & on-premise)
@@ -41,41 +64,33 @@ export async function uploadAsset(
   const contentType = MIME_MAP[ext] || 'application/octet-stream';
 
   const r2Bucket = process.env.R2_BUCKET_NAME;
-  const r2AccountId = process.env.R2_ACCOUNT_ID;
-  const r2AccessKey = process.env.R2_ACCESS_KEY_ID;
-  const r2SecretKey = process.env.R2_SECRET_ACCESS_KEY;
   const r2PublicDomain = process.env.R2_PUBLIC_URL || process.env.NEXT_PUBLIC_R2_URL;
+  const s3 = getS3Client();
 
-  // 1. Cloudflare R2 / S3 mode (if configured)
-  if (r2Bucket && r2AccountId && r2AccessKey && r2SecretKey) {
+  // 1. Cloudflare R2 mode (if configured)
+  if (r2Bucket && s3) {
     try {
       const key = `${subfolder}/${filename}`;
-      const endpoint = `https://${r2AccountId}.r2.cloudflarestorage.com/${r2Bucket}/${key}`;
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: r2Bucket,
+          Key: key,
+          Body: buffer,
+          ContentType: contentType,
+        })
+      );
 
-      // In production with R2 keys provided, upload via standard S3 HTTP PUT
-      // (Falls back gracefully to local disk if network or credentials fail)
-      const res = await fetch(endpoint, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': contentType,
-          'Content-Length': buffer.length.toString(),
-        },
-        body: new Uint8Array(buffer) as unknown as BodyInit,
-      });
+      const publicUrl = r2PublicDomain
+        ? `${r2PublicDomain.replace(/\/+$/, '')}/${key}`
+        : `https://${r2Bucket}.${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${key}`;
 
-      if (res.ok) {
-        const publicUrl = r2PublicDomain
-          ? `${r2PublicDomain.replace(/\/+$/, '')}/${key}`
-          : endpoint;
-
-        return {
-          url: publicUrl,
-          filename,
-          size: buffer.length,
-          storageType: 'r2',
-          contentType,
-        };
-      }
+      return {
+        url: publicUrl,
+        filename,
+        size: buffer.length,
+        storageType: 'r2',
+        contentType,
+      };
     } catch (err) {
       console.warn('R2 upload failed, falling back to local filesystem storage:', err);
     }
