@@ -1,0 +1,164 @@
+---
+import type { BankAccount } from '../types/wedding';
+
+interface Props {
+  groomBank: BankAccount;
+  brideBank: BankAccount;
+  groomName: string;
+  brideName: string;
+}
+
+const { groomBank, brideBank, groomName, brideName } = Astro.props;
+
+// Generate VietQR image URLs
+const groomQR = groomBank.accountNo
+  ? `https://img.vietqr.io/image/${groomBank.bankId}-${groomBank.accountNo}-compact2.png?amount=0&addInfo=Mung%20Cuoi%20${encodeURIComponent(groomName)}&accountName=${encodeURIComponent(groomBank.accountName)}`
+  : '';
+
+const brideQR = brideBank.accountNo
+  ? `https://img.vietqr.io/image/${brideBank.bankId}-${brideBank.accountNo}-compact2.png?amount=0&addInfo=Mung%20Cuoi%20${encodeURIComponent(brideName)}&accountName=${encodeURIComponent(brideBank.accountName)}`
+  : '';
+---
+
+<section class="py-12 px-4 max-w-lg mx-auto text-center content-auto">
+  <div class="bg-white/90 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border border-stone-200/80 space-y-6">
+    <div class="space-y-1">
+      <span class="text-xs font-semibold tracking-widest uppercase text-amber-700">Hộp Mừng Cưới</span>
+      <h2 class="text-2xl font-serif font-bold text-stone-800">Gửi Lời Chúc Phúc</h2>
+      <p class="text-xs text-stone-500 max-w-xs mx-auto">
+        Sự hiện diện và lời chúc phúc của quý khách là món quà quý giá nhất dành cho cô dâu và chú rể.
+      </p>
+    </div>
+
+    <!-- Toggle Selector -->
+    <div class="flex justify-center bg-stone-100 p-1 rounded-2xl max-w-xs mx-auto">
+      <button
+        id="btn-groom"
+        type="button"
+        class="flex-1 py-2 text-xs font-semibold rounded-xl bg-white text-stone-800 shadow-sm transition-all"
+      >
+        Mừng Chú Rể
+      </button>
+      <button
+        id="btn-bride"
+        type="button"
+        class="flex-1 py-2 text-xs font-semibold rounded-xl text-stone-500 hover:text-stone-800 transition-all"
+      >
+        Mừng Cô Dâu
+      </button>
+    </div>
+
+    <!-- Groom Bank Box -->
+    <div id="box-groom" class="space-y-4">
+      {groomQR ? (
+        <div class="flex justify-center">
+          <img
+            src={groomQR}
+            alt="Mã QR Chú Rể"
+            loading="lazy"
+            class="w-48 h-auto rounded-2xl shadow-md border border-stone-200"
+          />
+        </div>
+      ) : null}
+
+      <div class="bg-stone-50 p-4 rounded-2xl text-left text-xs space-y-2 border border-stone-200/60">
+        <div class="flex justify-between items-center">
+          <span class="text-stone-500">Ngân hàng:</span>
+          <span class="font-semibold text-stone-800">{groomBank.bankName || groomBank.bankId}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-stone-500">Chủ tài khoản:</span>
+          <span class="font-semibold text-stone-800">{groomBank.accountName}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-stone-500">Số tài khoản:</span>
+          <span class="font-mono font-bold text-stone-900">{groomBank.accountNo}</span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="copy-btn w-full py-2.5 px-4 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold shadow-md active:scale-95 transition-all"
+        data-account={groomBank.accountNo}
+      >
+        Sao chép số tài khoản
+      </button>
+    </div>
+
+    <!-- Bride Bank Box -->
+    <div id="box-bride" class="hidden space-y-4">
+      {brideQR ? (
+        <div class="flex justify-center">
+          <img
+            src={brideQR}
+            alt="Mã QR Cô Dâu"
+            loading="lazy"
+            class="w-48 h-auto rounded-2xl shadow-md border border-stone-200"
+          />
+        </div>
+      ) : null}
+
+      <div class="bg-stone-50 p-4 rounded-2xl text-left text-xs space-y-2 border border-stone-200/60">
+        <div class="flex justify-between items-center">
+          <span class="text-stone-500">Ngân hàng:</span>
+          <span class="font-semibold text-stone-800">{brideBank.bankName || brideBank.bankId}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-stone-500">Chủ tài khoản:</span>
+          <span class="font-semibold text-stone-800">{brideBank.accountName}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-stone-500">Số tài khoản:</span>
+          <span class="font-mono font-bold text-stone-900">{brideBank.accountNo}</span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="copy-btn w-full py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-md active:scale-95 transition-all"
+        data-account={brideBank.accountNo}
+      >
+        Sao chép số tài khoản
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  const btnGroom = document.getElementById('btn-groom');
+  const btnBride = document.getElementById('btn-bride');
+  const boxGroom = document.getElementById('box-groom');
+  const boxBride = document.getElementById('box-bride');
+
+  btnGroom?.addEventListener('click', () => {
+    btnGroom.className = 'flex-1 py-2 text-xs font-semibold rounded-xl bg-white text-stone-800 shadow-sm transition-all';
+    btnBride?.classList.remove('bg-white', 'text-stone-800', 'shadow-sm');
+    btnBride?.classList.add('text-stone-500');
+    boxGroom?.classList.remove('hidden');
+    boxBride?.classList.add('hidden');
+  });
+
+  btnBride?.addEventListener('click', () => {
+    btnBride.className = 'flex-1 py-2 text-xs font-semibold rounded-xl bg-white text-stone-800 shadow-sm transition-all';
+    btnGroom?.classList.remove('bg-white', 'text-stone-800', 'shadow-sm');
+    btnGroom?.classList.add('text-stone-500');
+    boxBride?.classList.remove('hidden');
+    boxGroom?.classList.add('hidden');
+  });
+
+  document.querySelectorAll('.copy-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const target = e.currentTarget as HTMLButtonElement;
+      const acc = target.getAttribute('data-account');
+      if (acc) {
+        navigator.clipboard.writeText(acc).then(() => {
+          const original = target.innerText;
+          target.innerText = '✓ Đã sao chép!';
+          setTimeout(() => {
+            target.innerText = original;
+          }, 2000);
+        });
+      }
+    });
+  });
+</script>

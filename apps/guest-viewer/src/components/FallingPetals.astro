@@ -1,0 +1,99 @@
+---
+interface Props {
+  count?: number;
+}
+const { count = 6 } = Astro.props;
+---
+
+<canvas
+  id="petals-canvas"
+  class="pointer-events-none fixed inset-0 z-40 h-full w-full opacity-70"
+  data-count={count}
+></canvas>
+
+<script>
+  const canvas = document.getElementById('petals-canvas') as HTMLCanvasElement | null;
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    const isMobile = window.innerWidth < 768;
+    const particleCount = isMobile ? 6 : 14;
+
+    function resize() {
+      if (!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    interface Petal {
+      x: number;
+      y: number;
+      size: number;
+      speedX: number;
+      speedY: number;
+      rotation: number;
+      rotationSpeed: number;
+      opacity: number;
+    }
+
+    const petals: Petal[] = [];
+    for (let i = 0; i < particleCount; i++) {
+      petals.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        size: Math.random() * 6 + 6,
+        speedX: Math.random() * 0.8 - 0.4,
+        speedY: Math.random() * 1.0 + 0.6,
+        rotation: Math.random() * 360,
+        rotationSpeed: Math.random() * 1.5 - 0.75,
+        opacity: Math.random() * 0.4 + 0.4,
+      });
+    }
+
+    let isVisible = true;
+    let animId: number;
+
+    function draw() {
+      if (!ctx || !canvas || !isVisible) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let p of petals) {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rotation * Math.PI) / 180);
+        ctx.fillStyle = `rgba(244, 180, 190, ${p.opacity})`;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.size, p.size * 0.55, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        p.x += p.speedX;
+        p.y += p.speedY;
+        p.rotation += p.rotationSpeed;
+
+        if (p.y > canvas.height + 15) {
+          p.y = -15;
+          p.x = Math.random() * canvas.width;
+        }
+        if (p.x > canvas.width + 15) p.x = -15;
+        if (p.x < -15) p.x = canvas.width + 15;
+      }
+
+      animId = requestAnimationFrame(draw);
+    }
+
+    // Auto pause when tab hidden to save mobile battery
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        isVisible = false;
+        cancelAnimationFrame(animId);
+      } else {
+        isVisible = true;
+        animId = requestAnimationFrame(draw);
+      }
+    });
+
+    animId = requestAnimationFrame(draw);
+  }
+</script>

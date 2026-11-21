@@ -1,0 +1,322 @@
+---
+export const prerender = false;
+
+import Layout from '../layouts/Layout.astro';
+import FloatingMusicPlayer from '../components/FloatingMusicPlayer.astro';
+import FallingPetals from '../components/FallingPetals.astro';
+import VietQRGiftBox from '../components/VietQRGiftBox.astro';
+import RSVPForm from '../components/RSVPForm.astro';
+import { getSiteBySlug } from '../lib/db';
+import { defaultWeddingData, type WeddingData } from '../types/wedding';
+
+const { slug = '' } = Astro.params;
+const guestName = Astro.url.searchParams.get('to') || Astro.url.searchParams.get('guest') || '';
+
+let weddingData: WeddingData = defaultWeddingData;
+let isExpired = false;
+let siteTitle = 'Thiệp Cưới Chú Rể & Cô Dâu';
+
+if (slug === 'chu-re-va-co-dau' || slug === 'demo') {
+  weddingData = defaultWeddingData;
+  siteTitle = `${defaultWeddingData.groom.shortName} & ${defaultWeddingData.bride.shortName}`;
+} else {
+  const site = getSiteBySlug(slug);
+
+  if (!site) {
+    return Astro.redirect('/404');
+  }
+
+  siteTitle = site.title;
+  const now = new Date();
+  const isViewLimitReached = site.maxViews > 0 && site.viewCount >= site.maxViews;
+  const isActiveExpired = site.activeExpiresAt ? now > new Date(site.activeExpiresAt) : false;
+  isExpired = site.status === 'EXPIRED_BACKUP' || isViewLimitReached || isActiveExpired;
+
+  try {
+    const raw = JSON.parse(site.publishedSnapshot || site.draftData);
+    weddingData = {
+      ...defaultWeddingData,
+      ...raw,
+      groom: { ...defaultWeddingData.groom, ...(raw.groom || {}) },
+      bride: { ...defaultWeddingData.bride, ...(raw.bride || {}) },
+      music: { ...defaultWeddingData.music, ...(raw.music || {}) },
+      events: raw.events || defaultWeddingData.events,
+      loveStory: raw.loveStory || defaultWeddingData.loveStory,
+      gallery: raw.gallery || defaultWeddingData.gallery,
+    };
+  } catch (err) {
+    console.error('Failed to parse wedding data in Astro viewer:', err);
+  }
+}
+
+const mainEvent = weddingData.events[0] || defaultWeddingData.events[0];
+const weddingDateStr = mainEvent?.date || '2026-12-25';
+---
+
+<Layout
+  title={`${siteTitle}${guestName ? ` - Kính mời ${guestName}` : ''}`}
+  description={weddingData.quote || 'Trân trọng kính mời bạn đến chung vui cùng gia đình chúng tôi!'}
+  coverImage={weddingData.coverImage}
+>
+  {isExpired ? (
+    <div class="min-h-screen bg-stone-950 text-stone-100 flex flex-col items-center justify-center p-6 text-center">
+      <div class="max-w-md w-full bg-stone-900 border border-stone-800 p-8 rounded-3xl shadow-2xl space-y-5">
+        <div class="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto text-2xl">
+          ❤️
+        </div>
+        <div class="space-y-2">
+          <span class="text-[11px] uppercase tracking-wider text-amber-400 font-bold px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20">
+            Lưu Trữ Kỷ Niệm
+          </span>
+          <h1 class="text-2xl font-serif font-bold text-white pt-1">{siteTitle}</h1>
+          <p class="text-xs text-stone-400 leading-relaxed">
+            Sự kiện cưới đã diễn ra viên mãn và đong đầy yêu thương. Cảm ơn tất cả người thân và bạn bè đã gửi lời chúc phúc!
+          </p>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div class="relative min-h-screen max-w-[540px] mx-auto bg-[#FAF7F2] shadow-2xl overflow-hidden pb-16">
+      <!-- Floating Interactive Islands -->
+      <FallingPetals count={6} />
+      <FloatingMusicPlayer
+        audioUrl={weddingData.music.url}
+        songTitle={weddingData.music.title}
+        artist={weddingData.music.artist}
+      />
+
+      <!-- ================= 1. HERO COVER ================= -->
+      <header class="relative w-full h-[680px] flex flex-col justify-end text-white overflow-hidden bg-stone-900">
+        <img
+          src={weddingData.coverImage}
+          alt={siteTitle}
+          fetchpriority="high"
+          class="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.88]"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/30 to-transparent"></div>
+
+        <div class="relative z-10 p-6 sm:p-8 space-y-3 text-center">
+          <div class="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-[11px] uppercase tracking-widest text-amber-200">
+            Save The Date
+          </div>
+          <h1 class="text-4xl sm:text-5xl font-serif font-bold tracking-tight text-white drop-shadow-md">
+            {weddingData.groom.shortName} <span class="font-vibes text-amber-300 font-normal">&</span> {weddingData.bride.shortName}
+          </h1>
+          <p class="text-xs sm:text-sm text-stone-200 tracking-wider uppercase font-light">
+            {weddingDateStr}
+          </p>
+        </div>
+      </header>
+
+      <!-- ================= 2. INVITATION MESSAGE ================= -->
+      <section class="py-12 px-6 text-center space-y-4">
+        {guestName ? (
+          <div class="inline-block px-4 py-1.5 rounded-2xl bg-amber-100/80 border border-amber-200 text-amber-900 text-xs font-semibold">
+            Trân trọng kính mời: <span class="font-bold">{guestName}</span>
+          </div>
+        ) : null}
+
+        <h2 class="text-3xl font-serif font-bold text-stone-900">Lời Ngỏ</h2>
+        <p class="text-xs sm:text-sm text-stone-600 leading-relaxed max-w-md mx-auto italic font-serif">
+          "{weddingData.quote}"
+        </p>
+        <div class="w-16 h-0.5 bg-amber-400 mx-auto mt-2"></div>
+      </section>
+
+      <!-- ================= 3. COUNTDOWN TIMER ================= -->
+      <section class="py-6 px-4">
+        <div class="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-md border border-stone-200/60 text-center max-w-sm mx-auto">
+          <span class="text-[11px] font-semibold text-amber-700 uppercase tracking-widest block mb-4">
+            Đếm Ngược Đến Ngày Chung Đôi
+          </span>
+          <div class="grid grid-cols-4 gap-2 text-center" id="countdown-grid" data-date={weddingDateStr}>
+            <div class="p-2.5 rounded-2xl bg-stone-50 border border-stone-200/50">
+              <span id="cd-days" class="block text-2xl font-serif font-bold text-stone-900">00</span>
+              <span class="text-[10px] text-stone-500 uppercase">Ngày</span>
+            </div>
+            <div class="p-2.5 rounded-2xl bg-stone-50 border border-stone-200/50">
+              <span id="cd-hours" class="block text-2xl font-serif font-bold text-stone-900">00</span>
+              <span class="text-[10px] text-stone-500 uppercase">Giờ</span>
+            </div>
+            <div class="p-2.5 rounded-2xl bg-stone-50 border border-stone-200/50">
+              <span id="cd-mins" class="block text-2xl font-serif font-bold text-stone-900">00</span>
+              <span class="text-[10px] text-stone-500 uppercase">Phút</span>
+            </div>
+            <div class="p-2.5 rounded-2xl bg-stone-50 border border-stone-200/50">
+              <span id="cd-secs" class="block text-2xl font-serif font-bold text-stone-900">00</span>
+              <span class="text-[10px] text-stone-500 uppercase">Giây</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. COUPLE PROFILES ================= -->
+      <section class="py-10 px-6 content-auto">
+        <div class="grid grid-cols-2 gap-4">
+          <!-- Chú Rể -->
+          <div class="bg-white/90 p-5 rounded-3xl shadow-sm border border-stone-200/80 text-center space-y-3">
+            <div class="w-24 h-24 mx-auto rounded-full overflow-hidden shadow-md border-2 border-amber-200">
+              <img
+                src={weddingData.groom.avatar}
+                alt={weddingData.groom.name}
+                loading="lazy"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div>
+              <span class="text-[10px] uppercase tracking-wider text-amber-700 font-bold block">Chú Rể</span>
+              <h3 class="text-base font-serif font-bold text-stone-900">{weddingData.groom.name}</h3>
+              <p class="text-[11px] text-stone-500 mt-1">{weddingData.groom.parents}</p>
+            </div>
+            {weddingData.groom.phone ? (
+              <a
+                href={`tel:${weddingData.groom.phone}`}
+                class="inline-block py-1.5 px-3 rounded-xl bg-amber-50 text-amber-800 text-[11px] font-semibold hover:bg-amber-100 transition-colors"
+              >
+                📞 {weddingData.groom.phone}
+              </a>
+            ) : null}
+          </div>
+
+          <!-- Cô Dâu -->
+          <div class="bg-white/90 p-5 rounded-3xl shadow-sm border border-stone-200/80 text-center space-y-3">
+            <div class="w-24 h-24 mx-auto rounded-full overflow-hidden shadow-md border-2 border-rose-200">
+              <img
+                src={weddingData.bride.avatar}
+                alt={weddingData.bride.name}
+                loading="lazy"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div>
+              <span class="text-[10px] uppercase tracking-wider text-rose-700 font-bold block">Cô Dâu</span>
+              <h3 class="text-base font-serif font-bold text-stone-900">{weddingData.bride.name}</h3>
+              <p class="text-[11px] text-stone-500 mt-1">{weddingData.bride.parents}</p>
+            </div>
+            {weddingData.bride.phone ? (
+              <a
+                href={`tel:${weddingData.bride.phone}`}
+                class="inline-block py-1.5 px-3 rounded-xl bg-rose-50 text-rose-800 text-[11px] font-semibold hover:bg-rose-100 transition-colors"
+              >
+                📞 {weddingData.bride.phone}
+              </a>
+            ) : null}
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 5. EVENTS SCHEDULE ================= -->
+      <section class="py-10 px-6 content-auto">
+        <div class="text-center space-y-1 mb-6">
+          <span class="text-xs font-semibold tracking-widest uppercase text-amber-700">Lịch Trình Sự Kiện</span>
+          <h2 class="text-2xl font-serif font-bold text-stone-800">Thời Gian & Địa Điểm</h2>
+        </div>
+
+        <div class="space-y-4">
+          {weddingData.events.map((ev) => (
+            <div class="bg-white/90 rounded-3xl p-5 shadow-sm border border-stone-200/80 space-y-3">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="text-base font-serif font-bold text-stone-900">{ev.title}</h3>
+                  <div class="text-xs text-amber-700 font-semibold mt-0.5">
+                    ⏰ {ev.time} — 📅 {ev.date}
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-xs text-stone-600 space-y-1">
+                <div class="font-semibold text-stone-800">📍 {ev.locationName}</div>
+                <div class="text-stone-500">{ev.address}</div>
+              </div>
+
+              {ev.mapUrl ? (
+                <a
+                  href={ev.mapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 py-2 px-4 rounded-xl bg-stone-900 text-white text-xs font-semibold hover:bg-stone-800 transition-colors w-full justify-center"
+                >
+                  <span>Chỉ đường trên Google Maps</span>
+                </a>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- ================= 6. PHOTO GALLERY ================= -->
+      {weddingData.gallery && weddingData.gallery.length > 0 ? (
+        <section class="py-10 px-6 content-auto">
+          <div class="text-center space-y-1 mb-6">
+            <span class="text-xs font-semibold tracking-widest uppercase text-amber-700">Album Hình Cưới</span>
+            <h2 class="text-2xl font-serif font-bold text-stone-800">Khoảnh Khắc Hạnh Phúc</h2>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            {weddingData.gallery.map((photo) => (
+              <div class="rounded-2xl overflow-hidden shadow-sm aspect-[3/4] bg-stone-200">
+                <img
+                  src={photo.url}
+                  alt={photo.caption || 'Ảnh cưới'}
+                  loading="lazy"
+                  class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <!-- ================= 7. VIETQR GIFT BOX ================= -->
+      <VietQRGiftBox
+        groomBank={weddingData.groom.bankAccount}
+        brideBank={weddingData.bride.bankAccount}
+        groomName={weddingData.groom.name}
+        brideName={weddingData.bride.name}
+      />
+
+      <!-- ================= 8. RSVP ATTENDANCE FORM ================= -->
+      <RSVPForm guestName={guestName} />
+
+      <!-- ================= FOOTER ================= -->
+      <footer class="mt-12 text-center text-xs text-stone-400 space-y-1">
+        <p class="font-serif italic">Trân trọng cảm ơn sự hiện diện của quý khách!</p>
+        <p class="text-[10px] text-stone-400">Được tạo với ❤️ bởi nền tảng LoveStory</p>
+      </footer>
+    </div>
+  )}
+</Layout>
+
+<script>
+  // Lightweight countdown timer
+  const grid = document.getElementById('countdown-grid');
+  if (grid) {
+    const targetDateStr = grid.getAttribute('data-date') || '2026-12-25';
+    const targetTime = new Date(targetDateStr).getTime();
+
+    function update() {
+      const now = new Date().getTime();
+      const diff = targetTime - now;
+
+      if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const mins = Math.floor((diff / 1000 / 60) % 60);
+        const secs = Math.floor((diff / 1000) % 60);
+
+        const elDays = document.getElementById('cd-days');
+        const elHours = document.getElementById('cd-hours');
+        const elMins = document.getElementById('cd-mins');
+        const elSecs = document.getElementById('cd-secs');
+
+        if (elDays) elDays.innerText = days < 10 ? '0' + days : '' + days;
+        if (elHours) elHours.innerText = hours < 10 ? '0' + hours : '' + hours;
+        if (elMins) elMins.innerText = mins < 10 ? '0' + mins : '' + mins;
+        if (elSecs) elSecs.innerText = secs < 10 ? '0' + secs : '' + secs;
+      }
+    }
+
+    update();
+    setInterval(update, 1000);
+  }
+</script>

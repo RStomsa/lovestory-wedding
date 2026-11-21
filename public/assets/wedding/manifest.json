@@ -1,0 +1,622 @@
+{
+  "openingEffects": [
+    {
+      "name": "curtain-blue-left.webp",
+      "url": "/assets/wedding/opening-effects/curtain-blue-left.webp"
+    },
+    {
+      "name": "curtain-blue-right.webp",
+      "url": "/assets/wedding/opening-effects/curtain-blue-right.webp"
+    },
+    {
+      "name": "curtain-red-left.webp",
+      "url": "/assets/wedding/opening-effects/curtain-red-left.webp"
+    },
+    {
+      "name": "curtain-red-right.webp",
+      "url": "/assets/wedding/opening-effects/curtain-red-right.webp"
+    },
+    {
+      "name": "curtain-pink-left.webp",
+      "url": "/assets/wedding/opening-effects/curtain-pink-left.webp"
+    },
+    {
+      "name": "curtain-pink-right.webp",
+      "url": "/assets/wedding/opening-effects/curtain-pink-right.webp"
+    }
+  ],
+  "audio": [
+    {
+      "name": "Nhạc cưới lãng mạn 1",
+      "url": "/assets/wedding/audio/wedding-melody-01.mp3"
+    },
+    {
+      "name": "Nhạc cưới lãng mạn 2",
+      "url": "/assets/wedding/audio/wedding-melody-02.mp3"
+    },
+    {
+      "name": "Nhạc cưới lãng mạn 3",
+      "url": "/assets/wedding/audio/wedding-melody-03.mp3"
+    },
+    {
+      "name": "Nhạc cưới lãng mạn 4",
+      "url": "/assets/wedding/audio/wedding-melody-04.mp3"
+    },
+    {
+      "name": "Nhạc cưới lãng mạn 5",
+      "url": "/assets/wedding/audio/wedding-melody-05.mp3"
+    },
+    {
+      "name": "Nhạc cưới lãng mạn 6",
+      "url": "/assets/wedding/audio/wedding-melody-06.mp3"
+    },
+    {
+      "name": "Nhạc cưới lãng mạn 7",
+      "url": "/assets/wedding/audio/wedding-melody-07.mp3"
+    },
+    {
+      "name": "Nhạc cưới lãng mạn 8",
+      "url": "/assets/wedding/audio/wedding-melody-08.mp3"
+    },
+    {
+      "name": "Nhạc cưới lãng mạn 9",
+      "url": "/assets/wedding/audio/wedding-melody-09.mp3"
+    },
+    {
+      "name": "Nhạc cưới lãng mạn 10",
+      "url": "/assets/wedding/audio/wedding-melody-10.mp3"
+    },
+    {
+      "name": "Nhạc cưới lãng mạn 11",
+      "url": "/assets/wedding/audio/wedding-melody-11.mp3"
+    },
+    {
+      "name": "Nhạc cưới lãng mạn 12",
+      "url": "/assets/wedding/audio/wedding-melody-12.mp3"
+    }
+  ],
+  "musicPlayer": [
+    {
+      "name": "audio-1.png",
+      "url": "/assets/wedding/music-player/audio-1.png"
+    },
+    {
+      "name": "audio-6.png",
+      "url": "/assets/wedding/music-player/audio-6.png"
+    },
+    {
+      "name": "audio-3.png",
+      "url": "/assets/wedding/music-player/audio-3.png"
+    },
+    {
+      "name": "audio-2.png",
+      "url": "/assets/wedding/music-player/audio-2.png"
+    },
+    {
+      "name": "audio-4.png",
+      "url": "/assets/wedding/music-player/audio-4.png"
+    },
+    {
+      "name": "audio-5.png",
+      "url": "/assets/wedding/music-player/audio-5.png"
+    }
+  ],
+  "plugins": [
+    {
+      "name": "calen_heart_1.png",
+      "url": "/assets/wedding/plugins/calen_heart_1.png"
+    },
+    {
+      "name": "biubiu.png",
+      "url": "/assets/wedding/plugins/biubiu.png"
+    },
+    {
+      "name": "light.mp4",
+      "url": "/assets/wedding/plugins/light.mp4"
+    },
+    {
+      "name": "wax-seal.webp",
+      "url": "/assets/wedding/plugins/wax-seal.webp"
+    },
+    {
+      "name": "fireworks.png",
+      "url": "/assets/wedding/plugins/fireworks.png"
+    }
+  ],
+  "flowchartIcons": [
+    {
+      "name": "Icon lịch trình 1",
+      "url": "/assets/wedding/flowchart-icons/timeline-icon-01.png"
+    },
+    {
+      "name": "Icon lịch trình 2",
+      "url": "/assets/wedding/flowchart-icons/timeline-icon-02.png"
+    },
+    {
+      "name": "Icon lịch trình 3",
+      "url": "/assets/wedding/flowchart-icons/timeline-icon-03.png"
+    },
+    {
+      "name": "Icon lịch trình 4",
+      "url": "/assets/wedding/flowchart-icons/timeline-icon-04.png"
+    },
+    {
+      "name": "Icon lịch trình 5",
+      "url": "/assets/wedding/flowchart-icons/timeline-icon-05.png"
+    },
+    {
+      "name": "Icon lịch trình 6",
+      "url": "/assets/wedding/flowchart-icons/timeline-icon-06.png"
+    },
+    {
+      "name": "Icon lịch trình 7",
+      "url": "/assets/wedding/flowchart-icons/timeline-icon-07.png"
+    },
+    {
+      "name": "Icon lịch trình 8",
+      "url": "/assets/wedding/flowchart-icons/timeline-icon-08.png"
+    }
+  ],
+  "cropShapes": [
+    {
+      "name": "Khung ảnh mask 1",
+      "url": "/assets/wedding/crop-shapes/crop-mask-01.png"
+    },
+    {
+      "name": "Khung ảnh mask 2",
+      "url": "/assets/wedding/crop-shapes/crop-mask-02.png"
+    },
+    {
+      "name": "Khung ảnh mask 3",
+      "url": "/assets/wedding/crop-shapes/crop-mask-03.png"
+    },
+    {
+      "name": "Khung ảnh mask 4",
+      "url": "/assets/wedding/crop-shapes/crop-mask-04.png"
+    },
+    {
+      "name": "Khung ảnh mask 5",
+      "url": "/assets/wedding/crop-shapes/crop-mask-05.png"
+    },
+    {
+      "name": "Khung ảnh mask 6",
+      "url": "/assets/wedding/crop-shapes/crop-mask-06.png"
+    },
+    {
+      "name": "Khung ảnh mask 7",
+      "url": "/assets/wedding/crop-shapes/crop-mask-07.png"
+    },
+    {
+      "name": "Khung ảnh mask 8",
+      "url": "/assets/wedding/crop-shapes/crop-mask-08.png"
+    },
+    {
+      "name": "Khung ảnh mask 9",
+      "url": "/assets/wedding/crop-shapes/crop-mask-09.png"
+    },
+    {
+      "name": "Khung ảnh mask 10",
+      "url": "/assets/wedding/crop-shapes/crop-mask-10.png"
+    },
+    {
+      "name": "Khung ảnh mask 11",
+      "url": "/assets/wedding/crop-shapes/crop-mask-11.png"
+    },
+    {
+      "name": "Khung ảnh mask 12",
+      "url": "/assets/wedding/crop-shapes/crop-mask-12.png"
+    }
+  ],
+  "characters": [
+    {
+      "name": "Sticker chibi 1",
+      "url": "/assets/wedding/characters/chibi-01.gif"
+    },
+    {
+      "name": "Sticker chibi 2",
+      "url": "/assets/wedding/characters/chibi-02.gif"
+    },
+    {
+      "name": "Sticker chibi 3",
+      "url": "/assets/wedding/characters/chibi-03.gif"
+    },
+    {
+      "name": "Sticker chibi 4",
+      "url": "/assets/wedding/characters/chibi-04.png"
+    },
+    {
+      "name": "Sticker chibi 5",
+      "url": "/assets/wedding/characters/chibi-05.png"
+    },
+    {
+      "name": "Sticker chibi 6",
+      "url": "/assets/wedding/characters/chibi-06.gif"
+    },
+    {
+      "name": "Sticker chibi 7",
+      "url": "/assets/wedding/characters/chibi-07.png"
+    },
+    {
+      "name": "Sticker chibi 8",
+      "url": "/assets/wedding/characters/chibi-08.png"
+    },
+    {
+      "name": "Sticker chibi 9",
+      "url": "/assets/wedding/characters/chibi-09.png"
+    },
+    {
+      "name": "Sticker chibi 10",
+      "url": "/assets/wedding/characters/chibi-10.png"
+    },
+    {
+      "name": "Sticker chibi 11",
+      "url": "/assets/wedding/characters/chibi-11.png"
+    }
+  ],
+  "decorations": [
+    {
+      "name": "Họa tiết trang trí 1",
+      "url": "/assets/wedding/decorations/decor-001.png"
+    },
+    {
+      "name": "Họa tiết trang trí 2",
+      "url": "/assets/wedding/decorations/decor-002.png"
+    },
+    {
+      "name": "Họa tiết trang trí 3",
+      "url": "/assets/wedding/decorations/decor-003.png"
+    },
+    {
+      "name": "Họa tiết trang trí 4",
+      "url": "/assets/wedding/decorations/decor-004.png"
+    },
+    {
+      "name": "Họa tiết trang trí 5",
+      "url": "/assets/wedding/decorations/decor-005.png"
+    },
+    {
+      "name": "Họa tiết trang trí 6",
+      "url": "/assets/wedding/decorations/decor-006.png"
+    },
+    {
+      "name": "Họa tiết trang trí 7",
+      "url": "/assets/wedding/decorations/decor-007.png"
+    },
+    {
+      "name": "Họa tiết trang trí 8",
+      "url": "/assets/wedding/decorations/decor-008.png"
+    },
+    {
+      "name": "Họa tiết trang trí 9",
+      "url": "/assets/wedding/decorations/decor-009.png"
+    },
+    {
+      "name": "Họa tiết trang trí 10",
+      "url": "/assets/wedding/decorations/decor-010.png"
+    },
+    {
+      "name": "Họa tiết trang trí 11",
+      "url": "/assets/wedding/decorations/decor-011.png"
+    },
+    {
+      "name": "Họa tiết trang trí 12",
+      "url": "/assets/wedding/decorations/decor-012.png"
+    },
+    {
+      "name": "Họa tiết trang trí 13",
+      "url": "/assets/wedding/decorations/decor-013.png"
+    },
+    {
+      "name": "Họa tiết trang trí 14",
+      "url": "/assets/wedding/decorations/decor-014.png"
+    },
+    {
+      "name": "Họa tiết trang trí 15",
+      "url": "/assets/wedding/decorations/decor-015.png"
+    },
+    {
+      "name": "Họa tiết trang trí 16",
+      "url": "/assets/wedding/decorations/decor-016.png"
+    },
+    {
+      "name": "Họa tiết trang trí 17",
+      "url": "/assets/wedding/decorations/decor-017.png"
+    },
+    {
+      "name": "Họa tiết trang trí 18",
+      "url": "/assets/wedding/decorations/decor-018.png"
+    },
+    {
+      "name": "Họa tiết trang trí 19",
+      "url": "/assets/wedding/decorations/decor-019.png"
+    },
+    {
+      "name": "Họa tiết trang trí 20",
+      "url": "/assets/wedding/decorations/decor-020.png"
+    },
+    {
+      "name": "Họa tiết trang trí 21",
+      "url": "/assets/wedding/decorations/decor-021.png"
+    },
+    {
+      "name": "Họa tiết trang trí 22",
+      "url": "/assets/wedding/decorations/decor-022.png"
+    },
+    {
+      "name": "Họa tiết trang trí 23",
+      "url": "/assets/wedding/decorations/decor-023.png"
+    },
+    {
+      "name": "Họa tiết trang trí 24",
+      "url": "/assets/wedding/decorations/decor-024.png"
+    },
+    {
+      "name": "Họa tiết trang trí 25",
+      "url": "/assets/wedding/decorations/decor-025.png"
+    },
+    {
+      "name": "Họa tiết trang trí 26",
+      "url": "/assets/wedding/decorations/decor-026.png"
+    },
+    {
+      "name": "Họa tiết trang trí 27",
+      "url": "/assets/wedding/decorations/decor-027.png"
+    },
+    {
+      "name": "Họa tiết trang trí 28",
+      "url": "/assets/wedding/decorations/decor-028.png"
+    },
+    {
+      "name": "Họa tiết trang trí 29",
+      "url": "/assets/wedding/decorations/decor-029.png"
+    },
+    {
+      "name": "Họa tiết trang trí 30",
+      "url": "/assets/wedding/decorations/decor-030.png"
+    },
+    {
+      "name": "Họa tiết trang trí 31",
+      "url": "/assets/wedding/decorations/decor-031.png"
+    },
+    {
+      "name": "Họa tiết trang trí 32",
+      "url": "/assets/wedding/decorations/decor-032.webp"
+    },
+    {
+      "name": "Họa tiết trang trí 33",
+      "url": "/assets/wedding/decorations/decor-033.png"
+    },
+    {
+      "name": "Họa tiết trang trí 34",
+      "url": "/assets/wedding/decorations/decor-034.png"
+    },
+    {
+      "name": "Họa tiết trang trí 35",
+      "url": "/assets/wedding/decorations/decor-035.png"
+    },
+    {
+      "name": "Họa tiết trang trí 36",
+      "url": "/assets/wedding/decorations/decor-036.png"
+    },
+    {
+      "name": "Họa tiết trang trí 37",
+      "url": "/assets/wedding/decorations/decor-037.png"
+    },
+    {
+      "name": "Họa tiết trang trí 38",
+      "url": "/assets/wedding/decorations/decor-038.png"
+    },
+    {
+      "name": "Họa tiết trang trí 39",
+      "url": "/assets/wedding/decorations/decor-039.png"
+    },
+    {
+      "name": "Họa tiết trang trí 40",
+      "url": "/assets/wedding/decorations/decor-040.png"
+    },
+    {
+      "name": "Họa tiết trang trí 41",
+      "url": "/assets/wedding/decorations/decor-041.png"
+    },
+    {
+      "name": "Họa tiết trang trí 42",
+      "url": "/assets/wedding/decorations/decor-042.png"
+    },
+    {
+      "name": "Họa tiết trang trí 43",
+      "url": "/assets/wedding/decorations/decor-043.png"
+    },
+    {
+      "name": "Họa tiết trang trí 44",
+      "url": "/assets/wedding/decorations/decor-044.png"
+    },
+    {
+      "name": "Họa tiết trang trí 45",
+      "url": "/assets/wedding/decorations/decor-045.png"
+    },
+    {
+      "name": "Họa tiết trang trí 46",
+      "url": "/assets/wedding/decorations/decor-046.png"
+    },
+    {
+      "name": "Họa tiết trang trí 47",
+      "url": "/assets/wedding/decorations/decor-047.png"
+    },
+    {
+      "name": "Họa tiết trang trí 48",
+      "url": "/assets/wedding/decorations/decor-048.png"
+    },
+    {
+      "name": "Họa tiết trang trí 49",
+      "url": "/assets/wedding/decorations/decor-049.png"
+    },
+    {
+      "name": "Họa tiết trang trí 50",
+      "url": "/assets/wedding/decorations/decor-050.png"
+    },
+    {
+      "name": "Họa tiết trang trí 51",
+      "url": "/assets/wedding/decorations/decor-051.png"
+    },
+    {
+      "name": "Họa tiết trang trí 52",
+      "url": "/assets/wedding/decorations/decor-052.png"
+    },
+    {
+      "name": "Họa tiết trang trí 53",
+      "url": "/assets/wedding/decorations/decor-053.png"
+    },
+    {
+      "name": "Họa tiết trang trí 54",
+      "url": "/assets/wedding/decorations/decor-054.webp"
+    },
+    {
+      "name": "Họa tiết trang trí 55",
+      "url": "/assets/wedding/decorations/decor-055.png"
+    },
+    {
+      "name": "Họa tiết trang trí 56",
+      "url": "/assets/wedding/decorations/decor-056.png"
+    },
+    {
+      "name": "Họa tiết trang trí 57",
+      "url": "/assets/wedding/decorations/decor-057.png"
+    },
+    {
+      "name": "Họa tiết trang trí 58",
+      "url": "/assets/wedding/decorations/decor-058.png"
+    },
+    {
+      "name": "Họa tiết trang trí 59",
+      "url": "/assets/wedding/decorations/decor-059.png"
+    },
+    {
+      "name": "Họa tiết trang trí 60",
+      "url": "/assets/wedding/decorations/decor-060.png"
+    },
+    {
+      "name": "Họa tiết trang trí 61",
+      "url": "/assets/wedding/decorations/decor-061.png"
+    },
+    {
+      "name": "Họa tiết trang trí 62",
+      "url": "/assets/wedding/decorations/decor-062.png"
+    },
+    {
+      "name": "Họa tiết trang trí 63",
+      "url": "/assets/wedding/decorations/decor-063.png"
+    },
+    {
+      "name": "Họa tiết trang trí 64",
+      "url": "/assets/wedding/decorations/decor-064.png"
+    },
+    {
+      "name": "Họa tiết trang trí 65",
+      "url": "/assets/wedding/decorations/decor-065.png"
+    },
+    {
+      "name": "Họa tiết trang trí 66",
+      "url": "/assets/wedding/decorations/decor-066.png"
+    },
+    {
+      "name": "Họa tiết trang trí 67",
+      "url": "/assets/wedding/decorations/decor-067.png"
+    },
+    {
+      "name": "Họa tiết trang trí 68",
+      "url": "/assets/wedding/decorations/decor-068.png"
+    },
+    {
+      "name": "Họa tiết trang trí 69",
+      "url": "/assets/wedding/decorations/decor-069.png"
+    },
+    {
+      "name": "Họa tiết trang trí 70",
+      "url": "/assets/wedding/decorations/decor-070.png"
+    },
+    {
+      "name": "Họa tiết trang trí 71",
+      "url": "/assets/wedding/decorations/decor-071.png"
+    },
+    {
+      "name": "Họa tiết trang trí 72",
+      "url": "/assets/wedding/decorations/decor-072.png"
+    },
+    {
+      "name": "Họa tiết trang trí 73",
+      "url": "/assets/wedding/decorations/decor-073.png"
+    },
+    {
+      "name": "Họa tiết trang trí 74",
+      "url": "/assets/wedding/decorations/decor-074.png"
+    },
+    {
+      "name": "Họa tiết trang trí 75",
+      "url": "/assets/wedding/decorations/decor-075.png"
+    },
+    {
+      "name": "Họa tiết trang trí 76",
+      "url": "/assets/wedding/decorations/decor-076.png"
+    },
+    {
+      "name": "Họa tiết trang trí 77",
+      "url": "/assets/wedding/decorations/decor-077.png"
+    },
+    {
+      "name": "Họa tiết trang trí 78",
+      "url": "/assets/wedding/decorations/decor-078.png"
+    },
+    {
+      "name": "Họa tiết trang trí 79",
+      "url": "/assets/wedding/decorations/decor-079.png"
+    },
+    {
+      "name": "Họa tiết trang trí 80",
+      "url": "/assets/wedding/decorations/decor-080.png"
+    },
+    {
+      "name": "Họa tiết trang trí 81",
+      "url": "/assets/wedding/decorations/decor-081.png"
+    },
+    {
+      "name": "Họa tiết trang trí 82",
+      "url": "/assets/wedding/decorations/decor-082.png"
+    },
+    {
+      "name": "Họa tiết trang trí 83",
+      "url": "/assets/wedding/decorations/decor-083.png"
+    },
+    {
+      "name": "Họa tiết trang trí 84",
+      "url": "/assets/wedding/decorations/decor-084.png"
+    },
+    {
+      "name": "Họa tiết trang trí 85",
+      "url": "/assets/wedding/decorations/decor-085.png"
+    },
+    {
+      "name": "Họa tiết trang trí 86",
+      "url": "/assets/wedding/decorations/decor-086.webp"
+    },
+    {
+      "name": "Họa tiết trang trí 87",
+      "url": "/assets/wedding/decorations/decor-087.png"
+    },
+    {
+      "name": "Họa tiết trang trí 88",
+      "url": "/assets/wedding/decorations/decor-088.png"
+    },
+    {
+      "name": "Họa tiết trang trí 89",
+      "url": "/assets/wedding/decorations/decor-089.png"
+    },
+    {
+      "name": "Họa tiết trang trí 90",
+      "url": "/assets/wedding/decorations/decor-090.png"
+    },
+    {
+      "name": "Họa tiết trang trí 91",
+      "url": "/assets/wedding/decorations/decor-091.png"
+    }
+  ]
+}

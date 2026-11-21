@@ -1,0 +1,77 @@
+---
+interface Props {
+  audioUrl?: string;
+  songTitle?: string;
+  artist?: string;
+}
+
+const {
+  audioUrl = '/assets/wedding/audio/wedding-melody-01.mp3',
+  songTitle = 'Until I Found You',
+  artist = 'LoveStory Studio',
+} = Astro.props;
+---
+
+<div class="fixed bottom-6 right-6 z-50 flex items-center gap-3 select-none">
+  <div id="music-tooltip" class="hidden sm:flex items-center gap-2 bg-stone-900/90 backdrop-blur-md text-amber-200 px-3 py-1.5 rounded-full text-xs shadow-xl border border-amber-300/20">
+    <span>🎵 Nhạc cưới</span>
+  </div>
+
+  <button
+    id="music-toggle-btn"
+    type="button"
+    aria-label="Bật/Tắt nhạc cưới"
+    class="relative p-2.5 rounded-full bg-white/90 text-amber-700 shadow-xl border border-amber-300/40 active:scale-95 transition-transform backdrop-blur-md"
+  >
+    <!-- Spinning Vinyl Disc Icon -->
+    <div id="vinyl-icon" class="w-8 h-8 rounded-full border-2 border-amber-600/60 bg-amber-950 flex items-center justify-center transition-transform">
+      <div class="w-2.5 h-2.5 rounded-full bg-amber-400 border border-stone-900"></div>
+    </div>
+  </button>
+
+  <audio id="wedding-audio" src={audioUrl} loop preload="metadata"></audio>
+</div>
+
+<script>
+  const audio = document.getElementById('wedding-audio') as HTMLAudioElement | null;
+  const btn = document.getElementById('music-toggle-btn');
+  const vinyl = document.getElementById('vinyl-icon');
+  const tooltip = document.getElementById('music-tooltip');
+  let isPlaying = false;
+
+  function toggle() {
+    if (!audio) return;
+    if (isPlaying) {
+      audio.pause();
+      isPlaying = false;
+      vinyl?.classList.remove('animate-spin');
+    } else {
+      audio.play().then(() => {
+        isPlaying = true;
+        vinyl?.classList.add('animate-spin');
+        if (tooltip) tooltip.style.display = 'none';
+      }).catch(() => {});
+    }
+  }
+
+  btn?.addEventListener('click', toggle);
+
+  // Auto start on first touch or click
+  const startOnInteraction = () => {
+    if (audio && !isPlaying) {
+      audio.play().then(() => {
+        isPlaying = true;
+        vinyl?.classList.add('animate-spin');
+      }).catch(() => {});
+    }
+    window.removeEventListener('click', startOnInteraction);
+    window.removeEventListener('touchstart', startOnInteraction);
+  };
+
+  window.addEventListener('click', startOnInteraction, { once: true });
+  window.addEventListener('touchstart', startOnInteraction, { once: true });
+
+  setTimeout(() => {
+    if (tooltip) tooltip.style.display = 'none';
+  }, 5000);
+</script>

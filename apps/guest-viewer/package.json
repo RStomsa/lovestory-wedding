@@ -1,0 +1,21 @@
+{
+  "name": "guest-viewer",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev --port 4321",
+    "build": "astro build",
+    "start": "node ./dist/server/entry.mjs",
+    "preview": "astro preview --port 4321"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.5.5",
+    "@astrojs/tailwind": "^5.1.5",
+    "astro": "^5.18.2",
+    "tailwindcss": "^3.4.19"
+  }
+}
