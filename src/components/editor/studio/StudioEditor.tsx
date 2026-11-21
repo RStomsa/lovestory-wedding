@@ -9,6 +9,10 @@ import StudioRightInspector from './StudioRightInspector';
 import StudioQuickPhotoBar from './StudioQuickPhotoBar';
 import StudioMobileBottomBar from './StudioMobileBottomBar';
 import StudioMobileBottomSheet from './StudioMobileBottomSheet';
+import StudioMobileDrawer from './StudioMobileDrawer';
+import StudioMobileTextModal from './StudioMobileTextModal';
+import StudioMobilePhotoModal from './StudioMobilePhotoModal';
+import StudioMobileOnboarding from './StudioMobileOnboarding';
 import WeddingProfileModal from './WeddingProfileModal';
 import { useStudioStore } from './studioStore';
 import { CheckCircle2, Loader2, ChevronLeft } from 'lucide-react';
@@ -23,8 +27,19 @@ function StudioEditorInner({ mode = 'user' }: StudioEditorProps) {
   const loadTemplateData = useStudioStore((state) => state.loadTemplateData);
   const isInspectorOpen = useStudioStore((state) => state.isInspectorOpen);
   const toggleInspector = useStudioStore((state) => state.toggleInspector);
+  const setShowOnboardingGuide = useStudioStore((state) => state.setShowOnboardingGuide);
   const [loadingTemplate, setLoadingTemplate] = useState(false);
   const [loadedNotification, setLoadedNotification] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      const hasSeen = localStorage.getItem('lovestory_mobile_guide_seen');
+      if (!hasSeen) {
+        setShowOnboardingGuide(true);
+        localStorage.setItem('lovestory_mobile_guide_seen', 'true');
+      }
+    }
+  }, [setShowOnboardingGuide]);
 
   useEffect(() => {
     if (!templateSlug) return;
@@ -119,13 +134,25 @@ function StudioEditorInner({ mode = 'user' }: StudioEditorProps) {
         )}
       </div>
 
-      {/* 3. Mobile First Bottom Navigation & Contextual Touch Action Strip (Mobile only) */}
+      {/* 3. 27BigGroup-style Mobile Menu Drawer (Matches Screenshot 8 & 9) */}
+      <StudioMobileDrawer />
+
+      {/* 4. 27BigGroup-style Mobile In-Place Text Edit Modal (Matches Screenshot 7 & 12) */}
+      <StudioMobileTextModal />
+
+      {/* 5. 27BigGroup-style Mobile Photo Picker Modal (Matches Screenshot 3 & 4) */}
+      <StudioMobilePhotoModal />
+
+      {/* 6. 27BigGroup-style Mobile Onboarding Guide (Matches Screenshot 1, 9, 10, 11, 12, 13) */}
+      <StudioMobileOnboarding />
+
+      {/* 7. Mobile First Bottom Navigation & Contextual Touch Action Strip (Mobile only) */}
       <StudioMobileBottomBar />
 
-      {/* 4. Mobile First Slide-up Bottom Sheet Modal (Mobile only) */}
+      {/* 8. Mobile First Slide-up Bottom Sheet Modal (Mobile only) */}
       <StudioMobileBottomSheet />
 
-      {/* 5. Fast Wedding Profile Creation & Linking Modal */}
+      {/* 9. Fast Wedding Profile Creation & Linking Modal */}
       <WeddingProfileModal />
     </div>
   );

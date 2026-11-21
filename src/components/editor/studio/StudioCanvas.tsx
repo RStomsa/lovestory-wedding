@@ -7,7 +7,24 @@ import { CanvasElement } from './studioTypes';
 import StudioFallingOverlay from './StudioFallingOverlay';
 import StudioWidgetRenderer from './StudioWidgetRenderer';
 import { resolveFontFamily, loadCustomFontFile } from '@/lib/studioFonts';
-import { Copy, Trash2, MoreHorizontal, ZoomIn, ZoomOut, MessageCircle, ArrowUp, ArrowDown, Move, RotateCw, UploadCloud, Loader2 } from 'lucide-react';
+import {
+  Copy,
+  Trash2,
+  MoreHorizontal,
+  ZoomIn,
+  ZoomOut,
+  MessageCircle,
+  ArrowUp,
+  ArrowDown,
+  Move,
+  RotateCw,
+  UploadCloud,
+  Loader2,
+  Image as ImageIcon,
+  Wand2,
+  Edit3,
+  Check,
+} from 'lucide-react';
 
 // Dynamically import react-moveable to ensure SSR safe
 const Moveable = dynamic(() => import('react-moveable'), { ssr: false });
@@ -28,7 +45,15 @@ export default function StudioCanvas() {
     setZoom,
     zoom,
     previewAnimKey,
+    isMobileView,
+    setIsMobileView,
+    desktopModeOnMobile,
+    setTextEditModalElementId,
+    setPhotoPickerModalElementId,
+    hiddenElementIds,
   } = useStudioStore();
+
+  const isTouchFriendly = isMobileView && !desktopModeOnMobile;
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const [moveableTarget, setMoveableTarget] = useState<HTMLElement | null>(null);
@@ -41,16 +66,20 @@ export default function StudioCanvas() {
   // Auto-fit zoom on mobile screens (< 768px) so 500px canvas fits edge-to-edge
   useEffect(() => {
     const updateZoomForViewport = () => {
-      if (typeof window !== 'undefined' && window.innerWidth < 768) {
-        const availableW = window.innerWidth - 20;
-        const fit = Math.min(1.0, Math.max(0.45, availableW / canvas.width));
-        setZoom(Number(fit.toFixed(2)));
+      if (typeof window !== 'undefined') {
+        const isMob = window.innerWidth < 768;
+        setIsMobileView(isMob);
+        if (isMob) {
+          const availableW = window.innerWidth - 16;
+          const fit = Math.min(1.0, Math.max(0.45, availableW / canvas.width));
+          setZoom(Number(fit.toFixed(2)));
+        }
       }
     };
     updateZoomForViewport();
     window.addEventListener('resize', updateZoomForViewport);
     return () => window.removeEventListener('resize', updateZoomForViewport);
-  }, [canvas.width, setZoom]);
+  }, [canvas.width, setZoom, setIsMobileView]);
 
   // Touch gesture handlers for 2-finger pinch-to-zoom
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -532,6 +561,8 @@ export default function StudioCanvas() {
 
           {/* Elements on Canvas */}
           {elements.map((el) => {
+            if (hiddenElementIds.includes(el.id)) return null;
+
             const isSelected = selectedId === el.id;
 
             // Entrance animation class & inline style
@@ -564,6 +595,19 @@ export default function StudioCanvas() {
                 onPointerDown={(e) => {
                   // Do not intercept if currently inline-editing text
                   if (editingTextId === el.id) return;
+
+                  if (isTouchFriendly) {
+                    // 27BigGroup-style Touch Friendly Mode:
+                    // DO NOT intercept scroll gestures or drag elements on mobile!
+                    // Tapping selects element and opens quick tools
+                    e.stopPropagation();
+                    selectElement(el.id);
+
+                    if (el.type === 'text') {
+                      setTextEditModalElementId(el.id);
+                    }
+                    return;
+                  }
 
                   e.stopPropagation();
                   selectElement(el.id);
@@ -610,8 +654,16 @@ export default function StudioCanvas() {
                   window.addEventListener('pointermove', onPointerMove);
                   window.addEventListener('pointerup', onPointerUp);
                 }}
-                className={`absolute cursor-move transition-shadow ${
-                  isSelected ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:ring-1 hover:ring-blue-300/70'
+                className={`absolute transition-all ${
+                  isTouchFriendly
+                    ? isSelected
+                      ? el.type === 'image'
+                        ? 'ring-2 ring-red-500 shadow-2xl rounded-2xl'
+                        : 'ring-2 ring-amber-500 shadow-lg'
+                      : 'hover:ring-1 hover:ring-rose-200'
+                    : isSelected
+                    ? 'ring-2 ring-blue-500 shadow-lg cursor-move'
+                    : 'hover:ring-1 hover:ring-blue-300/70 cursor-move'
                 }`}
                 style={{
                   left: `${el.x}px`,
@@ -624,6 +676,99 @@ export default function StudioCanvas() {
                   boxSizing: 'border-box',
                 }}
               >
+                {/* 27BigGroup Helper Badges on Mobile (Matches Screenshot 5 & 6 & 11) */}
+                {isTouchFriendly && !isSelected && el.type === 'image' && (
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      selectElement(el.id);
+                      setPhotoPickerModalElementId(el.id);
+                    }}
+                    className="absolute inset-0 z-20 flex items-center justify-center pointer-events-auto"
+                  >
+                    <span className="px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-xs text-white text-[11px] font-semibold shadow-md flex items-center gap-1.5 active:scale-95 transition-transform border border-white/20">
+                      <ImageIcon className="w-3.5 h-3.5 text-rose-300" />
+                      <span>Ấn vào để đổi ảnh</span>
+                    </span>
+                  </div>
+                )}
+
+                {isTouchFriendly && !isSelected && el.type === 'text' && (
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      selectElement(el.id);
+                      setTextEditModalElementId(el.id);
+                    }}
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 pointer-events-auto z-20"
+                  >
+                    <span className="px-2 py-0.5 rounded-full bg-rose-500/80 backdrop-blur-xs text-white text-[9px] font-medium shadow-xs whitespace-nowrap active:scale-95 transition-transform">
+                      Ấn vào để sửa chữ
+                    </span>
+                  </div>
+                )}
+
+                {/* 27BigGroup In-Place Floating Image Toolbar on Mobile (Matches Screenshot 6 & 11) */}
+                {isTouchFriendly && isSelected && el.type === 'image' && (
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 flex flex-wrap items-center justify-center gap-1.5 p-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 shadow-2xl rounded-2xl min-w-[280px] max-w-[95%] animate-in fade-in"
+                  >
+                    <button
+                      onClick={() => setPhotoPickerModalElementId(el.id)}
+                      className="px-2.5 py-1.5 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400 font-bold text-xs flex items-center gap-1 active:scale-95"
+                    >
+                      <ImageIcon className="w-3.5 h-3.5" />
+                      <span>Đổi ảnh</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        updateElement(el.id, { isCutout: !el.isCutout }, true);
+                        alert('✨ Đã bật/tắt tách nền AI cho ảnh!');
+                      }}
+                      className="px-2.5 py-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-medium text-xs flex items-center gap-1 active:scale-95"
+                    >
+                      <Wand2 className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Xóa phông AI</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        const cur = el.borderRadius ?? 0;
+                        const next = cur === 0 ? 16 : cur === 16 ? 28 : cur === 28 ? 9999 : 0;
+                        updateElement(el.id, { borderRadius: next }, true);
+                      }}
+                      className="px-2.5 py-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-medium text-xs active:scale-95"
+                    >
+                      <span>Viền ảnh</span>
+                    </button>
+
+                    <button
+                      onClick={() => bringToFront(el.id)}
+                      className="p-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 active:scale-95"
+                      title="Lên lớp trên"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      onClick={() => sendToBack(el.id)}
+                      className="p-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 active:scale-95"
+                      title="Xuống lớp dưới"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      onClick={() => selectElement(null)}
+                      className="px-2.5 py-1.5 rounded-xl bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 font-medium text-xs active:scale-95"
+                    >
+                      Bỏ chọn
+                    </button>
+                  </div>
+                )}
+
                 {/* Prevent child inputs/buttons from swallowing drag events in editor mode */}
                 <div
                   key={`${el.id}-${el.animation?.type || 'none'}-${previewAnimKey}`}
@@ -638,8 +783,8 @@ export default function StudioCanvas() {
             );
           })}
 
-          {/* Moveable Bounding Box Controller with Smart Snapping Guidelines */}
-          {selectedId && moveableTarget && (
+          {/* Moveable Bounding Box Controller with Smart Snapping Guidelines (Desktop only) */}
+          {!isTouchFriendly && selectedId && moveableTarget && (
             <Moveable
               target={moveableTarget}
               container={typeof document !== 'undefined' ? (document.getElementById('studio-main-canvas') as HTMLElement | null) : null}
@@ -721,8 +866,8 @@ export default function StudioCanvas() {
             />
           )}
 
-          {/* FLOATING MINI ACTION TOOLBAR DIRECTLY ABOVE THE SELECTED ELEMENT (As seen in Screenshot 3) */}
-          {selectedEl && (
+          {/* FLOATING MINI ACTION TOOLBAR DIRECTLY ABOVE THE SELECTED ELEMENT (Desktop only) */}
+          {!isTouchFriendly && selectedEl && (
             <div
               className="absolute z-50 flex items-center bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 shadow-xl rounded-full px-2 py-1 gap-1 text-stone-700 dark:text-stone-200 transition-all"
               style={{

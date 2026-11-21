@@ -58,6 +58,24 @@ interface StudioState {
   // Animation Replay Trigger
   previewAnimKey: number;
   triggerPreviewAnim: () => void;
+
+  // 27BigGroup-style Mobile Touch Mode
+  isMobileView: boolean;
+  setIsMobileView: (isMobile: boolean) => void;
+  desktopModeOnMobile: boolean;
+  setDesktopModeOnMobile: (force: boolean) => void;
+  mobileDrawerOpen: boolean;
+  setMobileDrawerOpen: (open: boolean) => void;
+  textEditModalElementId: string | null;
+  setTextEditModalElementId: (id: string | null) => void;
+  photoPickerModalElementId: string | null;
+  setPhotoPickerModalElementId: (id: string | null) => void;
+  photoQuality: '1920' | '1200' | '900';
+  setPhotoQuality: (q: '1920' | '1200' | '900') => void;
+  showOnboardingGuide: boolean;
+  setShowOnboardingGuide: (show: boolean) => void;
+  hiddenElementIds: string[];
+  toggleElementVisibility: (id: string) => void;
 }
 
 export const DEFAULT_WEDDING_PROFILE: WeddingProfileData = {
@@ -704,4 +722,27 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       hasUnsavedChanges: false,
     }));
   },
+
+  // 27BigGroup-style Mobile Touch Mode implementation
+  isMobileView: false,
+  setIsMobileView: (isMobile) => set({ isMobileView: isMobile }),
+  desktopModeOnMobile: false,
+  setDesktopModeOnMobile: (force) => set({ desktopModeOnMobile: force }),
+  mobileDrawerOpen: false,
+  setMobileDrawerOpen: (open) => set({ mobileDrawerOpen: open }),
+  textEditModalElementId: null,
+  setTextEditModalElementId: (id) => set({ textEditModalElementId: id }),
+  photoPickerModalElementId: null,
+  setPhotoPickerModalElementId: (id) => set({ photoPickerModalElementId: id }),
+  photoQuality: '1200',
+  setPhotoQuality: (q) => set({ photoQuality: q }),
+  showOnboardingGuide: false,
+  setShowOnboardingGuide: (show) => set({ showOnboardingGuide: show }),
+  hiddenElementIds: [],
+  toggleElementVisibility: (id) =>
+    set((state) => ({
+      hiddenElementIds: state.hiddenElementIds.includes(id)
+        ? state.hiddenElementIds.filter((item) => item !== id)
+        : [...state.hiddenElementIds, id],
+    })),
 }));

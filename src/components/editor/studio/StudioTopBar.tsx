@@ -27,6 +27,7 @@ import {
   Check,
   Copy,
   Crown,
+  Menu,
 } from 'lucide-react';
 import { useStudioStore } from './studioStore';
 import StudioPreviewModal from './StudioPreviewModal';
@@ -52,6 +53,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
     toggleInspector,
     weddingProfile,
     setProfileModalOpen,
+    setMobileDrawerOpen,
   } = useStudioStore();
 
   const [isExporting, setIsExporting] = useState(false);
@@ -311,11 +313,29 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
     <>
       <header className="h-14 px-4 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between z-30 select-none shadow-xs">
         {/* Left: Brand & Undo/Redo */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Mobile Hamburger Menu Button (Matches 27BigGroup Screenshot 1 & 5) */}
+          <button
+            onClick={() => setMobileDrawerOpen(true)}
+            className="md:hidden p-2 rounded-xl text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors border border-stone-200 dark:border-stone-700 active:scale-95"
+            title="Mở bảng công cụ chỉnh sửa"
+          >
+            <Menu className="w-4 h-4" />
+          </button>
+
+          {/* Mobile Preview Icon Button (Matches 27BigGroup Screenshot 1 & 5) */}
+          <button
+            onClick={() => setShowPreviewModal(true)}
+            className="md:hidden p-2 rounded-xl text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors border border-stone-200 dark:border-stone-700 active:scale-95"
+            title="Xem trước thiệp cưới"
+          >
+            <Eye className="w-4 h-4 text-rose-500" />
+          </button>
+
           {mode === 'admin' ? (
             <Link
               href="/admin"
-              className="px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1.5 text-xs font-semibold"
+              className="hidden sm:flex px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:text-purple-300 transition-colors items-center gap-1.5 text-xs font-semibold"
               title="Quay lại Bảng Điều Khiển Admin"
             >
               <ArrowLeft className="w-4 h-4 shrink-0" />
@@ -324,7 +344,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
           ) : (
             <Link
               href="/templates"
-              className="p-2 rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              className="hidden sm:flex p-2 rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               title="Quay lại danh mục mẫu thiệp"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -335,17 +355,17 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
             <span className="font-serif font-bold text-base text-rose-600">💍 LoveStory</span>
             {mode === 'admin' ? (
               <span className="text-[10px] font-sans px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/30 font-bold uppercase tracking-wider">
-                Admin Master Studio
+                Admin
               </span>
             ) : (
-              <span className="text-[10px] font-sans px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 font-semibold uppercase tracking-wider">
+              <span className="hidden sm:inline-block text-[10px] font-sans px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 font-semibold uppercase tracking-wider">
                 Studio
               </span>
             )}
           </div>
 
           {/* Undo / Redo */}
-          <div className="flex items-center gap-0.5 pl-3 border-l border-stone-200 dark:border-stone-800">
+          <div className="hidden sm:flex items-center gap-0.5 pl-3 border-l border-stone-200 dark:border-stone-800">
             <button
               onClick={undo}
               disabled={past.length === 0}

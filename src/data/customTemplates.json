@@ -1,5 +1,20 @@
 [
   {
+    "id": "thiep-cuoi-kem-chu-vang-save-the-date-c165",
+    "name": "Thiệp Cưới Kem Chữ Vàng Save The Date (C165)",
+    "slug": "thiep-cuoi-kem-chu-vang-save-the-date-c165",
+    "category": "wedding",
+    "tier": "PREMIUM",
+    "price": 30000,
+    "badge": "Hot VIP",
+    "longThumbnail": "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80",
+    "baseTemplateId": "thiep-cuoi-kem-chu-vang-save-the-date-c165",
+    "description": "Mẫu thiệp cưới scrollytelling hoàng gia sang trọng được thiết kế bởi LoveStory Studio.",
+    "isCustom": true,
+    "views": 0,
+    "likes": 0
+  },
+  {
     "id": "thiep-cuoi-hoang-gia",
     "name": "Thiệp Cưới Hoàng Gia LoveStory",
     "slug": "thiep-cuoi-hoang-gia",
