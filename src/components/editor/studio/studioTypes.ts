@@ -1,6 +1,17 @@
 export type CanvasElementType = 'text' | 'image' | 'graphic' | 'shape' | 'widget';
 
-export type ImageFilterPreset = 'none' | 'pastel' | 'vintage' | 'sunset' | 'noir';
+export type ImageFilterPreset =
+  | 'none'
+  | 'pastel'
+  | 'vintage'
+  | 'sunset'
+  | 'noir'
+  | 'warm'
+  | 'cool'
+  | 'bnw'
+  | 'romance'
+  | 'golden'
+  | 'film';
 
 export interface ImageFilterConfig {
   preset?: ImageFilterPreset;
@@ -11,13 +22,35 @@ export interface ImageFilterConfig {
 }
 
 export interface ContinuousAnimation {
-  type: 'none' | 'floating' | 'heartbeat' | 'wobble' | 'spin';
+  type:
+    | 'none'
+    | 'floating'
+    | 'heartbeat'
+    | 'wobble'
+    | 'spin'
+    | 'pulse'
+    | 'glow'
+    | 'sway'
+    | 'bounce-slow'
+    | 'rotate-slow';
   duration: number; // seconds, e.g. 2.0
   delay: number;    // seconds, e.g. 0.0
 }
 
 export interface EntranceAnimation {
-  type: 'none' | 'fade-in' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'zoom-in' | 'zoom-out' | 'rotate-in' | 'bounce-in';
+  type:
+    | 'none'
+    | 'fade-in'
+    | 'slide-left'
+    | 'slide-right'
+    | 'slide-up'
+    | 'slide-down'
+    | 'zoom-in'
+    | 'zoom-out'
+    | 'rotate-in'
+    | 'bounce-in'
+    | 'bounce'
+    | 'flip';
   duration: number;
   delay: number;
 }
@@ -91,7 +124,7 @@ export interface CanvasElement {
     | 'guest_name'
     | 'album'
     | 'slideshow';
-  widgetConfig?: Record<string, unknown>;
+  widgetConfig?: Record<string, any>;
   // Grouping & animations
   groupId?: string;
   animation?: EntranceAnimation;

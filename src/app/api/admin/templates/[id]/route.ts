@@ -22,7 +22,7 @@ export async function PATCH(
       ...(name ? { name: String(name).trim() } : {}),
       ...(tier ? { tier } : {}),
       ...(price !== undefined ? { price: Number(price) } : {}),
-      ...(badge !== undefined ? { badge: String(badge).trim() } : {}),
+      ...(badge !== undefined ? { badge: String(badge).trim() as 'Miễn phí' | 'Basic' | 'Premium' } : {}),
       ...(category ? { category } : {}),
       ...(longThumbnail ? { longThumbnail: String(longThumbnail).trim() } : {}),
       ...(description !== undefined ? { description: String(description).trim() } : {}),

@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { WeddingData, TemplateId } from '@/types/wedding';
 import { defaultWeddingData } from '@/data/defaultWedding';
-import { getStoredWeddingData, saveStoredWeddingData, resetWeddingData } from '@/lib/storage';
+import { getStoredWeddingData, saveStoredWeddingData, resetWeddingData } from '@/lib/weddingStorage';
 import { CATALOG_TEMPLATES } from '@/data/templatesCatalog';
 import { useAuth } from '@/context/AuthContext';
 import DevicePreviewBar from '@/components/editor/DevicePreviewBar';
@@ -180,7 +180,7 @@ function EditorContent() {
         </main>
       </div>
 
-      {/* CineLove-style Quick Image Replace Strip */}
+      {/* LoveStory-style Quick Image Replace Strip */}
       <QuickPhotoBar data={data} onChange={handleDataChange} />
     </div>
   );

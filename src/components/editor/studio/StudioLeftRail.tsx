@@ -74,7 +74,7 @@ export default function StudioLeftRail() {
 
   // Dynamic Assets (Graphics & Music) loaded from server + Admin uploads
   const [graphicsList, setGraphicsList] = useState<GraphicSticker[]>(GRAPHICS_CATALOG);
-  const [musicCatalog, setMusicCatalog] = useState<Record<string, unknown>[]>(weddingMusicCatalog as Record<string, unknown>[]);
+  const [musicCatalog, setMusicCatalog] = useState<any[]>(weddingMusicCatalog as any[]);
   const [isUploadingGfx, setIsUploadingGfx] = useState(false);
   const gfxFileInputRef = React.useRef<HTMLInputElement>(null);
 

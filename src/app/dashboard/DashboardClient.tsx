@@ -68,7 +68,9 @@ interface OrderItem {
   id: string;
   amount: number;
   status: string;
-  planRequested: string | null;
+  type?: string;
+  code?: string;
+  planRequested?: string | null;
   createdAt: Date | string;
 }
 

@@ -60,7 +60,7 @@ export async function uploadAsset(
           'Content-Type': contentType,
           'Content-Length': buffer.length.toString(),
         },
-        body: buffer,
+        body: new Uint8Array(buffer) as unknown as BodyInit,
       });
 
       if (res.ok) {
