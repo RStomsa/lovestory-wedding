@@ -369,7 +369,7 @@ export default function StudioCanvas() {
               whiteSpace: 'pre-wrap',
               wordBreak: 'break-word',
               userSelect: 'none',
-              cursor: isSelected ? 'text' : 'pointer',
+              cursor: editingTextId === el.id ? 'text' : isSelected ? 'move' : 'pointer',
             }}
             title="Nháy đúp chuột để chỉnh sửa chữ trực tiếp trên thiệp"
           >
@@ -562,14 +562,53 @@ export default function StudioCanvas() {
                 key={el.id}
                 id={`canvas-node-${el.id}`}
                 onPointerDown={(e) => {
+                  // Do not intercept if currently inline-editing text
+                  if (editingTextId === el.id) return;
+
                   e.stopPropagation();
                   selectElement(el.id);
-                  setMoveableTarget(e.currentTarget);
+                  const node = e.currentTarget;
+                  setMoveableTarget(node);
+
                   if (typeof window !== 'undefined' && 'vibrate' in navigator) {
                     try {
                       navigator.vibrate(8);
                     } catch {}
                   }
+
+                  const startX = e.clientX;
+                  const startY = e.clientY;
+                  const origX = el.x;
+                  const origY = el.y;
+                  let hasDragged = false;
+
+                  const onPointerMove = (moveEvt: PointerEvent) => {
+                    const dx = (moveEvt.clientX - startX) / zoom;
+                    const dy = (moveEvt.clientY - startY) / zoom;
+                    if (!hasDragged && Math.hypot(dx, dy) < 3) return;
+                    hasDragged = true;
+
+                    const nextX = Math.round(origX + dx);
+                    const nextY = Math.round(origY + dy);
+                    node.style.left = `${nextX}px`;
+                    node.style.top = `${nextY}px`;
+                  };
+
+                  const onPointerUp = (upEvt: PointerEvent) => {
+                    window.removeEventListener('pointermove', onPointerMove);
+                    window.removeEventListener('pointerup', onPointerUp);
+
+                    if (hasDragged) {
+                      const dx = (upEvt.clientX - startX) / zoom;
+                      const dy = (upEvt.clientY - startY) / zoom;
+                      const nextX = Math.round(origX + dx);
+                      const nextY = Math.round(origY + dy);
+                      updateElement(el.id, { x: nextX, y: nextY }, true);
+                    }
+                  };
+
+                  window.addEventListener('pointermove', onPointerMove);
+                  window.addEventListener('pointerup', onPointerUp);
                 }}
                 className={`absolute cursor-move transition-shadow ${
                   isSelected ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:ring-1 hover:ring-blue-300/70'
@@ -608,7 +647,7 @@ export default function StudioCanvas() {
               resizable={true}
               rotatable={true}
               pinchable={['rotatable', 'resizable']}
-              checkInput={true}
+              checkInput={false}
               origin={false}
               keepRatio={false}
               snappable={true}
@@ -626,6 +665,11 @@ export default function StudioCanvas() {
               renderDirections={['nw', 'n', 'ne', 'w', 'e', 'sw', 's', 'se']}
               edge={false}
               zoom={zoom}
+              onDragStart={({ set, target }) => {
+                const left = parseFloat(target.style.left) || 0;
+                const top = parseFloat(target.style.top) || 0;
+                set([left, top]);
+              }}
               onDrag={({ target, left, top }) => {
                 target.style.left = `${left}px`;
                 target.style.top = `${top}px`;
@@ -634,7 +678,15 @@ export default function StudioCanvas() {
                 if (!isDrag) return;
                 const left = parseFloat(target.style.left);
                 const top = parseFloat(target.style.top);
-                updateElement(selectedId, { x: Math.round(left), y: Math.round(top) }, true);
+                if (!isNaN(left) && !isNaN(top)) {
+                  updateElement(selectedId, { x: Math.round(left), y: Math.round(top) }, true);
+                }
+              }}
+              onResizeStart={({ setOrigin, dragStart, target }) => {
+                setOrigin(['%', '%']);
+                const left = parseFloat(target.style.left) || 0;
+                const top = parseFloat(target.style.top) || 0;
+                dragStart && dragStart.set([left, top]);
               }}
               onResize={({ target, width, height, drag }) => {
                 target.style.width = `${width}px`;
