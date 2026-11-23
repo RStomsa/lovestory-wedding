@@ -66,7 +66,7 @@ export default function TemplatesManagerClient({
   // State for Harvested Templates
   const [harvestedTemplates] = useState<any[]>(initialHarvestedTemplates);
   const [searchHarvested, setSearchHarvested] = useState('');
-  const [harvestedFilter, setHarvestedFilter] = useState<'all' | 'wedding' | 'birthday' | 'event'>('all');
+  const [harvestedFilter, setHarvestedFilter] = useState<'all' | 'wedding' | 'birthday' | 'graduation' | 'event' | 'anniversary'>('all');
 
   // State for VIP Modern Templates
   const [searchMinvite, setSearchMinvite] = useState('');
@@ -142,17 +142,13 @@ export default function TemplatesManagerClient({
     });
   }, [catalogTemplates, categoryFilter, tierFilter, searchCatalog]);
 
-  // Filtering Harvested Templates (188 templates)
+  // Filtering Harvested Templates (190 templates)
   const filteredHarvested = useMemo(() => {
     return harvestedTemplates.filter((item) => {
       const matchCat =
         harvestedFilter === 'all'
           ? true
-          : harvestedFilter === 'wedding'
-          ? item.slug.includes('cuoi')
-          : harvestedFilter === 'birthday'
-          ? item.slug.includes('sinh-nhat')
-          : !item.slug.includes('cuoi') && !item.slug.includes('sinh-nhat');
+          : item.category === harvestedFilter;
       const matchSearch =
         !searchHarvested.trim() ||
         (item.title && item.title.toLowerCase().includes(searchHarvested.toLowerCase())) ||
@@ -959,9 +955,11 @@ export default function TemplatesManagerClient({
             <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
               {[
                 { id: 'all', label: `Tất cả (${harvestedTemplates.length})` },
-                { id: 'wedding', label: 'Thiệp cưới' },
-                { id: 'birthday', label: 'Sinh nhật' },
-                { id: 'event', label: 'Sự kiện khác' },
+                { id: 'wedding', label: `Thiệp cưới (${harvestedTemplates.filter(t => t.category === 'wedding').length})` },
+                { id: 'birthday', label: `Sinh nhật (${harvestedTemplates.filter(t => t.category === 'birthday').length})` },
+                { id: 'graduation', label: `Tốt nghiệp (${harvestedTemplates.filter(t => t.category === 'graduation').length})` },
+                { id: 'event', label: `Sự kiện (${harvestedTemplates.filter(t => t.category === 'event').length})` },
+                { id: 'anniversary', label: `Kỷ niệm (${harvestedTemplates.filter(t => t.category === 'anniversary').length})` },
               ].map((cat) => (
                 <button
                   key={cat.id}

@@ -20,7 +20,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
     "name": "Thiệp Cưới Kem Chữ Vàng Save The Date (C165)",
     "category": "wedding",
     "tier": "PREMIUM",
-    "thumbnail": "https://assets.cinelove.me/templates/long_thumbnail/6e435cd6-d240-4228-af2f-fdcb408e2ac0_1793354530.webp",
+    "thumbnail": "https://assets.lovestory.vn/templates/long_thumbnail/6e435cd6-d240-4228-af2f-fdcb408e2ac0_1793354530.webp",
     "imagesCount": 10,
     "description": "Phong cách kem chữ vàng sang trọng, bố cục 14 ảnh thời trang cao cấp kết hợp hiệu ứng bay lơ lửng đầy chất thơ.",
     "config": {
@@ -85,7 +85,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 2,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/51060618-d3e2-4e8f-96bd-5eb511eda567.png",
+        "src": "https://assets.lovestory.vn/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/51060618-d3e2-4e8f-96bd-5eb511eda567.png",
         "borderRadius": 24,
         "objectFit": "cover"
       },
@@ -129,7 +129,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 5,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/265cb318-f716-482a-b4e3-f95df605cebf.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/265cb318-f716-482a-b4e3-f95df605cebf.jpg",
         "borderRadius": 18,
         "objectFit": "cover"
       },
@@ -143,7 +143,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 5,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/b37e65ae-8dc0-4fed-beba-f10180747b09.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/b37e65ae-8dc0-4fed-beba-f10180747b09.jpg",
         "borderRadius": 18,
         "objectFit": "cover"
       },
@@ -157,7 +157,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 15,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/assets/plugins/calen_heart_1.png",
+        "src": "https://assets.lovestory.vn/assets/plugins/calen_heart_1.png",
         "objectFit": "contain",
         "continuousAnimation": {
           "type": "floating",
@@ -204,7 +204,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/44a9482e-9e93-480a-a550-b3da14701627.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/44a9482e-9e93-480a-a550-b3da14701627.jpg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -218,7 +218,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/182f3f31-447c-4c4c-924c-0c1450242f5f.webp",
+        "src": "https://assets.lovestory.vn/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/182f3f31-447c-4c4c-924c-0c1450242f5f.webp",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -232,7 +232,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/3f3a4cf5-bcff-456a-8b7d-cde582e01c54.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/3f3a4cf5-bcff-456a-8b7d-cde582e01c54.jpg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -246,7 +246,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/896bb579-8a49-4851-9dbc-b8190d57d02f.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/896bb579-8a49-4851-9dbc-b8190d57d02f.jpg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -260,7 +260,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/1e231b09-2684-4c48-843c-4a114ba6233c.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/1e231b09-2684-4c48-843c-4a114ba6233c.jpg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -274,7 +274,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/2fa8b375-baf1-4857-b67e-b8fb7a104b59.png",
+        "src": "https://assets.lovestory.vn/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/2fa8b375-baf1-4857-b67e-b8fb7a104b59.png",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -288,7 +288,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/72b7b5a2-46f1-4258-8e53-635b5e1e1dea.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/6e435cd6-d240-4228-af2f-fdcb408e2ac0/72b7b5a2-46f1-4258-8e53-635b5e1e1dea.jpg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -324,7 +324,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
     "name": "Thiệp Cưới Tạp Chí Our Love Begins (C61)",
     "category": "wedding",
     "tier": "BASIC",
-    "thumbnail": "https://assets.cinelove.me/templates/long_thumbnail/aaff9931-20bd-4982-9db6-6c39ac52fdc9_1793184128.webp",
+    "thumbnail": "https://assets.lovestory.vn/templates/long_thumbnail/aaff9931-20bd-4982-9db6-6c39ac52fdc9_1793184128.webp",
     "imagesCount": 13,
     "description": "Phong cách bìa tạp chí thời trang hiện đại, tôn vinh trọn vẹn từng khoảnh khắc tình yêu của cặp đôi.",
     "config": {
@@ -350,7 +350,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 1,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/40ffecd9-9809-4a07-8951-9fb7004ac12a.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/40ffecd9-9809-4a07-8951-9fb7004ac12a.jpg",
         "borderRadius": 0,
         "objectFit": "cover"
       },
@@ -450,7 +450,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 5,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/0f2c2ae5-c7a7-460b-9792-9865ed6b0f17.png",
+        "src": "https://assets.lovestory.vn/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/0f2c2ae5-c7a7-460b-9792-9865ed6b0f17.png",
         "borderRadius": 18,
         "objectFit": "cover"
       },
@@ -464,7 +464,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 5,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/72cdfe25-5b66-4494-822d-71b7f5453cd2.png",
+        "src": "https://assets.lovestory.vn/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/72cdfe25-5b66-4494-822d-71b7f5453cd2.png",
         "borderRadius": 18,
         "objectFit": "cover"
       },
@@ -478,7 +478,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 15,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/assets/plugins/calen_heart_1.png",
+        "src": "https://assets.lovestory.vn/assets/plugins/calen_heart_1.png",
         "objectFit": "contain",
         "continuousAnimation": {
           "type": "floating",
@@ -525,7 +525,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/695e6cf1-5e7c-4eea-8d3d-6790558b7aa6.png",
+        "src": "https://assets.lovestory.vn/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/695e6cf1-5e7c-4eea-8d3d-6790558b7aa6.png",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -539,7 +539,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/18019917-8748-4b66-b2c1-29a80b47ea46.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/18019917-8748-4b66-b2c1-29a80b47ea46.jpg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -553,7 +553,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/18019917-8748-4b66-b2c1-29a80b47ea46.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/18019917-8748-4b66-b2c1-29a80b47ea46.jpg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -567,7 +567,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/6ce283ea-6221-4afe-9139-ebe200133231.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/6ce283ea-6221-4afe-9139-ebe200133231.jpg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -581,7 +581,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/e987b72c-22f1-4118-ae31-805fe6311f6d.png",
+        "src": "https://assets.lovestory.vn/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/e987b72c-22f1-4118-ae31-805fe6311f6d.png",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -595,7 +595,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/e1b24dc5-7753-4a9b-aad6-a987e4d6112b.png",
+        "src": "https://assets.lovestory.vn/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/e1b24dc5-7753-4a9b-aad6-a987e4d6112b.png",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -609,7 +609,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/5a508f27-c1b9-442f-8a28-2aaf51016367/c36e7adc-ce39-4034-9bf5-985850217142.png",
+        "src": "https://assets.lovestory.vn/templates/assets/5a508f27-c1b9-442f-8a28-2aaf51016367/c36e7adc-ce39-4034-9bf5-985850217142.png",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -623,7 +623,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/6ce283ea-6221-4afe-9139-ebe200133231.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/6ce283ea-6221-4afe-9139-ebe200133231.jpg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -637,7 +637,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/49fb4930-d703-4afc-8e6d-f1c490dd6847.png",
+        "src": "https://assets.lovestory.vn/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/49fb4930-d703-4afc-8e6d-f1c490dd6847.png",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -651,7 +651,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/f7a25e71-fb80-48e7-b372-cdf9bd490c38.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/aaff9931-20bd-4982-9db6-6c39ac52fdc9/f7a25e71-fb80-48e7-b372-cdf9bd490c38.jpg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -687,7 +687,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
     "name": "Thiệp Cưới Hoa Hồng Đỏ Our Love Story (C39)",
     "category": "wedding",
     "tier": "BASIC",
-    "thumbnail": "https://assets.cinelove.me/templates/long_thumbnail/a2f11727-8717-46db-ada4-ff29271ce53b_1793184129.webp",
+    "thumbnail": "https://assets.lovestory.vn/templates/long_thumbnail/a2f11727-8717-46db-ada4-ff29271ce53b_1793184129.webp",
     "imagesCount": 5,
     "description": "Tông đỏ nhung quyến rũ kết hợp hoa hồng tươi thắm, mang lại cảm giác nồng nàn và hạnh phúc ngập tràn.",
     "config": {
@@ -752,7 +752,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 2,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/a2f11727-8717-46db-ada4-ff29271ce53b/36845bd2-c26e-4176-9ad8-e955bcd7e738.jpeg",
+        "src": "https://assets.lovestory.vn/templates/assets/a2f11727-8717-46db-ada4-ff29271ce53b/36845bd2-c26e-4176-9ad8-e955bcd7e738.jpeg",
         "borderRadius": 24,
         "objectFit": "cover"
       },
@@ -796,7 +796,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 5,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/a2f11727-8717-46db-ada4-ff29271ce53b/bc6fcb69-9450-4329-8201-75081809241d.jpeg",
+        "src": "https://assets.lovestory.vn/templates/assets/a2f11727-8717-46db-ada4-ff29271ce53b/bc6fcb69-9450-4329-8201-75081809241d.jpeg",
         "borderRadius": 18,
         "objectFit": "cover"
       },
@@ -810,7 +810,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 5,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/a2f11727-8717-46db-ada4-ff29271ce53b/7dc164ec-37de-419b-9e33-a92eafd44fdc.jpeg",
+        "src": "https://assets.lovestory.vn/templates/assets/a2f11727-8717-46db-ada4-ff29271ce53b/7dc164ec-37de-419b-9e33-a92eafd44fdc.jpeg",
         "borderRadius": 18,
         "objectFit": "cover"
       },
@@ -824,7 +824,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 15,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/assets/plugins/calen_heart_1.png",
+        "src": "https://assets.lovestory.vn/assets/plugins/calen_heart_1.png",
         "objectFit": "contain",
         "continuousAnimation": {
           "type": "floating",
@@ -871,7 +871,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/a2f11727-8717-46db-ada4-ff29271ce53b/0b6a64d0-658b-4bb9-916b-9fa6a26c68bc.jpeg",
+        "src": "https://assets.lovestory.vn/templates/assets/a2f11727-8717-46db-ada4-ff29271ce53b/0b6a64d0-658b-4bb9-916b-9fa6a26c68bc.jpeg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -885,7 +885,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/a2f11727-8717-46db-ada4-ff29271ce53b/ee967957-18a5-41b2-bbdb-7f13c7c82321.png",
+        "src": "https://assets.lovestory.vn/templates/assets/a2f11727-8717-46db-ada4-ff29271ce53b/ee967957-18a5-41b2-bbdb-7f13c7c82321.png",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -921,7 +921,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
     "name": "Thiệp Cưới Phong Bì Kem Hoa Cúc (C44)",
     "category": "wedding",
     "tier": "PREMIUM",
-    "thumbnail": "https://assets.cinelove.me/templates/long_thumbnail/0189eb35-5cf1-4525-a8d0-867f70e0bf67_1793184130.webp",
+    "thumbnail": "https://assets.lovestory.vn/templates/long_thumbnail/0189eb35-5cf1-4525-a8d0-867f70e0bf67_1793184130.webp",
     "imagesCount": 16,
     "description": "Hiệu ứng mở phong bì thư thanh tao, họa tiết hoa cúc dại tinh khôi trên nền giấy mỹ thuật cao cấp.",
     "config": {
@@ -986,7 +986,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 2,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/b298e6ad-dd15-475c-aca4-c3f0850f44fc.png",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/b298e6ad-dd15-475c-aca4-c3f0850f44fc.png",
         "borderRadius": 24,
         "objectFit": "cover"
       },
@@ -1030,7 +1030,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 5,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/eabf8d6a-550e-4a4f-8a19-039dc57d2245.jpeg",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/eabf8d6a-550e-4a4f-8a19-039dc57d2245.jpeg",
         "borderRadius": 18,
         "objectFit": "cover"
       },
@@ -1044,7 +1044,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 5,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/b2369584-b526-46a5-851b-034c9f2e1e0f.png",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/b2369584-b526-46a5-851b-034c9f2e1e0f.png",
         "borderRadius": 18,
         "objectFit": "cover"
       },
@@ -1058,7 +1058,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 15,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/assets/plugins/calen_heart_1.png",
+        "src": "https://assets.lovestory.vn/assets/plugins/calen_heart_1.png",
         "objectFit": "contain",
         "continuousAnimation": {
           "type": "floating",
@@ -1105,7 +1105,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/8a449f7f-2368-4990-98bc-bd7c9b619f30.jpeg",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/8a449f7f-2368-4990-98bc-bd7c9b619f30.jpeg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -1119,7 +1119,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/66d12607-1554-4e57-b216-4f105da70233.png",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/66d12607-1554-4e57-b216-4f105da70233.png",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -1133,7 +1133,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/f68e05b9-48ee-4b3a-95a3-e9efea5cbecd.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/f68e05b9-48ee-4b3a-95a3-e9efea5cbecd.jpg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -1147,7 +1147,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/e5aad9b4-4113-4d80-aa59-288f3d6f7a55.jpeg",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/e5aad9b4-4113-4d80-aa59-288f3d6f7a55.jpeg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -1161,7 +1161,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/abaf4ab7-040c-45b3-bb7f-4499cf5c356c.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/abaf4ab7-040c-45b3-bb7f-4499cf5c356c.jpg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -1175,7 +1175,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/e89ebd60-3f04-4013-9c11-9103dc96a28a.png",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/e89ebd60-3f04-4013-9c11-9103dc96a28a.png",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -1189,7 +1189,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/c8518188-4ee3-4063-84d6-7901def53cd9.png",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/c8518188-4ee3-4063-84d6-7901def53cd9.png",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -1203,7 +1203,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/d697d3a7-2502-46df-8323-da87bbf88421.png",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/d697d3a7-2502-46df-8323-da87bbf88421.png",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -1217,7 +1217,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/e986b1a5-2f6a-4562-ba4b-1ae07685f39e.jpeg",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/e986b1a5-2f6a-4562-ba4b-1ae07685f39e.jpeg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -1231,7 +1231,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/b51f0c79-7294-4c57-a8f2-227681a33969.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/b51f0c79-7294-4c57-a8f2-227681a33969.jpg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -1245,7 +1245,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/2d021cc4-357c-48c9-9e46-81c3730d8c76.png",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/2d021cc4-357c-48c9-9e46-81c3730d8c76.png",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -1259,7 +1259,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/b192c518-cb49-4ca6-9b2a-84859b513df6.jpg",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/b192c518-cb49-4ca6-9b2a-84859b513df6.jpg",
         "borderRadius": 16,
         "objectFit": "cover"
       },
@@ -1273,7 +1273,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
         "rotation": 0,
         "zIndex": 4,
         "opacity": 1,
-        "src": "https://assets.cinelove.me/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/99a12553-3a04-4af0-8c1a-5e91ac8752cb.jpeg",
+        "src": "https://assets.lovestory.vn/templates/assets/0189eb35-5cf1-4525-a8d0-867f70e0bf67/99a12553-3a04-4af0-8c1a-5e91ac8752cb.jpeg",
         "borderRadius": 16,
         "objectFit": "cover"
       },

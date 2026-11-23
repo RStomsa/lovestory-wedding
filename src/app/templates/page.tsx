@@ -23,6 +23,7 @@ import UserDropdown from '@/components/auth/UserDropdown';
 import { useAuth } from '@/context/AuthContext';
 
 type CategoryFilter = 'all' | 'wedding' | 'birthday' | 'graduation' | 'event' | 'anniversary';
+type StyleFilter = 'all' | 'envelope' | 'traditional' | 'minimalist' | 'korean_pastel' | 'editorial';
 type TierFilter = 'all' | 'FREE' | 'BASIC' | 'PREMIUM';
 type SortOption = 'recommended' | 'views' | 'likes' | 'newest';
 
@@ -33,6 +34,15 @@ const CATEGORY_TABS: { id: CategoryFilter; label: string; count?: number }[] = [
   { id: 'graduation', label: 'Thiệp tốt nghiệp' },
   { id: 'event', label: 'Sự kiện & Khai trương' },
   { id: 'anniversary', label: 'Kỷ niệm & Tình yêu' },
+];
+
+const STYLE_OPTIONS: { id: StyleFilter; label: string; icon: string }[] = [
+  { id: 'all', label: 'Tất cả phong cách', icon: '✨' },
+  { id: 'envelope', label: 'Phong bì mở nắp', icon: '💌' },
+  { id: 'traditional', label: 'Cổ điển & Truyền thống', icon: '🏛️' },
+  { id: 'minimalist', label: 'Tối giản hiện đại', icon: '🖤' },
+  { id: 'korean_pastel', label: 'Hàn Quốc & Pastel', icon: '🌸' },
+  { id: 'editorial', label: 'Tạp chí & Thời trang', icon: '📖' },
 ];
 
 const TIER_OPTIONS: { id: TierFilter; label: string }[] = [
@@ -54,6 +64,7 @@ export default function TemplatesCatalogPage() {
 
   const [allTemplates, setAllTemplates] = useState<CatalogTemplate[]>(CATALOG_TEMPLATES);
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
+  const [activeStyle, setActiveStyle] = useState<StyleFilter>('all');
   const [activeTier, setActiveTier] = useState<TierFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('recommended');
   const [searchQuery, setSearchQuery] = useState('');
@@ -105,6 +116,11 @@ export default function TemplatesCatalogPage() {
       result = result.filter((item) => item.category === activeCategory);
     }
 
+    // Filter Style
+    if (activeStyle !== 'all') {
+      result = result.filter((item) => item.style === activeStyle);
+    }
+
     // Filter Tier
     if (activeTier !== 'all') {
       result = result.filter((item) => item.tier === activeTier);
@@ -147,6 +163,7 @@ export default function TemplatesCatalogPage() {
 
   const resetFilters = () => {
     setActiveCategory('all');
+    setActiveStyle('all');
     setActiveTier('all');
     setSortBy('recommended');
     setSearchQuery('');
@@ -248,6 +265,32 @@ export default function TemplatesCatalogPage() {
             })}
           </div>
 
+          {/* Style Pills (Available for 'all' and 'wedding') */}
+          {(activeCategory === 'all' || activeCategory === 'wedding') && (
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none pt-1">
+              <span className="text-[11px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider pl-1 pr-1.5 shrink-0">
+                Phong cách:
+              </span>
+              {STYLE_OPTIONS.map((style) => {
+                const isStyleActive = activeStyle === style.id;
+                return (
+                  <button
+                    key={style.id}
+                    onClick={() => setActiveStyle(style.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 shrink-0 ${
+                      isStyleActive
+                        ? 'bg-rose-500/15 border border-rose-500/40 text-rose-600 dark:text-rose-400 font-bold shadow-2xs'
+                        : 'bg-white/80 dark:bg-stone-900/80 border border-stone-200/80 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:border-stone-400 dark:hover:border-stone-600'
+                    }`}
+                  >
+                    <span>{style.icon}</span>
+                    <span>{style.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           {/* Secondary Controls Bar: Search, Tier, Sort */}
           <div className="bg-white dark:bg-stone-900 p-3 sm:p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
             {/* Search Input */}
@@ -305,7 +348,7 @@ export default function TemplatesCatalogPage() {
               </div>
 
               {/* Reset if filters active */}
-              {(activeCategory !== 'all' || activeTier !== 'all' || searchQuery || sortBy !== 'recommended') && (
+              {(activeCategory !== 'all' || activeStyle !== 'all' || activeTier !== 'all' || searchQuery || sortBy !== 'recommended') && (
                 <button
                   onClick={resetFilters}
                   title="Đặt lại bộ lọc"
