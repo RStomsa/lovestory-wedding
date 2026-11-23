@@ -1,0 +1,1215 @@
+{
+  "_id": "69d7beed4863767c472e57ef",
+  "title": "Homeward Love",
+  "description": "Mẫu thiệp cưới mang cảm giác ấm áp, trang trọng và gần gũi, phù hợp với các cặp đôi muốn nhấn mạnh ý nghĩa cùng nhau xây dựng tổ ấm. Thiết kế có bố cục đầy đủ, dễ theo dõi, kết hợp hài hòa giữa lời mời, album ảnh, video, địa điểm, mừng cưới và xác nhận tham dự.",
+  "category": "wedding",
+  "status": "public",
+  "thumbnail": "m-invite/template/69d7beed4863767c472e57ef/baf01307-98df-4a1a-a86c-53baf2264d97.png",
+  "plan_required": 1,
+  "settings": {
+    "canvasHeight": 4424,
+    "canvasBackgroundColor": "#ffffff",
+    "canvasBackgroundImage": null,
+    "openingEffect": null,
+    "openingEffectData": {
+      "leftImage": null,
+      "rightImage": null
+    },
+    "openingEffectConfig": {
+      "text": {
+        "content": "",
+        "fontFamily": "Arial",
+        "fontSize": 24,
+        "color": "#ffffff",
+        "animation": "fade",
+        "animationSpeed": 5
+      },
+      "enabled": true,
+      "color": "#000000",
+      "opacity": 1,
+      "duration": 3000,
+      "textPosition": 25
+    },
+    "backgroundMusic": "music/6967466ad64e39b0f8206118.mp3",
+    "backgroundMusicAutoplay": true,
+    "fallingEffect": [
+      "falling-effects/708bc90f-e91e-4cd5-a97f-5d2cd6112c2e.png",
+      "falling-effects/38d8b61a-cb01-4b6d-aa83-5f0c84d96795.webp"
+    ],
+    "fallingEffectEnabled": true,
+    "fallingEffectConfig": {
+      "speed": {
+        "min": 1.5,
+        "max": 4
+      },
+      "wind": {
+        "min": -1,
+        "max": 1
+      },
+      "radius": {
+        "min": 15,
+        "max": 25
+      },
+      "opacity": {
+        "min": 0.4,
+        "max": 0.9
+      },
+      "rotationSpeed": {
+        "min": 0,
+        "max": 1
+      },
+      "count": 20
+    },
+    "globalEffect": "slideUpMix",
+    "backgroundRepeat": "repeat",
+    "backgroundSize": "100% auto",
+    "backgroundBlendMode": "normal",
+    "backgroundOpacity": 1,
+    "backgroundOverlayColor": "transparent",
+    "menu": [
+      {
+        "id": "home",
+        "label": "Home",
+        "targetWidgetId": null,
+        "type": "internal"
+      }
+    ]
+  },
+  "widgets": [
+    {
+      "id": "harms25d3",
+      "type": "svg",
+      "props": {
+        "src": "https://cdn.biihappy.com/m-invite/stock/69651ec793c9337534d2a98e.svg"
+      },
+      "style": {
+        "position": "absolute",
+        "top": 864,
+        "left": 164,
+        "transform": "translate(-164px, -56px)",
+        "width": 428,
+        "height": 436.22,
+        "zIndex": 1,
+        "color": "#feffea",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "rsrhoz0gv",
+      "type": "image",
+      "props": {
+        "src": "6704d5f8c63f3efd4a033c58/photo/3248cbff-1c5d-4616-a2a2-b5aa3637afac/large.jpg",
+        "variants": {
+          "small": "6704d5f8c63f3efd4a033c58/photo/3248cbff-1c5d-4616-a2a2-b5aa3637afac/small.jpg",
+          "large": "6704d5f8c63f3efd4a033c58/photo/3248cbff-1c5d-4616-a2a2-b5aa3637afac/large.jpg",
+          "exlarge": "6704d5f8c63f3efd4a033c58/photo/3248cbff-1c5d-4616-a2a2-b5aa3637afac/exlarge.jpg",
+          "_id": "69d7c11e4863767c472e5909"
+        },
+        "autoScale": true,
+        "isUserUpload": true,
+        "crop": {
+          "x": 0,
+          "y": 0,
+          "width": 800,
+          "height": 1418.0302677532013,
+          "naturalWidth": 800,
+          "naturalHeight": 1423
+        }
+      },
+      "style": {
+        "position": "absolute",
+        "top": 251.6085,
+        "left": 89.6,
+        "transform": "translate(-90px, -252.5px)",
+        "width": 428,
+        "height": 761.305,
+        "zIndex": 2,
+        "maskImage": "none",
+        "maskShape": "none",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "igno2dza4",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Kiến Văn",
+      "style": {
+        "position": "absolute",
+        "top": 430,
+        "left": 64,
+        "transform": "translate(64.5px, -228px)",
+        "width": 171,
+        "height": "auto",
+        "zIndex": 3,
+        "fontSize": 25,
+        "fontFamily": "Comic Sans MS",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#c08e7a",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1775747431498-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Việt Hoài",
+      "style": {
+        "position": "absolute",
+        "top": 450,
+        "left": 84,
+        "transform": "translate(44.5px, -200px)",
+        "width": 171,
+        "height": "auto",
+        "zIndex": 4,
+        "fontSize": 25,
+        "fontFamily": "Comic Sans MS",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#c08e7a",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "ie2ovq7ly",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "11h30 Thứ 3, Ngày 24 tháng 11, 2026",
+      "style": {
+        "position": "absolute",
+        "top": 429.99999999999994,
+        "left": 62.95000000000001,
+        "transform": "translate(-62.9px, 219.55px)",
+        "width": 427.9,
+        "height": "auto",
+        "zIndex": 5,
+        "fontSize": 20,
+        "fontFamily": "Patrick Hand",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#333333",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1775747601180-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "NHÀ HÀNG TIỆC CƯỚI FOREVER",
+      "style": {
+        "position": "absolute",
+        "top": 450,
+        "left": 84.05000000000001,
+        "transform": "translate(-84px, 235.5px)",
+        "width": 427.9,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 25,
+        "fontFamily": "Patrick Hand",
+        "fontWeight": "normal",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#333333",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "lu1mw34n2",
+      "type": "image",
+      "props": {
+        "src": "https://cdn.biihappy.com/m-invite/stock/81076797-a0af-4b11-8805-8ac785ca1e8d.png",
+        "autoScale": false
+      },
+      "style": {
+        "position": "absolute",
+        "top": 764,
+        "left": 80.91729323308272,
+        "transform": "translate(221.182px, 44px)",
+        "width": 125.818,
+        "height": 141.812,
+        "zIndex": 7,
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1775747895653-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "INVITATION",
+      "style": {
+        "position": "absolute",
+        "top": 470,
+        "left": 104.10000000000001,
+        "transform": "translate(-104.05px, 402.9px)",
+        "width": 427.9,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 25,
+        "fontFamily": "Playfair Display",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#90af65",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1775748426647-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Từ yêu thương và gắn bó, giờ đây chúng con nguyện cùng nhìn về một hướng để xây dựng tổ ấm.",
+      "style": {
+        "position": "absolute",
+        "top": 445,
+        "left": 103.5,
+        "transform": "translate(-75.5px, 552.5px)",
+        "width": 372,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 16,
+        "fontFamily": "Courier New",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#000000",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1775748480003-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Kính mời quý vị đến chung vui và chúc phúc cho hành trình mới của hai chúng con.",
+      "style": {
+        "position": "absolute",
+        "top": 465,
+        "left": 124.3,
+        "transform": "translate(-95.7px, 634.75px)",
+        "width": 370.8,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 16,
+        "fontFamily": "Courier New",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#000000",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "pkgt1fj5i",
+      "type": "photo_album",
+      "props": {
+        "photos": [
+          {
+            "src": "6704d5f8c63f3efd4a033c58/photo/aa7c7dab-4ff4-4995-93de-9e7db29518cd/large.jpg",
+            "width": 900,
+            "height": 1600
+          },
+          {
+            "src": "6704d5f8c63f3efd4a033c58/photo/10fcb0bf-5274-4605-9100-98bb10365069/large.jpg",
+            "width": 1280,
+            "height": 854
+          },
+          {
+            "src": "6704d5f8c63f3efd4a033c58/photo/0323ceb8-08f1-4853-b735-8c63ba4f7294/large.jpg",
+            "width": 854,
+            "height": 1280
+          },
+          {
+            "src": "6704d5f8c63f3efd4a033c58/photo/e8cc9705-501f-4b70-bfd7-06a3755ae15b/large.jpg",
+            "width": 1280,
+            "height": 854
+          },
+          {
+            "src": "6704d5f8c63f3efd4a033c58/photo/3a66a000-f49b-4814-b2c7-5aba622d5765/large.jpg",
+            "width": 854,
+            "height": 1280
+          },
+          {
+            "src": "6704d5f8c63f3efd4a033c58/photo/c0bfac45-ab35-46ee-a140-6bca25140b11/large.jpg",
+            "width": 1025,
+            "height": 1600
+          },
+          {
+            "src": "https://cdn.biihappy.com/ziiweb/default/website/galleries/61990322c41d7b37de534633/small.jpg",
+            "width": 1500,
+            "height": 2250
+          }
+        ],
+        "style": {
+          "position": "absolute",
+          "transform": "translate(27.375px, -22px)",
+          "width": 345.25,
+          "height": 298.306,
+          "albumLayout": "masonry",
+          "albumSpacing": 22,
+          "albumContainerPadding": 12,
+          "albumColumns": 2,
+          "albumSeeMoreTextColor": "#e1a9a9",
+          "albumSeeMoreBorderColor": "#543c3c"
+        }
+      },
+      "style": {
+        "position": "absolute",
+        "top": 351,
+        "left": 14.5,
+        "transform": "translate(-8px, 1019.98px)",
+        "width": 415,
+        "height": 687.1,
+        "zIndex": 8,
+        "albumLayout": "rows",
+        "albumSpacing": 15,
+        "albumContainerPadding": 5,
+        "albumColumns": 2,
+        "albumSeeMoreTextColor": "#333333",
+        "albumSeeMoreBorderColor": "#543c3c",
+        "animation": "slideUpMix",
+        "animationDuration": 1,
+        "albumRowHeight": 300,
+        "albumImageBorderRadius": 0,
+        "albumMaxDisplayCount": 7,
+        "albumImageShadowEnabled": true,
+        "albumWrapperBackgroundColor": "#ffffff",
+        "albumImageShadowY": 0,
+        "albumImageShadowBlur": 10,
+        "albumImageShadowSpread": 0,
+        "albumSeeMoreText": "XEM TẤT CẢ ALBUM",
+        "albumSeeMoreBorderWidth": 0,
+        "albumSeeMorePaddingVertical": 15,
+        "albumSeeMorePaddingHorizontal": 26,
+        "albumSeeMoreFontFamily": "Courier New",
+        "albumSeeMoreFontSize": 16
+      }
+    },
+    {
+      "id": "widget-1775748696966-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "ALBUM ẢNH",
+      "style": {
+        "position": "absolute",
+        "top": 475,
+        "left": 95,
+        "transform": "translate(-75.05px, 821.35px)",
+        "width": 373.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 20,
+        "fontFamily": "Playfair Display",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "left",
+        "color": "#90af65",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "sih9v66v1",
+      "type": "youtube",
+      "props": {
+        "youtubeUrl": "https://www.youtube.com/embed/lGUdD29BDMg",
+        "style": {
+          "position": "absolute",
+          "transform": "translate(0px, 0px)",
+          "width": 400,
+          "height": 225,
+          "boxShadowH": 6,
+          "boxShadowV": 6,
+          "boxShadowBlur": 8,
+          "boxShadowSpread": 0,
+          "boxShadowColor": "#8c8c8c",
+          "boxShadowEnabled": true
+        }
+      },
+      "style": {
+        "position": "absolute",
+        "top": 1929.5,
+        "left": 13.35,
+        "transform": "translate(6.9px, 1374.54px)",
+        "width": 387.5,
+        "height": 225,
+        "zIndex": 9,
+        "boxShadowH": 0,
+        "boxShadowV": 0,
+        "boxShadowBlur": 0,
+        "boxShadowSpread": 0,
+        "boxShadowColor": "#000000",
+        "boxShadowEnabled": false,
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1775748888447-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Hành trình hạnh phúc bắt đầu từ đây",
+      "style": {
+        "position": "absolute",
+        "top": 495,
+        "left": 115,
+        "transform": "translate(-95.05px, 836.35px)",
+        "width": 373.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 16,
+        "fontFamily": "Courier New",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "left",
+        "color": "#353535",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1775749031098-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "WEDDING VIDEO",
+      "style": {
+        "position": "absolute",
+        "top": 490,
+        "left": 123,
+        "transform": "translate(-101.7px, 2715.33px)",
+        "width": 373.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 20,
+        "fontFamily": "Playfair Display",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "left",
+        "color": "#90af65",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1775749031098-1",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Thước phim kỷ niệm của chúng mình",
+      "style": {
+        "position": "absolute",
+        "top": 510,
+        "left": 143,
+        "transform": "translate(-121.3px, 2733.42px)",
+        "width": 373.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 16,
+        "fontFamily": "Courier New",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "left",
+        "color": "#353535",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1775749165063-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "LOCATION",
+      "style": {
+        "position": "absolute",
+        "top": 522,
+        "left": 143,
+        "transform": "translate(-122.6px, 2153.54px)",
+        "width": 373.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 20,
+        "fontFamily": "Playfair Display",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "left",
+        "color": "#90af65",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1775749165063-1",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Địa điểm tổ chức tiệc cưới",
+      "style": {
+        "position": "absolute",
+        "top": 542,
+        "left": 163,
+        "transform": "translate(-142.6px, 2168.54px)",
+        "width": 373.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 16,
+        "fontFamily": "Courier New",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "left",
+        "color": "#353535",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "v2rrblco6",
+      "type": "map",
+      "props": {
+        "mapAddress": "35 Đường 2 Tháng 9 - Hải Châu - Đà Nẵng"
+      },
+      "style": {
+        "position": "absolute",
+        "top": 2491,
+        "left": 88.35,
+        "transform": "translate(-68.1px, 383.548px)",
+        "width": 387.5,
+        "height": 256.5,
+        "zIndex": 10,
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1775749261579-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "NHÀ HÀNG TIỆC CƯỚI FOREVER",
+      "style": {
+        "position": "absolute",
+        "top": 558,
+        "left": 183,
+        "transform": "translate(-162.6px, 2212.27px)",
+        "width": 373.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 20,
+        "fontFamily": "Playfair Display",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "left",
+        "color": "#353535",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1775749307077-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "35 Đường 2 Tháng 9, Hải Châu, Đà Nẵng",
+      "style": {
+        "position": "absolute",
+        "top": 572,
+        "left": 203,
+        "transform": "translate(-182.6px, 2239.27px)",
+        "width": 373.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 16,
+        "fontFamily": "Courier New",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "left",
+        "color": "#353535",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1775749511930-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "WEDDING GIFT",
+      "style": {
+        "position": "absolute",
+        "top": 530,
+        "left": 163,
+        "transform": "translate(-140.7px, 3081.57px)",
+        "width": 373.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 20,
+        "fontFamily": "Playfair Display",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "left",
+        "color": "#90af65",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1775749511931-1",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Hộp mừng cưới",
+      "style": {
+        "position": "absolute",
+        "top": 551,
+        "left": 183,
+        "transform": "translate(-161.7px, 3095.56px)",
+        "width": 373.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 16,
+        "fontFamily": "Courier New",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "left",
+        "color": "#353535",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "90f7nf68u",
+      "type": "qr",
+      "props": {
+        "qrContent": "https://example.com",
+        "qrColor": "#000000",
+        "qrBgColor": "#ffffff",
+        "qrIcon": "https://cdn.biihappy.com/m-invite/stock/69651d0393c9337534d2a490.png",
+        "brideBankName": "VCB",
+        "brideAccountName": "NGÔ VIỆT HOÀI",
+        "brideAccountNumber": "123456789",
+        "brideQRGenerated": true,
+        "brideQRImage": "https://cdn.biihappy.com/m-invite/design/69d7beed4863767c472e57ef/qr-bride.png",
+        "brideQRPending": false,
+        "brideQRContent": "https://qr.sepay.vn/img?acc=123456789&bank=VCB&amount=&des=Mung%20cuoi%20NG%C3%94%20VI%E1%BB%86T%20HO%C3%80I",
+        "groomBankName": "VCB",
+        "groomAccountName": "HOÀNG KIẾN VĂN",
+        "groomAccountNumber": "123456789",
+        "groomQRGenerated": true,
+        "groomQRImage": "https://cdn.biihappy.com/m-invite/design/69d7beed4863767c472e57ef/qr-groom.png",
+        "groomQRPending": false,
+        "groomQRContent": "https://qr.sepay.vn/img?acc=123456789&bank=VCB&amount=&des=Mung%20cuoi%20HO%C3%80NG%20KI%E1%BA%BEN%20V%C4%82N",
+        "brideQRS3Key": "m-invite/design/69d7beed4863767c472e57ef/qr-bride.png",
+        "groomQRS3Key": "m-invite/design/69d7beed4863767c472e57ef/qr-groom.png"
+      },
+      "style": {
+        "position": "absolute",
+        "top": 3150,
+        "left": 114,
+        "transform": "translate(0px, 551px)",
+        "width": 200,
+        "height": 200,
+        "zIndex": 11,
+        "borderWidth": 0,
+        "continuousAnimation": "swing",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "ghxzbxhb6",
+      "type": "rsvp",
+      "props": {
+        "rsvpTitle": "XÁC NHẬN THAM DỰ",
+        "rsvpNameLabel": "Họ và tên",
+        "rsvpAttendanceLabel": "Bạn sẽ tham dự chứ?",
+        "rsvpOption1": "Có, tôi sẽ tham dự",
+        "rsvpOption2": "Tôi bận, rất tiếc không thể tham dự",
+        "rsvpButtonText": "Gửi xác nhận"
+      },
+      "style": {
+        "position": "absolute",
+        "top": 3060,
+        "left": 38,
+        "transform": "translate(-38px, 901.89px)",
+        "width": 428,
+        "height": "auto",
+        "zIndex": 12,
+        "borderWidth": 0,
+        "boxShadowEnabled": false,
+        "rsvpTitleColor": "#90af65",
+        "rsvpPrimaryColor": "#90af65",
+        "rsvpButtonBackgroundColor": "#90af65",
+        "rsvpTitleFontFamily": "Playfair Display",
+        "rsvpLabelFontFamily": "Courier New",
+        "animation": "slideUpMix",
+        "animationDuration": 1,
+        "rsvpTitleFontSize": 20,
+        "rsvpLabelFontSize": 14
+      }
+    },
+    {
+      "id": "widget-1776095436731-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Nhà Trai",
+      "style": {
+        "position": "absolute",
+        "top": 585,
+        "left": 182.75,
+        "transform": "translate(-162.6px, 1641.63px)",
+        "width": 167.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 17,
+        "fontFamily": "Playfair Display",
+        "fontWeight": "bold",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#353535",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "bsxhuqnju",
+      "type": "image",
+      "props": {
+        "src": "6704d5f8c63f3efd4a033c58/photo/10f6a713-7a11-4d3b-8dc8-c80103ef3e0c/large.jpg",
+        "variants": {
+          "small": "6704d5f8c63f3efd4a033c58/photo/10f6a713-7a11-4d3b-8dc8-c80103ef3e0c/small.jpg",
+          "large": "6704d5f8c63f3efd4a033c58/photo/10f6a713-7a11-4d3b-8dc8-c80103ef3e0c/large.jpg",
+          "exlarge": "6704d5f8c63f3efd4a033c58/photo/10f6a713-7a11-4d3b-8dc8-c80103ef3e0c/exlarge.jpg",
+          "_id": "69ad9c2a9ee8c61d0de23c06"
+        },
+        "autoScale": true,
+        "isUserUpload": true,
+        "crop": {
+          "x": 0,
+          "y": 11.896958011437505,
+          "width": 1280,
+          "height": 1300.2785449146252,
+          "naturalWidth": 1280,
+          "naturalHeight": 1591
+        }
+      },
+      "style": {
+        "position": "absolute",
+        "top": 2333.4028125,
+        "left": 85.6,
+        "transform": "translate(-48.95px, 16.9382px)",
+        "width": 134.7,
+        "height": 136.834,
+        "zIndex": 13,
+        "borderRadiusTopLeft": 100,
+        "borderRadiusTopRight": 100,
+        "borderRadiusBottomRight": 100,
+        "borderRadiusBottomLeft": 100,
+        "maskImage": "none",
+        "maskShape": "none",
+        "boxShadowBlur": 22,
+        "boxShadowEnabled": true,
+        "boxShadowSpread": -4,
+        "boxShadowColor": "#8dac63",
+        "boxShadowH": 0,
+        "boxShadowV": 0
+      }
+    },
+    {
+      "id": "widget-1776095589346-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Nhà Gái",
+      "style": {
+        "position": "absolute",
+        "top": 605,
+        "left": 204.94999999999993,
+        "transform": "translate(37.2px, 1621.63px)",
+        "width": 163.3,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 17,
+        "fontFamily": "Playfair Display",
+        "fontWeight": "bold",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#353535",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1776095605030-0",
+      "type": "image",
+      "props": {
+        "src": "6704d5f8c63f3efd4a033c58/photo/4ae483fc-5a26-4aea-9ba3-b31d54a16e7c/large.jpg",
+        "variants": {
+          "small": "6704d5f8c63f3efd4a033c58/photo/4ae483fc-5a26-4aea-9ba3-b31d54a16e7c/small.jpg",
+          "large": "6704d5f8c63f3efd4a033c58/photo/4ae483fc-5a26-4aea-9ba3-b31d54a16e7c/large.jpg",
+          "exlarge": "6704d5f8c63f3efd4a033c58/photo/4ae483fc-5a26-4aea-9ba3-b31d54a16e7c/exlarge.jpg",
+          "_id": "69ad9c399ee8c61d0de23c16"
+        },
+        "autoScale": true,
+        "isUserUpload": true
+      },
+      "style": {
+        "position": "absolute",
+        "top": 2353.4028125,
+        "left": 105.6,
+        "transform": "translate(150.85px, -3.07748px)",
+        "width": 134.7,
+        "height": 136.834,
+        "zIndex": 13,
+        "borderRadiusTopLeft": 100,
+        "borderRadiusTopRight": 100,
+        "borderRadiusBottomRight": 100,
+        "borderRadiusBottomLeft": 100,
+        "maskImage": "none",
+        "maskShape": "none",
+        "boxShadowBlur": 19,
+        "boxShadowEnabled": true,
+        "boxShadowSpread": -3,
+        "boxShadowColor": "#89a660",
+        "boxShadowH": 0,
+        "boxShadowV": 0
+      }
+    },
+    {
+      "id": "widget-1776095654813-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Ông Hoàng Kiến Nam",
+      "style": {
+        "position": "absolute",
+        "top": 612,
+        "left": 203.25,
+        "transform": "translate(-183.1px, 1653.08px)",
+        "width": 167.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 15,
+        "fontFamily": "Courier New",
+        "fontWeight": "normal",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#353535",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1776095674412-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Bà Nguyễn Thị Hoài",
+      "style": {
+        "position": "absolute",
+        "top": 625,
+        "left": 222.75,
+        "transform": "translate(-202.6px, 1668.88px)",
+        "width": 167.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 15,
+        "fontFamily": "Courier New",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#353535",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1776095708913-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Ông Ngô Hoàng Quân",
+      "style": {
+        "position": "absolute",
+        "top": 625,
+        "left": 222.99999999999997,
+        "transform": "translate(17.2px, 1641px)",
+        "width": 167.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 15,
+        "fontFamily": "Courier New",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#353535",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1776095720432-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Bà Trần Thị Hồng Thắm",
+      "style": {
+        "position": "absolute",
+        "top": 645,
+        "left": 242.99999999999997,
+        "transform": "translate(-16.55px, 1648.9px)",
+        "width": 194.7,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 15,
+        "fontFamily": "Courier New",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#353535",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1776095946919-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "THE COUPLE",
+      "style": {
+        "position": "absolute",
+        "top": 553,
+        "left": 163,
+        "transform": "translate(-133.45px, 1449.75px)",
+        "width": 373.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 18,
+        "fontFamily": "Palatino",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "left",
+        "color": "#353535",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1776095946919-1",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "CÔ DÂU - CHÚ RỂ",
+      "style": {
+        "position": "absolute",
+        "top": 564,
+        "left": 183,
+        "transform": "translate(-163.1px, 1574.18px)",
+        "width": 373.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 20,
+        "fontFamily": "Playfair Display",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "left",
+        "color": "#90af65",
+        "animation": "slideUpMix",
+        "animationDuration": 1,
+        "textTransform": "uppercase"
+      }
+    },
+    {
+      "id": "widget-1776096004204-0",
+      "type": "svg",
+      "props": {
+        "src": "https://cdn.biihappy.com/m-invite/stock/69651ec793c9337534d2a98e.svg"
+      },
+      "style": {
+        "position": "absolute",
+        "top": 906,
+        "left": 183,
+        "transform": "translate(-183px, 1169.1px)",
+        "width": 428,
+        "height": 543.1,
+        "zIndex": 1,
+        "color": "#feffea",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1776096094320-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "HOÀNG KIẾN VĂN",
+      "style": {
+        "position": "absolute",
+        "top": 605,
+        "left": 203,
+        "transform": "translate(-182.6px, 1927.5px)",
+        "width": 167.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 17,
+        "fontFamily": "Courier New",
+        "fontWeight": "bold",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#333333",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "widget-1776096145221-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "NGÔ VIỆT HOÀI",
+      "style": {
+        "position": "absolute",
+        "top": 625,
+        "left": 223,
+        "transform": "translate(17.2px, 1907.55px)",
+        "width": 167.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 17,
+        "fontFamily": "Courier New",
+        "fontWeight": "bold",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "center",
+        "color": "#333333",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    },
+    {
+      "id": "uaz9deqdk",
+      "type": "svg",
+      "props": {
+        "src": "https://cdn.biihappy.com/m-invite/stock/6964ecd375dc09b0bdcfa026.svg"
+      },
+      "style": {
+        "position": "absolute",
+        "top": 2436,
+        "left": 159,
+        "transform": "translate(46.3597px, 91.1784px)",
+        "width": 29.8403,
+        "height": 29.8403,
+        "zIndex": 14,
+        "color": "#353535"
+      }
+    },
+    {
+      "id": "widget-1776572498580-0",
+      "type": "text",
+      "props": {
+        "content": "Thêm tiêu đề phụ"
+      },
+      "content": "Từ nay, chúng tôi đã về một nhà",
+      "style": {
+        "position": "absolute",
+        "top": 501,
+        "left": 135,
+        "transform": "translate(-113.3px, 1672.98px)",
+        "width": 373.2,
+        "height": "auto",
+        "zIndex": 6,
+        "fontSize": 16,
+        "fontFamily": "Courier New",
+        "fontWeight": "500",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textAlign": "left",
+        "color": "#353535",
+        "animation": "slideUpMix",
+        "animationDuration": 1
+      }
+    }
+  ],
+  "images": [],
+  "ogImage": "m-invite/template/69d7beed4863767c472e57ef/24ef0f35-e375-4616-a9e7-33a45bdf1c28-og.jpg",
+  "markets": [
+    "VN"
+  ]
+}

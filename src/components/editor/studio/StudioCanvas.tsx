@@ -538,6 +538,7 @@ export default function StudioCanvas() {
             <img
               src={el.src}
               alt={el.alt || 'Asset'}
+              referrerPolicy="no-referrer"
               style={{
                 width: '100%',
                 height: '100%',

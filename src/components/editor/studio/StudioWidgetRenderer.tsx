@@ -309,8 +309,31 @@ export default function StudioWidgetRenderer({ element }: Props) {
 
   // 5. MAP / VENUE WIDGET (Địa điểm tổ chức & Bản đồ chỉ đường)
   if (widgetType === 'map') {
+    // If it's a compact button or height is <= 90px (e.g. "Chỉ đường" button in dual-venue templates)
+    if ((element.height && element.height <= 90) || (widgetConfig.label && !widgetConfig.title)) {
+      const label = widgetConfig.label || 'Chỉ đường';
+      const textColor = widgetConfig.textColor || '#6d0208';
+      const bgColor = widgetConfig.bgColor && widgetConfig.bgColor !== 'transparent' ? widgetConfig.bgColor : 'transparent';
+      const borderColor = widgetConfig.borderColor && widgetConfig.borderColor !== 'rgba(0,0,0,0)' ? widgetConfig.borderColor : textColor;
+
+      return (
+        <div
+          className="w-full h-full rounded-xl flex items-center justify-center gap-2 font-medium text-xs shadow-2xs select-none cursor-pointer transition-all px-3 overflow-hidden"
+          style={{
+            color: textColor,
+            backgroundColor: bgColor,
+            border: `1px solid ${borderColor}`,
+            borderRadius: widgetConfig.borderRadius !== undefined ? `${widgetConfig.borderRadius}px` : '12px',
+          }}
+        >
+          <Navigation className="w-3.5 h-3.5 shrink-0" style={{ color: textColor }} />
+          <span className="font-semibold tracking-wide truncate">{label}</span>
+        </div>
+      );
+    }
+
     return (
-      <div className="w-full h-full bg-white/95 dark:bg-stone-900/95 rounded-2xl p-4 shadow-sm border border-[#EADBCE] dark:border-stone-800 flex flex-col justify-between select-none">
+      <div className="w-full h-full bg-white/95 dark:bg-stone-900/95 rounded-2xl p-4 shadow-sm border border-[#EADBCE] dark:border-stone-800 flex flex-col justify-between select-none overflow-hidden">
         <div className="text-center">
           <div className="flex items-center justify-center gap-1 text-[10px] uppercase tracking-[0.2em] text-[#8C7355] dark:text-amber-300 font-bold">
             <MapPin className="w-3.5 h-3.5" />

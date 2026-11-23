@@ -1004,6 +1004,7 @@ export default function TemplatesManagerClient({
                       src={thumbUrl}
                       alt={cleanTitle}
                       loading="lazy"
+                      referrerPolicy="no-referrer"
                       className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src =

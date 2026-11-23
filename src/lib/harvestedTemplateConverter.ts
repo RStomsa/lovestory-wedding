@@ -670,6 +670,278 @@ export function convertHarvestedToStudioPreset(raw: HarvestedRawTemplate): Studi
  * Resolve any template by slug or ID with ZERO-MOCK guarantee:
  * Always prioritizes real harvested templates with authentic images and content!
  */
+function parseMinviteTransform(transformStr?: string): { tx: number; ty: number; rot: number } {
+  let tx = 0;
+  let ty = 0;
+  let rot = 0;
+  if (!transformStr) return { tx, ty, rot };
+
+  const tMatch = transformStr.match(/translate\(\s*([-\d.]+)px\s*,\s*([-\d.]+)px\s*\)/);
+  if (tMatch) {
+    tx = parseFloat(tMatch[1]);
+    ty = parseFloat(tMatch[2]);
+  }
+
+  const rMatch = transformStr.match(/rotate\(\s*([-\d.]+)deg\s*\)/);
+  if (rMatch) {
+    rot = ((Math.round(parseFloat(rMatch[1])) % 360) + 360) % 360;
+  }
+
+  return { tx, ty, rot };
+}
+
+function convertMinviteDesignToStudioPreset(minviteMatch: any, rawDesign: any): StudioTemplatePreset {
+  const coverSrc = minviteMatch.coverImage || minviteMatch.thumbnail || '/assets/wedding/templates/c165/photo_01.webp';
+  const cat = (minviteMatch.category === 'birthday' || minviteMatch.category === 'baby'
+    ? 'birthday'
+    : minviteMatch.category === 'event' || minviteMatch.category === 'opening'
+    ? 'event'
+    : 'wedding') as 'wedding' | 'birthday' | 'event' | 'graduation';
+
+  const rawWidgets = Array.isArray(rawDesign.widgets) ? rawDesign.widgets : [];
+  const canvasWidth = 500;
+  const mWidth = 428;
+  const offsetX = Math.round((canvasWidth - mWidth) / 2); // 36px
+
+  let minY = 0;
+  rawWidgets.forEach((w: any) => {
+    const top = parseFloat(w.style?.top || 0);
+    const { ty } = parseMinviteTransform(w.style?.transform);
+    const calculatedY = top + ty;
+    if (calculatedY < minY) minY = calculatedY;
+  });
+
+  const shiftY = minY < 0 ? Math.abs(minY) + 20 : 20;
+  const elements: CanvasElement[] = [];
+
+  rawWidgets.forEach((w: any, idx: number) => {
+    const wType = w.type;
+    const style = w.style || {};
+    const props = w.props || {};
+
+    const top = parseFloat(style.top || 0);
+    const left = parseFloat(style.left || 0);
+    const { tx, ty, rot } = parseMinviteTransform(style.transform);
+
+    const calcX = Math.round(left + tx + offsetX);
+    const calcY = Math.round(top + ty + shiftY);
+
+    const rawW = style.width;
+    const width = typeof rawW === 'number' ? Math.round(rawW) : !isNaN(parseFloat(rawW)) ? Math.round(parseFloat(rawW)) : 300;
+
+    const rawH = style.height;
+    const height = typeof rawH === 'number' ? Math.round(rawH) : !isNaN(parseFloat(rawH)) ? Math.round(parseFloat(rawH)) : 60;
+
+    const zIndex = parseInt(style.zIndex, 10) || idx + 1;
+    const opacity = style.opacity !== undefined ? parseFloat(style.opacity) : 1;
+
+    if (wType === 'text') {
+      const textContent = w.content || props.content || '';
+      if (!textContent.trim()) return;
+
+      const fontSize = Math.round(parseFloat(style.fontSize || 16));
+      const fontFamily = style.fontFamily || 'Playfair Display';
+      const color = style.color || '#052307';
+      const textAlign = (style.textAlign as any) || 'center';
+      const letterSpacing = parseFloat(style.letterSpacing || 0);
+      const linesCount = textContent.split('\n').length;
+      const autoH = Math.max(24, Math.round(fontSize * 1.5 * linesCount));
+
+      elements.push({
+        id: `minvite-text-${w.id || idx}`,
+        type: 'text',
+        x: calcX,
+        y: calcY,
+        width: Math.max(30, width),
+        height: autoH,
+        rotation: rot,
+        zIndex,
+        opacity,
+        text: textContent,
+        fontFamily,
+        fontSize,
+        color,
+        textAlign,
+        letterSpacing,
+        fontWeight: style.fontWeight >= 600 || style.fontWeight === 'bold' ? '700' : 'normal',
+        fontStyle: style.fontStyle === 'italic' ? 'italic' : 'normal',
+      });
+    } else if (wType === 'image') {
+      let src = props.src || (props.variants && (props.variants.large || props.variants.small)) || '';
+      if (src && !src.startsWith('http')) {
+        src = `https://cdn.biihappy.com/m-invite/${src}`;
+      }
+      if (!src) src = coverSrc;
+
+      const bRadius = Math.round(parseFloat(style.borderRadiusTopLeft || style.borderRadius || 0));
+
+      elements.push({
+        id: `minvite-img-${w.id || idx}`,
+        type: 'image',
+        x: calcX,
+        y: calcY,
+        width: Math.max(20, width),
+        height: Math.max(20, height),
+        rotation: rot,
+        zIndex,
+        opacity,
+        src,
+        borderRadius: bRadius,
+        objectFit: 'cover',
+      });
+    } else if (wType === 'svg') {
+      let src = props.src || '';
+      if (src && !src.startsWith('http')) {
+        src = `https://cdn.biihappy.com/m-invite/${src}`;
+      }
+      if (!src) return;
+
+      elements.push({
+        id: `minvite-gfx-${w.id || idx}`,
+        type: 'graphic',
+        x: calcX,
+        y: calcY,
+        width: Math.max(10, width),
+        height: Math.max(10, height),
+        rotation: rot,
+        zIndex,
+        opacity,
+        src,
+        objectFit: 'contain',
+      });
+    } else if (wType === 'line') {
+      elements.push({
+        id: `minvite-line-${w.id || idx}`,
+        type: 'shape',
+        shapeType: 'line',
+        x: calcX,
+        y: calcY,
+        width: Math.max(10, width),
+        height: Math.max(1, Math.round(parseFloat(style.borderWidth || 1))),
+        rotation: rot,
+        zIndex,
+        opacity,
+        color: style.borderColor || '#052307',
+      });
+    } else if (wType === 'map') {
+      elements.push({
+        id: `minvite-map-${w.id || idx}`,
+        type: 'widget',
+        widgetType: 'map',
+        x: 40,
+        y: calcY,
+        width: 420,
+        height: Math.max(200, height),
+        rotation: 0,
+        zIndex,
+        opacity: 1,
+        widgetConfig: {
+          address: props.mapAddress || '44 Phan Đình Phùng, Hải Châu, Đà Nẵng',
+          locationName: 'Địa điểm tổ chức hôn lễ',
+        },
+      });
+    } else if (wType === 'rsvp') {
+      elements.push({
+        id: `minvite-rsvp-${w.id || idx}`,
+        type: 'widget',
+        widgetType: 'rsvp',
+        x: 40,
+        y: calcY,
+        width: 420,
+        height: 340,
+        rotation: 0,
+        zIndex,
+        opacity: 1,
+      });
+    } else if (wType === 'calendar') {
+      elements.push({
+        id: `minvite-calendar-${w.id || idx}`,
+        type: 'widget',
+        widgetType: 'calendar',
+        x: 40,
+        y: calcY,
+        width: 420,
+        height: 300,
+        rotation: 0,
+        zIndex,
+        opacity: 1,
+        widgetConfig: {
+          date: '2027-11-24',
+        },
+      });
+    } else if (wType === 'qr') {
+      elements.push({
+        id: `minvite-qr-${w.id || idx}`,
+        type: 'widget',
+        widgetType: 'giftbox',
+        x: 40,
+        y: calcY,
+        width: 420,
+        height: 280,
+        rotation: 0,
+        zIndex,
+        opacity: 1,
+        widgetConfig: {
+          groomBank: {
+            bankName: props.groomBankName || 'VCB',
+            accountNo: props.groomAccountNumber || '0123456789',
+            accountName: props.groomAccountName || 'Hoàng Kiến Văn',
+          },
+          brideBank: {
+            bankName: props.brideBankName || 'VCB',
+            accountNo: props.brideAccountNumber || '0987654321',
+            accountName: props.brideAccountName || 'Ngô Việt Hoài',
+          },
+        },
+      });
+    } else if (wType === 'photo_album') {
+      elements.push({
+        id: `minvite-album-${w.id || idx}`,
+        type: 'widget',
+        widgetType: 'album',
+        x: 40,
+        y: calcY,
+        width: 420,
+        height: 340,
+        rotation: 0,
+        zIndex,
+        opacity: 1,
+      });
+    }
+  });
+
+  const rawHeight = parseFloat(rawDesign.settings?.canvasHeight || 5358);
+  const canvasHeight = Math.max(2500, Math.round(rawHeight + shiftY + 100));
+  const bgMusic = rawDesign.settings?.backgroundMusic;
+  const audioUrl = bgMusic
+    ? bgMusic.startsWith('http')
+      ? bgMusic
+      : `https://cdn.biihappy.com/m-invite/${bgMusic}`
+    : 'https://assets.cinelove.me/mp3/5f4c5139-a13a-4ff0-82a2-e3a61240042f.mp3';
+
+  return {
+    id: minviteMatch.id,
+    slug: minviteMatch.slug,
+    name: minviteMatch.title,
+    category: cat,
+    tier: minviteMatch.tier || 'VIP 200k',
+    thumbnail: coverSrc,
+    imagesCount: elements.filter((e) => e.type === 'image').length || 10,
+    description: minviteMatch.description || `Mẫu thiệp ${minviteMatch.title} thu thập từ M-Invite.`,
+    config: {
+      width: 500,
+      height: canvasHeight,
+      background: rawDesign.settings?.canvasBackgroundColor || '#ffffff',
+      title: minviteMatch.title,
+      audioTitle: `Nhạc thiệp ${minviteMatch.title}`,
+      audioUrl,
+      envelopeCover: { enabled: true, coverId: 'default' },
+      fallingEffect: { enabled: true, type: 'snow' },
+    },
+    elements,
+  };
+}
+
 export function getStudioTemplate(slugOrId: string): StudioTemplatePreset | null {
   const norm = slugOrId.toLowerCase().trim();
 
@@ -681,6 +953,16 @@ export function getStudioTemplate(slugOrId: string): StudioTemplatePreset | null
       norm.includes(m.id?.toLowerCase())
   );
   if (minviteMatch) {
+    const designFile = path.join(process.cwd(), 'src', 'data', 'minvite_designs', `${minviteMatch.id}.json`);
+    if (fs.existsSync(designFile)) {
+      try {
+        const rawDesign = JSON.parse(fs.readFileSync(designFile, 'utf-8'));
+        return convertMinviteDesignToStudioPreset(minviteMatch, rawDesign);
+      } catch (err) {
+        console.error('Error parsing minvite design file:', err);
+      }
+    }
+
     const coverSrc = minviteMatch.coverImage || minviteMatch.thumbnail || '/assets/wedding/templates/c165/photo_01.webp';
     const cat = (minviteMatch.category === 'birthday' || minviteMatch.category === 'baby'
       ? 'birthday'

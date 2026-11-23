@@ -229,6 +229,7 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
               <img
                 src={el.src}
                 alt={el.alt || 'Wedding asset'}
+                referrerPolicy="no-referrer"
                 style={{
                   width: '100%',
                   height: '100%',
