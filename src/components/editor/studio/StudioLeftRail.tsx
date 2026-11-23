@@ -33,6 +33,7 @@ import { SidebarTab } from './studioTypes';
 import { STUDIO_TEMPLATE_PRESETS } from '@/data/studioTemplatePresets';
 import { GRAPHICS_CATALOG, GraphicSticker } from '@/data/graphicsCatalog';
 import weddingMusicCatalog from '@/data/weddingMusicCatalog.json';
+import StudioColorPalette from './StudioColorPalette';
 import harvestedTemplates from '@/data/harvested_templates/index.json';
 import minviteTemplates from '@/data/minvite_templates.json';
 import { resolveFontFamily } from '@/lib/studioFonts';
@@ -1278,6 +1279,15 @@ export default function StudioLeftRail() {
 
             {bgSubTab === 'color' ? (
               <>
+                {/* Đồng bộ màu: Màu trên thiệp & Màu vừa dùng */}
+                <StudioColorPalette
+                  currentColor={canvas.background}
+                  onChange={(hex) => setCanvasBackground(hex)}
+                  elements={elements}
+                  canvasBackground={canvas.background}
+                  label="Màu nền thiệp"
+                />
+
                 {/* Section: Màu trơn with "Màu tùy chỉnh" button */}
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between">

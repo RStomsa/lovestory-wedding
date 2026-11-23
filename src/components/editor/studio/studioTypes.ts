@@ -201,7 +201,7 @@ export interface CanvasConfig {
   background: string;
   title: string;
   category?: string;
-  status: 'draft' | 'published';
+  status?: 'draft' | 'published';
   audioTitle?: string;
   audioUrl?: string;
   audioIcon?: string;

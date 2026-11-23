@@ -24,7 +24,9 @@ import {
 } from 'lucide-react';
 import { useStudioStore } from './studioStore';
 import { resolveFontFamily } from '@/lib/studioFonts';
+import { resolveStudioAssetUrl } from '@/lib/studioUtils';
 import StudioFontPicker from './StudioFontPicker';
+import StudioColorPalette from './StudioColorPalette';
 
 export default function StudioRightInspector() {
   const {
@@ -35,6 +37,7 @@ export default function StudioRightInspector() {
     removeElement,
     duplicateElement,
     setCanvasTitle,
+    setCanvasBackground,
     triggerPreviewAnim,
     toggleInspector,
     weddingProfile,
@@ -198,6 +201,17 @@ export default function StudioRightInspector() {
               <option value="Bản nháp">Bản nháp</option>
               <option value="Riêng tư">Riêng tư (Chỉ khách mời có link)</option>
             </select>
+          </div>
+
+          {/* Canvas Background Color Quick Palette with Document Colors & Recent Colors */}
+          <div className="pt-2 border-t border-stone-200 dark:border-stone-800">
+            <StudioColorPalette
+              currentColor={canvas.background || '#ffffff'}
+              onChange={(hex) => setCanvasBackground(hex)}
+              elements={elements}
+              canvasBackground={canvas.background}
+              label="Màu nền toàn thiệp"
+            />
           </div>
 
           {/* General Accordions */}
@@ -622,8 +636,18 @@ export default function StudioRightInspector() {
               <div className="relative w-full h-32 flex items-center justify-center rounded-xl overflow-hidden bg-stone-200/50">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={selectedElement.src}
-                  alt="Preview"
+                  src={resolveStudioAssetUrl(selectedElement.src)}
+                  alt="Ảnh xem trước"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (target.src.includes('/stock/')) {
+                      const fn = target.src.split('/stock/').pop()?.split('?')[0];
+                      if (fn) {
+                        target.src = `/assets/m-invite/stock/${fn}`;
+                        return;
+                      }
+                    }
+                  }}
                   className="max-w-full max-h-full object-contain"
                   style={{
                     filter: selectedElement.filter
@@ -1305,35 +1329,25 @@ export default function StudioRightInspector() {
             </div>
           )}
 
-          {/* Color & Opacity Slider (Screenshots 3 & 4: "Màu sắc & Độ hiển thị 100%") */}
+          {/* Color & Opacity Slider with Document Colors & Recent Colors */}
           <div className="space-y-3 pt-2 border-t border-stone-200 dark:border-stone-800">
-            <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block">Màu sắc</span>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-stone-600 dark:text-stone-400">
-                {selectedElement.type === 'text' ? 'Màu chữ' : 'Màu nền'}
-              </span>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={
-                    selectedElement.type === 'text'
-                      ? selectedElement.color || '#000000'
-                      : selectedElement.fillColor || '#FAF7F2'
-                  }
-                  onChange={(e) => {
-                    if (selectedElement.type === 'text') {
-                      updateElement(selectedElement.id, { color: e.target.value }, true);
-                    } else {
-                      updateElement(selectedElement.id, { fillColor: e.target.value }, true);
-                    }
-                  }}
-                  className="w-7 h-7 rounded-lg cursor-pointer border border-stone-200 overflow-hidden"
-                />
-                <span className="font-mono text-xs uppercase text-stone-500">
-                  {selectedElement.type === 'text' ? selectedElement.color || '#000' : selectedElement.fillColor || '#FAF7F2'}
-                </span>
-              </div>
-            </div>
+            <StudioColorPalette
+              currentColor={
+                selectedElement.type === 'text'
+                  ? selectedElement.color || '#000000'
+                  : selectedElement.fillColor || '#FAF7F2'
+              }
+              onChange={(hex) => {
+                if (selectedElement.type === 'text') {
+                  updateElement(selectedElement.id, { color: hex }, true);
+                } else {
+                  updateElement(selectedElement.id, { fillColor: hex }, true);
+                }
+              }}
+              elements={elements}
+              canvasBackground={canvas.background}
+              label={selectedElement.type === 'text' ? 'Màu chữ' : 'Màu nền'}
+            />
 
             {/* Opacity slider */}
             <div className="space-y-1.5">
@@ -1441,13 +1455,13 @@ export default function StudioRightInspector() {
                       className="w-16 bg-white dark:bg-stone-900 border rounded px-2 py-1 font-mono text-center"
                     />
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span>Màu viền</span>
-                    <input
-                      type="color"
-                      value={selectedElement.borderColor || '#333333'}
-                      onChange={(e) => updateElement(selectedElement.id, { borderColor: e.target.value }, true)}
-                      className="w-7 h-7 rounded cursor-pointer border"
+                  <div className="space-y-1.5 pt-1 border-t border-stone-200 dark:border-stone-700">
+                    <StudioColorPalette
+                      currentColor={selectedElement.borderColor || '#333333'}
+                      onChange={(hex) => updateElement(selectedElement.id, { borderColor: hex }, true)}
+                      elements={elements}
+                      canvasBackground={canvas.background}
+                      label="Màu viền"
                     />
                   </div>
                   <div className="flex items-center justify-between">

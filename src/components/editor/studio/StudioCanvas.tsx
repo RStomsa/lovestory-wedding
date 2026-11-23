@@ -7,6 +7,7 @@ import { CanvasElement } from './studioTypes';
 import StudioFallingOverlay from './StudioFallingOverlay';
 import StudioWidgetRenderer from './StudioWidgetRenderer';
 import { resolveFontFamily, loadCustomFontFile } from '@/lib/studioFonts';
+import { resolveStudioAssetUrl } from '@/lib/studioUtils';
 import {
   Copy,
   Trash2,
@@ -617,13 +618,23 @@ export default function StudioCanvas() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={el.src}
-              alt={el.alt || 'Asset'}
+              src={resolveStudioAssetUrl(el.src)}
+              alt={el.alt || 'Đồ họa LoveStory'}
               referrerPolicy="no-referrer"
+              onError={(e) => {
+                const target = e.currentTarget;
+                if (target.src.includes('/stock/')) {
+                  const fn = target.src.split('/stock/').pop()?.split('?')[0];
+                  if (fn) {
+                    target.src = `/assets/m-invite/stock/${fn}`;
+                    return;
+                  }
+                }
+              }}
               style={{
                 width: '100%',
                 height: '100%',
-                objectFit: el.objectFit || 'cover',
+                objectFit: el.objectFit || (el.type === 'graphic' ? 'contain' : 'cover'),
                 filter: filterStyle,
                 pointerEvents: 'none',
               }}

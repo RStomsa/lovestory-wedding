@@ -5,6 +5,7 @@ import { STUDIO_TEMPLATE_PRESETS, StudioTemplatePreset } from '@/data/studioTemp
 import { getCustomStudioPreset } from '@/lib/studioPresetsService';
 import { getAllCatalogTemplates } from '@/lib/templatesService';
 import minviteTemplates from '@/data/minvite_templates.json';
+import { resolveStudioAssetUrl } from '@/lib/studioUtils';
 
 export interface HarvestedRawTemplate {
   slug: string;
@@ -768,9 +769,7 @@ function convertMinviteDesignToStudioPreset(minviteMatch: any, rawDesign: any): 
       });
     } else if (wType === 'image') {
       let src = props.src || (props.variants && (props.variants.large || props.variants.small)) || '';
-      if (src && !src.startsWith('http')) {
-        src = `https://cdn.biihappy.com/m-invite/${src}`;
-      }
+      src = resolveStudioAssetUrl(src);
       if (!src) src = coverSrc;
 
       const bRadius = Math.round(parseFloat(style.borderRadiusTopLeft || style.borderRadius || 0));
@@ -791,9 +790,7 @@ function convertMinviteDesignToStudioPreset(minviteMatch: any, rawDesign: any): 
       });
     } else if (wType === 'svg') {
       let src = props.src || '';
-      if (src && !src.startsWith('http')) {
-        src = `https://cdn.biihappy.com/m-invite/${src}`;
-      }
+      src = resolveStudioAssetUrl(src);
       if (!src) return;
 
       elements.push({

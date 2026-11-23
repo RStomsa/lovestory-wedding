@@ -6,6 +6,8 @@ import prisma from '@/lib/prisma';
 import { defaultWeddingData } from '@/data/defaultWedding';
 import TemplateRenderer from '@/components/TemplateRenderer';
 import EnvelopeOpeningEffect from '@/components/common/EnvelopeOpeningEffect';
+import StudioPublicSiteViewer from '@/components/editor/studio/StudioPublicSiteViewer';
+import { getStudioTemplate } from '@/lib/harvestedTemplateConverter';
 import { Heart, Clock, ArrowRight, ShieldAlert, Sparkles } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -182,6 +184,28 @@ export default async function PublicWeddingPage({ params, searchParams }: Props)
   const site = await getSiteBySlug(slug);
 
   if (!site) {
+    // If not found in database, check if it's a Studio template preset (e.g. minvite or harvested template)
+    const templatePreset = getStudioTemplate(slug);
+    if (templatePreset) {
+      return (
+        <StudioPublicSiteViewer
+          canvas={{
+            width: 500,
+            height: 5000,
+            background: '#ffffff',
+            title: templatePreset.name,
+            status: 'published',
+            ...templatePreset.config,
+          }}
+          elements={templatePreset.elements}
+          guestName={guestName}
+          guestRole={role}
+          showEnvelope={showEnvelope}
+          siteTitle={templatePreset.name}
+          slug={slug}
+        />
+      );
+    }
     notFound();
   }
 
@@ -264,21 +288,45 @@ export default async function PublicWeddingPage({ params, searchParams }: Props)
   });
 
   // 5. Parse wedding data safely with deep fallback
+  let isStudioDesign = false;
+  let studioData: { canvas?: any; elements?: any[]; weddingProfile?: any } | null = null;
   let parsedData = defaultWeddingData;
+
   try {
-    const raw = JSON.parse(site.publishedSnapshot || site.draftData);
-    parsedData = {
-      ...defaultWeddingData,
-      ...raw,
-      groom: { ...defaultWeddingData.groom, ...(raw.groom || {}) },
-      bride: { ...defaultWeddingData.bride, ...(raw.bride || {}) },
-      music: { ...defaultWeddingData.music, ...(raw.music || {}) },
-      events: raw.events || defaultWeddingData.events,
-      gallery: raw.gallery || defaultWeddingData.gallery,
-      loveStory: raw.loveStory || defaultWeddingData.loveStory,
-    };
+    const raw = JSON.parse(site.publishedSnapshot || site.draftData || '{}');
+    if (raw && (Array.isArray(raw.elements) || raw.canvas)) {
+      isStudioDesign = true;
+      studioData = raw;
+    } else {
+      parsedData = {
+        ...defaultWeddingData,
+        ...raw,
+        groom: { ...defaultWeddingData.groom, ...(raw.groom || {}) },
+        bride: { ...defaultWeddingData.bride, ...(raw.bride || {}) },
+        music: { ...defaultWeddingData.music, ...(raw.music || {}) },
+        events: raw.events || defaultWeddingData.events,
+        gallery: raw.gallery || defaultWeddingData.gallery,
+        loveStory: raw.loveStory || defaultWeddingData.loveStory,
+      };
+    }
   } catch (err) {
     console.error('Failed to parse wedding data for site:', site.slug, err);
+  }
+
+  // 6. If published from LoveStory Studio, render the full Studio presentation!
+  if (isStudioDesign && studioData?.elements) {
+    return (
+      <StudioPublicSiteViewer
+        canvas={studioData.canvas || { width: 500, height: 5000, background: '#ffffff', title: site.title }}
+        elements={studioData.elements}
+        weddingProfile={studioData.weddingProfile}
+        guestName={guestName}
+        guestRole={role}
+        showEnvelope={showEnvelope}
+        siteTitle={site.title}
+        slug={site.slug}
+      />
+    );
   }
 
   return (

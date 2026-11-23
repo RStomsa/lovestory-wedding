@@ -23,6 +23,7 @@ import {
 import { useStudioStore } from './studioStore';
 import { STUDIO_FONTS, resolveFontFamily } from '@/lib/studioFonts';
 import { GRAPHICS_CATALOG } from '@/data/graphicsCatalog';
+import StudioColorPalette from './StudioColorPalette';
 import { WEDDING_TEXT_TEMPLATES } from '@/data/weddingTextTemplates';
 import StudioPreviewModal from './StudioPreviewModal';
 import {
@@ -339,51 +340,27 @@ export default function StudioMobileBottomSheet() {
             )}
 
             {/* =========================================================================
-                4. COLOR PICKER SHEET
+                4. COLOR PICKER SHEET (VỚI BẢNG MÀU ĐỒNG BỘ & MÀU VỪA DÙNG)
             ========================================================================= */}
             {activeMobileSheet === 'color' && selectedEl && (
               <div className="space-y-3">
-                <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wider block">Bảng màu tiêu chuẩn</span>
-                <div className="grid grid-cols-6 gap-2.5">
-                  {WEDDING_COLORS.map((hex) => {
-                    const isCurrent = (selectedEl.type === 'text' ? selectedEl.color : selectedEl.fillColor) === hex;
-                    return (
-                      <button
-                        key={hex}
-                        onClick={() => {
-                          if (selectedEl.type === 'text') {
-                            updateElement(selectedEl.id, { color: hex }, true);
-                          } else {
-                            updateElement(selectedEl.id, { fillColor: hex }, true);
-                          }
-                        }}
-                        className={`aspect-square rounded-2xl border-2 transition-transform active:scale-90 flex items-center justify-center shadow-xs ${
-                          isCurrent ? 'border-rose-500 scale-110 shadow-md ring-2 ring-rose-300' : 'border-stone-200 dark:border-stone-700'
-                        }`}
-                        style={{ backgroundColor: hex }}
-                      >
-                        {isCurrent && <Check className="w-3.5 h-3.5 text-white drop-shadow-md" />}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Custom Color Input */}
-                <div className="pt-2 border-t border-stone-200 dark:border-stone-800 flex items-center justify-between">
-                  <span className="font-medium text-stone-600 dark:text-stone-300">Tùy chọn màu tự do</span>
-                  <input
-                    type="color"
-                    value={selectedEl.type === 'text' ? selectedEl.color || '#000000' : selectedEl.fillColor || '#FAF7F2'}
-                    onChange={(e) => {
-                      if (selectedEl.type === 'text') {
-                        updateElement(selectedEl.id, { color: e.target.value }, true);
-                      } else {
-                        updateElement(selectedEl.id, { fillColor: e.target.value }, true);
-                      }
-                    }}
-                    className="w-9 h-9 rounded-xl border border-stone-300 cursor-pointer overflow-hidden"
-                  />
-                </div>
+                <StudioColorPalette
+                  currentColor={
+                    selectedEl.type === 'text'
+                      ? selectedEl.color || '#000000'
+                      : selectedEl.fillColor || '#FAF7F2'
+                  }
+                  onChange={(hex) => {
+                    if (selectedEl.type === 'text') {
+                      updateElement(selectedEl.id, { color: hex }, true);
+                    } else {
+                      updateElement(selectedEl.id, { fillColor: hex }, true);
+                    }
+                  }}
+                  elements={elements}
+                  canvasBackground={canvas.background}
+                  label={selectedEl.type === 'text' ? 'Màu chữ' : 'Màu nền'}
+                />
               </div>
             )}
 
