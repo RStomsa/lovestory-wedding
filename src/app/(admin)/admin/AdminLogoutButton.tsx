@@ -21,7 +21,7 @@ export default function AdminLogoutButton() {
     <button
       type="button"
       onClick={handleLogout}
-      className="p-1.5 rounded-lg text-stone-400 hover:text-rose-400 hover:bg-stone-800 transition-colors shrink-0"
+      className="p-1.5 rounded-lg text-stone-400 hover:text-rose-600 hover:bg-stone-200/60 transition-colors shrink-0"
       title="Đăng xuất khỏi hệ thống"
       aria-label="Đăng xuất"
     >

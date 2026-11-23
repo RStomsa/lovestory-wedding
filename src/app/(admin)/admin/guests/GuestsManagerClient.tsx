@@ -6,16 +6,11 @@ import {
   Users,
   Copy,
   ExternalLink,
-  Share2,
   Download,
-  Sparkles,
   Check,
   Search,
-  Filter,
-  Mail,
   Send,
-  Plus,
-  Trash2,
+  Sparkles,
 } from 'lucide-react';
 
 interface SiteOption {
@@ -105,47 +100,47 @@ export default function GuestsManagerClient({ initialSites }: { initialSites: Si
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-stone-900 via-stone-900/90 to-purple-950/40 border border-stone-800 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-purple-500/20 text-purple-300 border border-purple-500/30">
-              Personalized Guest Link Generator
+      <div className="p-6 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-stone-100 text-stone-700 border border-stone-200">
+              Cá nhân hóa khách mời
             </span>
-            <span className="text-xs text-stone-400">Tự động sinh link kèm tên khách</span>
+            <span className="text-xs text-stone-400 font-mono">Tự động sinh link kèm tên khách</span>
           </div>
-          <h1 className="text-2xl font-serif font-bold text-white tracking-tight">
+          <h1 className="text-xl font-serif font-bold text-stone-900 tracking-tight">
             Cá Nhân Hóa Khách Mời &amp; Chia Sẻ Zalo
           </h1>
-          <p className="text-xs text-stone-400 max-w-2xl">
-            Tạo hàng loạt thiệp cưới mang tên từng người bạn, đồng nghiệp hoặc họ hàng. Khi khách mở thiệp sẽ có lời chào trang trọng và nắp phong bì 3D nứt con dấu sáp!
+          <p className="text-xs text-stone-500 mt-1 max-w-2xl leading-relaxed">
+            Tạo hàng loạt thiệp cưới mang tên từng người bạn, đồng nghiệp hoặc họ hàng. Khi khách mở thiệp sẽ có lời chào trang trọng và nắp phong bì 3D nứt con dấu sáp.
           </p>
         </div>
 
         <button
           type="button"
           onClick={handleExportCSV}
-          className="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition-all transform active:scale-95 shrink-0"
+          className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-medium text-xs shadow-2xs flex items-center justify-center gap-1.5 transition-colors shrink-0"
         >
-          <Download className="w-4 h-4" />
-          <span>Xuất File Excel/CSV ({guestList.length})</span>
+          <Download className="w-3.5 h-3.5" />
+          <span>Xuất CSV ({guestList.length})</span>
         </button>
       </div>
 
       {/* Main Grid: Left Config Panel & Right Table Panel */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left: Input & Setup Form */}
-        <div className="space-y-4 p-5 rounded-3xl bg-stone-900/70 border border-stone-800">
-          <h3 className="font-bold text-sm text-white flex items-center gap-2">
-            <Users className="w-4 h-4 text-purple-400" />
-            <span>1. Cấu hình Thiệp &amp; Danh sách</span>
+        <div className="space-y-4 p-5 rounded-2xl bg-white border border-stone-200/90 shadow-xs">
+          <h3 className="font-semibold text-xs text-stone-900 flex items-center gap-2">
+            <Users className="w-4 h-4 text-stone-600" />
+            <span>1. Cấu hình thiệp &amp; danh sách</span>
           </h3>
 
           {/* Select Wedding Site */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-stone-300 block">
-              Chọn Thiệp Cưới Đích
+            <label className="text-xs font-medium text-stone-700 block">
+              Chọn thiệp cưới đích
             </label>
             <select
               value={selectedSlug}
@@ -153,7 +148,7 @@ export default function GuestsManagerClient({ initialSites }: { initialSites: Si
                 setSelectedSlug(e.target.value);
                 setCustomSlugInput('');
               }}
-              className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200 text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900"
             >
               <option value="thiep-cuoi-165">Mẫu Demo C165 (Kem Chữ Vàng)</option>
               <option value="thiep-cuoi-61">Mẫu Demo C61 (Tạp Chí Our Love Begins)</option>
@@ -168,7 +163,7 @@ export default function GuestsManagerClient({ initialSites }: { initialSites: Si
 
           {/* Custom Slug Input if needed */}
           <div className="space-y-1.5">
-            <label className="text-[11px] text-stone-400 block font-mono">
+            <label className="text-[11px] text-stone-500 block">
               Hoặc nhập mã slug tùy ý:
             </label>
             <input
@@ -176,13 +171,13 @@ export default function GuestsManagerClient({ initialSites }: { initialSites: Si
               placeholder="VD: thiep-cuoi-105"
               value={customSlugInput}
               onChange={(e) => setCustomSlugInput(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white font-mono placeholder-stone-500 focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-1.5 rounded-xl bg-stone-50/60 border border-stone-200 text-xs text-stone-900 font-mono placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900"
             />
           </div>
 
           {/* Group Tag */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-stone-300 block">
+            <label className="text-xs font-medium text-stone-700 block">
               Phân nhóm khách mặc định
             </label>
             <div className="grid grid-cols-3 gap-1.5 text-xs">
@@ -191,10 +186,10 @@ export default function GuestsManagerClient({ initialSites }: { initialSites: Si
                   key={grp}
                   type="button"
                   onClick={() => setDefaultGroup(grp)}
-                  className={`py-1.5 px-2 rounded-xl border text-[11px] font-medium transition-all ${
+                  className={`py-1.5 px-2 rounded-lg border text-[11px] font-medium transition-colors ${
                     defaultGroup === grp
-                      ? 'bg-purple-600 text-white border-purple-500'
-                      : 'bg-stone-950 text-stone-400 border-stone-800 hover:text-white'
+                      ? 'bg-stone-900 text-white border-stone-900'
+                      : 'bg-stone-50 text-stone-600 border-stone-200 hover:bg-stone-100 hover:text-stone-900'
                   }`}
                 >
                   {grp}
@@ -204,12 +199,12 @@ export default function GuestsManagerClient({ initialSites }: { initialSites: Si
           </div>
 
           {/* Envelope Opening Toggle */}
-          <div className="p-3 bg-stone-950/80 rounded-2xl border border-stone-800 flex items-center justify-between">
+          <div className="p-3 bg-stone-50 rounded-xl border border-stone-200/80 flex items-center justify-between">
             <div>
-              <span className="text-xs font-semibold text-white block">
-                Bật Phong Bì 3D
+              <span className="text-xs font-medium text-stone-900 block">
+                Bật phong bì 3D
               </span>
-              <span className="text-[10px] text-stone-400 block">
+              <span className="text-[11px] text-stone-500 block">
                 Khách chạm con dấu sáp để mở thiệp
               </span>
             </div>
@@ -217,17 +212,17 @@ export default function GuestsManagerClient({ initialSites }: { initialSites: Si
               type="checkbox"
               checked={withEnvelope}
               onChange={(e) => setWithEnvelope(e.target.checked)}
-              className="w-4 h-4 accent-purple-600 rounded cursor-pointer"
+              className="w-4 h-4 accent-stone-900 rounded cursor-pointer"
             />
           </div>
 
           {/* Bulk Paste Names */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-stone-300">
-                Dán danh sách tên khách mời (Mỗi người 1 dòng)
+              <label className="text-xs font-medium text-stone-700">
+                Dán danh sách khách (mỗi người 1 dòng)
               </label>
-              <span className="text-[10px] text-purple-400 font-mono">
+              <span className="text-[11px] text-stone-500 font-mono">
                 {guestList.length} khách
               </span>
             </div>
@@ -236,32 +231,32 @@ export default function GuestsManagerClient({ initialSites }: { initialSites: Si
               value={inputNamesText}
               onChange={(e) => setInputNamesText(e.target.value)}
               placeholder="Anh Nam&#10;Chị Lan&#10;Bạn Hùng&#10;Cô Út..."
-              className="w-full px-3 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white placeholder-stone-600 focus:outline-none focus:border-purple-500 font-sans leading-relaxed resize-none"
+              className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200 text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 leading-relaxed resize-none"
             />
           </div>
         </div>
 
         {/* Right: Table of Generated Links */}
-        <div className="lg:col-span-2 space-y-4 p-5 rounded-3xl bg-stone-900/70 border border-stone-800">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-800">
+        <div className="lg:col-span-2 space-y-4 p-5 rounded-2xl bg-white border border-stone-200/90 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-200/80">
             <div>
-              <h3 className="font-bold text-sm text-white">
-                2. Danh Sách Đường Link Cá Nhân Hóa ({filteredGuests.length})
+              <h3 className="font-semibold text-xs text-stone-900">
+                2. Danh sách link cá nhân hóa ({filteredGuests.length})
               </h3>
-              <p className="text-[11px] text-stone-400 mt-0.5">
-                Bấm nút sao chép link hoặc sao chép tin nhắn để gửi ngay qua Zalo, Messenger, SMS
+              <p className="text-[11px] text-stone-500 mt-0.5">
+                Sao chép link hoặc tin nhắn mẫu để gửi qua Zalo, Messenger
               </p>
             </div>
 
             {/* Search Input */}
             <div className="relative w-full sm:w-64">
-              <Search className="w-3.5 h-3.5 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Tìm theo tên khách..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-purple-500"
+                className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-50/60 border border-stone-200 text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900"
               />
             </div>
           </div>
@@ -269,8 +264,8 @@ export default function GuestsManagerClient({ initialSites }: { initialSites: Si
           {/* Table Container */}
           <div className="space-y-2 max-h-[560px] overflow-y-auto pr-1">
             {filteredGuests.length === 0 ? (
-              <div className="py-16 text-center text-stone-500 text-xs">
-                Chưa có tên khách mời nào. Hãy nhập tên ở cột bên trái!
+              <div className="py-16 text-center text-stone-400 text-xs">
+                Chưa có tên khách mời nào. Hãy nhập tên ở cột bên trái.
               </div>
             ) : (
               filteredGuests.map((item, idx) => {
@@ -280,22 +275,22 @@ export default function GuestsManagerClient({ initialSites }: { initialSites: Si
                 return (
                   <div
                     key={item.id}
-                    className="p-3.5 rounded-2xl bg-stone-950/80 border border-stone-800/80 hover:border-purple-500/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
+                    className="p-3.5 rounded-xl bg-stone-50/60 border border-stone-200/80 hover:border-stone-300 hover:bg-stone-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
                   >
                     <div className="space-y-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-stone-800 text-stone-300 text-[10px] font-mono flex items-center justify-center shrink-0">
+                        <span className="w-5 h-5 rounded-full bg-stone-200/80 text-stone-700 text-[10px] font-mono flex items-center justify-center shrink-0">
                           {idx + 1}
                         </span>
-                        <h4 className="font-bold text-xs text-white truncate">
+                        <h4 className="font-medium text-xs text-stone-900 truncate">
                           {item.name}
                         </h4>
-                        <span className="px-2 py-0.5 rounded-full bg-purple-950/60 text-purple-300 border border-purple-800/40 text-[9px] font-semibold">
+                        <span className="px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 border border-stone-200 text-[10px] font-medium">
                           {item.group}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-2 text-[10px] text-stone-500 font-mono truncate pl-7">
+                      <div className="flex items-center gap-2 text-[11px] text-stone-500 font-mono truncate pl-7">
                         <span className="truncate">{item.url}</span>
                       </div>
                     </div>
@@ -307,10 +302,10 @@ export default function GuestsManagerClient({ initialSites }: { initialSites: Si
                         type="button"
                         onClick={() => copyToClipboard(item.url, item.id, 'url')}
                         title="Sao chép đường link"
-                        className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold flex items-center gap-1 transition-all ${
+                        className={`px-3 py-1.5 rounded-lg text-[11px] font-medium flex items-center gap-1 transition-colors ${
                           isCopied
                             ? 'bg-emerald-600 text-white'
-                            : 'bg-stone-800 hover:bg-stone-700 text-stone-200'
+                            : 'bg-white border border-stone-200 hover:bg-stone-100 text-stone-700'
                         }`}
                       >
                         {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
@@ -322,14 +317,14 @@ export default function GuestsManagerClient({ initialSites }: { initialSites: Si
                         type="button"
                         onClick={() => copyToClipboard(item.zaloMessage, item.id, 'msg')}
                         title="Sao chép toàn bộ tin nhắn Zalo"
-                        className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold flex items-center gap-1 transition-all ${
+                        className={`px-3 py-1.5 rounded-lg text-[11px] font-medium flex items-center gap-1 transition-colors ${
                           isCopiedMsg
                             ? 'bg-emerald-600 text-white'
-                            : 'bg-purple-900/40 hover:bg-purple-800/60 text-purple-300 border border-purple-700/50'
+                            : 'bg-stone-900 hover:bg-stone-800 text-white'
                         }`}
                       >
                         {isCopiedMsg ? <Check className="w-3.5 h-3.5" /> : <Send className="w-3.5 h-3.5" />}
-                        <span>{isCopiedMsg ? 'Đã chép tin Zalo' : 'Tin Zalo'}</span>
+                        <span>{isCopiedMsg ? 'Đã chép tin' : 'Tin Zalo'}</span>
                       </button>
 
                       {/* Open Link */}
@@ -337,7 +332,7 @@ export default function GuestsManagerClient({ initialSites }: { initialSites: Si
                         href={item.url}
                         target="_blank"
                         title="Mở xem thử thiệp mời với tư cách khách này"
-                        className="p-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 hover:text-white transition-colors"
+                        className="p-1.5 rounded-lg border border-stone-200 hover:bg-stone-100 text-stone-600 transition-colors"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                       </Link>

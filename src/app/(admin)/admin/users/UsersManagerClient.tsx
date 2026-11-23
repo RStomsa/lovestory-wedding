@@ -5,13 +5,12 @@ import Link from 'next/link';
 import {
   Search,
   Crown,
-  Zap,
-  Gift,
   ShieldCheck,
   AlertCircle,
   KeyRound,
   LogOut,
-  ExternalLink,
+  Users,
+  CheckCircle2,
 } from 'lucide-react';
 
 interface UserData {
@@ -93,7 +92,7 @@ export default function UsersManagerClient({ initialUsers }: { initialUsers: Use
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, sessions: [] } : u))
       );
-      setMessage({ text: `✓ ${data.message}`, type: 'success' });
+      setMessage({ text: `Đã thu hồi tất cả phiên đăng nhập của ${userName}`, type: 'success' });
       setTimeout(() => setMessage(null), 4000);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Lỗi';
@@ -104,81 +103,104 @@ export default function UsersManagerClient({ initialUsers }: { initialUsers: Use
   };
 
   return (
-    <div className="space-y-4">
-      {/* Search Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="space-y-5">
+      {/* Top Banner */}
+      <div className="p-6 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-stone-100 text-stone-700 border border-stone-200">
+              Quản trị người dùng
+            </span>
+            <span className="text-xs text-stone-400 font-mono">Cơ sở dữ liệu thực</span>
+          </div>
+          <h1 className="text-xl font-serif font-bold text-stone-900 tracking-tight">
+            Quản Lý Thành Viên &amp; Phân Quyền
+          </h1>
+          <p className="text-xs text-stone-500 mt-1">
+            Quản lý vai trò (Admin / User), nâng cấp gói thành viên trực tiếp, kiểm soát phiên đăng nhập và bảo mật tài khoản.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <Link
+            href="/admin/sessions"
+            className="px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200/80 text-stone-800 text-xs font-medium border border-stone-200/90 transition-colors flex items-center gap-1.5"
+          >
+            <KeyRound className="w-3.5 h-3.5 text-stone-600" />
+            <span>Xem phiên đăng nhập</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Search Bar & Summary */}
+      <div className="p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Tìm theo tên, email hoặc số điện thoại..."
-            className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-stone-800 bg-stone-900/60 text-stone-200 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-stone-200 bg-stone-50/60 text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
           />
         </div>
 
-        <div className="flex items-center gap-3 text-xs text-stone-400">
-          <span>
-            Hiển thị: <span className="font-bold text-white">{filteredUsers.length}</span> / {users.length} thành viên
-          </span>
-          <Link
-            href="/admin/sessions"
-            className="px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/30 font-semibold transition-all flex items-center gap-1.5"
-          >
-            <KeyRound className="w-3.5 h-3.5" />
-            <span>Xem Toàn Bộ Phiên Đăng Nhập &rarr;</span>
-          </Link>
+        <div className="text-xs text-stone-500">
+          Hiển thị <span className="font-semibold text-stone-900">{filteredUsers.length}</span> / {users.length} tài khoản
         </div>
       </div>
 
       {/* Message notification */}
       {message && (
         <div
-          className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
+          className={`p-3.5 rounded-xl text-xs flex items-center gap-2 border ${
             message.type === 'success'
-              ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-300'
-              : 'bg-rose-500/10 border border-rose-500/20 text-rose-300'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : 'bg-rose-50 border-rose-200 text-rose-800'
           }`}
         >
-          <AlertCircle className="w-4 h-4 shrink-0" />
+          {message.type === 'success' ? (
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          ) : (
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          )}
           <span>{message.text}</span>
         </div>
       )}
 
       {/* Table */}
-      <div className="rounded-2xl bg-stone-900/60 border border-stone-800/80 overflow-hidden shadow-xs">
+      <div className="rounded-2xl bg-white border border-stone-200/90 overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-stone-800 bg-stone-950/40 text-stone-400 font-semibold uppercase tracking-wider text-[11px]">
-                <th className="py-3 px-4">Thành Viên</th>
-                <th className="py-3 px-4">Gói Dịch Vụ</th>
-                <th className="py-3 px-4">Vai Trò</th>
-                <th className="py-3 px-4">Thiệp Đã Tạo</th>
-                <th className="py-3 px-4">Trạng Thái Đăng Nhập</th>
-                <th className="py-3 px-4 text-right">Tác Vụ Nhanh</th>
+              <tr className="border-b border-stone-200/90 bg-stone-50/70 text-stone-600 font-medium text-[11px]">
+                <th className="py-3 px-4">Thành viên</th>
+                <th className="py-3 px-4">Gói dịch vụ</th>
+                <th className="py-3 px-4">Vai trò</th>
+                <th className="py-3 px-4">Thiệp đã tạo</th>
+                <th className="py-3 px-4">Trạng thái đăng nhập</th>
+                <th className="py-3 px-4 text-right">Tác vụ</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-800/50">
+            <tbody className="divide-y divide-stone-100">
               {filteredUsers.map((u) => {
                 const isLoading = loadingId === u.id;
                 const activeSessions = u.sessions.filter((s) => new Date(s.expiresAt) > now);
                 const latestSession = u.sessions[0];
 
                 return (
-                  <tr key={u.id} className="hover:bg-stone-800/20 transition-colors">
+                  <tr key={u.id} className="hover:bg-stone-50/60 transition-colors">
                     {/* User Info */}
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-purple-900/30 border border-purple-500/20 text-purple-300 font-bold flex items-center justify-center shrink-0">
-                          {u.name.charAt(0)}
+                        <div className="w-8 h-8 rounded-full bg-rose-50 border border-rose-200/60 text-rose-700 font-semibold flex items-center justify-center shrink-0">
+                          {u.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <div className="font-bold text-stone-200">{u.name}</div>
-                          <div className="text-[11px] text-stone-400 font-mono">{u.email}</div>
+                          <div className="font-medium text-stone-900">{u.name}</div>
+                          <div className="text-[11px] text-stone-500 font-mono">{u.email}</div>
                           {u.phone && (
-                            <div className="text-[10px] text-stone-500 font-mono mt-0.5">{u.phone}</div>
+                            <div className="text-[10px] text-stone-400 font-mono mt-0.5">{u.phone}</div>
                           )}
                         </div>
                       </div>
@@ -190,23 +212,17 @@ export default function UsersManagerClient({ initialUsers }: { initialUsers: Use
                         disabled={isLoading}
                         value={u.plan}
                         onChange={(e) => handleUpdate(u.id, { plan: e.target.value })}
-                        className={`py-1.5 px-2.5 rounded-xl text-xs font-semibold border transition-all focus:outline-none ${
+                        className={`py-1 px-2.5 rounded-lg text-xs font-medium border transition-colors focus:outline-none ${
                           u.plan === 'LIFETIME_VIP_200K'
-                            ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                            ? 'bg-amber-50 border-amber-200 text-amber-900'
                             : u.plan === 'ANNUAL_50K'
-                            ? 'bg-blue-500/10 border-blue-500/30 text-blue-300'
-                            : 'bg-stone-800/60 border-stone-700 text-stone-300'
+                            ? 'bg-sky-50 border-sky-200 text-sky-900'
+                            : 'bg-stone-50 border-stone-200 text-stone-700'
                         }`}
                       >
-                        <option value="FREE" className="bg-stone-900 text-stone-300">
-                          🎁 FREE (300 views)
-                        </option>
-                        <option value="ANNUAL_50K" className="bg-stone-900 text-blue-300">
-                          ⚡ GÓI 1 NĂM (50.000đ)
-                        </option>
-                        <option value="LIFETIME_VIP_200K" className="bg-stone-900 text-amber-300">
-                          👑 VIP TRỌN ĐỜI (200.000đ)
-                        </option>
+                        <option value="FREE">Miễn phí (300 views)</option>
+                        <option value="ANNUAL_50K">Gói 1 Năm (50.000 đ)</option>
+                        <option value="LIFETIME_VIP_200K">VIP Trọn Đời (200.000 đ)</option>
                       </select>
                     </td>
 
@@ -216,46 +232,42 @@ export default function UsersManagerClient({ initialUsers }: { initialUsers: Use
                         disabled={isLoading}
                         value={u.role}
                         onChange={(e) => handleUpdate(u.id, { role: e.target.value })}
-                        className={`py-1.5 px-2.5 rounded-xl text-xs font-semibold border transition-all focus:outline-none ${
+                        className={`py-1 px-2.5 rounded-lg text-xs font-medium border transition-colors focus:outline-none ${
                           u.role === 'ADMIN'
-                            ? 'bg-purple-500/10 border-purple-500/30 text-purple-300'
-                            : 'bg-stone-800/60 border-stone-700 text-stone-400'
+                            ? 'bg-stone-900 text-white border-stone-900'
+                            : 'bg-stone-50 border-stone-200 text-stone-700'
                         }`}
                       >
-                        <option value="USER" className="bg-stone-900 text-stone-400">
-                          USER (Cặp đôi)
-                        </option>
-                        <option value="ADMIN" className="bg-stone-900 text-purple-300">
-                          ADMIN (Quản trị)
-                        </option>
+                        <option value="USER">Khách hàng</option>
+                        <option value="ADMIN">Quản trị viên</option>
                       </select>
                     </td>
 
                     {/* Sites Count */}
                     <td className="py-3.5 px-4">
-                      <span className="font-semibold text-stone-300">
+                      <span className="font-medium text-stone-800">
                         {u.sites.length} thiệp
                       </span>
                     </td>
 
                     {/* Login & Session Status */}
                     <td className="py-3.5 px-4">
-                      <div className="space-y-1">
+                      <div className="space-y-0.5">
                         {activeSessions.length > 0 ? (
                           <div className="flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                            <span className="text-emerald-400 font-bold text-[11px]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            <span className="text-emerald-700 font-medium text-[11px]">
                               {activeSessions.length} thiết bị online
                             </span>
                           </div>
                         ) : (
-                          <span className="text-stone-500 text-[11px]">
-                            Offline
+                          <span className="text-stone-400 text-[11px]">
+                            Ngoại tuyến
                           </span>
                         )}
 
                         {latestSession && (
-                          <div className="text-[10px] text-stone-500">
+                          <div className="text-[10px] text-stone-400">
                             Gần nhất: {new Date(latestSession.createdAt).toLocaleDateString('vi-VN')}
                           </div>
                         )}
@@ -271,7 +283,7 @@ export default function UsersManagerClient({ initialUsers }: { initialUsers: Use
                             disabled={isLoading}
                             onClick={() => handleRevokeUserSessions(u.id, u.name)}
                             title="Đăng xuất khỏi tất cả thiết bị"
-                            className="px-2 py-1 rounded-lg bg-rose-600/15 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/25 text-[10px] font-semibold flex items-center gap-1 transition-all active:scale-95 disabled:opacity-50"
+                            className="px-2.5 py-1 rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-50 text-[11px] font-medium transition-colors flex items-center gap-1 disabled:opacity-50"
                           >
                             <LogOut className="w-3 h-3" />
                             <span>Đăng xuất ({activeSessions.length})</span>
@@ -283,9 +295,9 @@ export default function UsersManagerClient({ initialUsers }: { initialUsers: Use
                             type="button"
                             disabled={isLoading}
                             onClick={() => handleUpdate(u.id, { plan: 'LIFETIME_VIP_200K' })}
-                            className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 text-[11px] font-semibold transition-all inline-flex items-center gap-1"
+                            className="px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 text-white text-[11px] font-medium transition-colors inline-flex items-center gap-1 shadow-2xs"
                           >
-                            <Crown className="w-3 h-3" />
+                            <Crown className="w-3 h-3 text-amber-300" />
                             <span>Nâng VIP</span>
                           </button>
                         )}

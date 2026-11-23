@@ -17,8 +17,10 @@ import {
   KeyRound,
   ShieldCheck,
   ShieldAlert,
-  LogOut,
-  Wand2,
+  Heart,
+  UserCheck,
+  Crown,
+  Cloud,
 } from 'lucide-react';
 
 function LoginFormContent() {
@@ -45,7 +47,11 @@ function LoginFormContent() {
     if (errorParam) {
       if (errorParam === 'google_callback_exception') {
         const details = searchParams.get('details');
-        setError(details ? `Đăng nhập Google thất bại: ${decodeURIComponent(details)}` : 'Đăng nhập bằng Google gặp lỗi xử lý. Vui lòng thử lại hoặc đăng nhập bằng Email / Demo bên dưới.');
+        setError(
+          details
+            ? `Đăng nhập Google thất bại: ${decodeURIComponent(details)}`
+            : 'Đăng nhập bằng Google gặp lỗi phản hồi từ máy chủ. Vui lòng thử lại hoặc đăng nhập bằng Email bên dưới.'
+        );
       } else if (errorParam === 'google_token_exchange_failed') {
         setError('Không thể xác thực mã từ Google. Vui lòng kiểm tra lại cấu hình.');
       } else if (errorParam === 'google_config_missing') {
@@ -65,13 +71,11 @@ function LoginFormContent() {
   useEffect(() => {
     if (!isAuthenticated || !user) return;
 
-    // Admin goes to requested admin path or /admin
     if (user.role === 'ADMIN') {
       window.location.href = redirectParam || '/admin';
       return;
     }
 
-    // Customer / Normal User: If target is valid and NOT admin, redirect immediately
     if (redirectParam && !redirectParam.startsWith('/admin')) {
       window.location.href = redirectParam;
     } else {
@@ -113,7 +117,6 @@ function LoginFormContent() {
         if (isUserAdmin) {
           window.location.href = redirectParam || '/admin';
         } else {
-          // Customers are NEVER redirected into /admin
           const safeTarget = redirectParam && !redirectParam.startsWith('/admin') ? redirectParam : '/dashboard';
           window.location.href = safeTarget;
         }
@@ -156,7 +159,6 @@ function LoginFormContent() {
       if (role === 'admin') {
         window.location.href = '/admin';
       } else {
-        // Customers go to customer dashboard
         const safeTarget = redirectParam && !redirectParam.startsWith('/admin') ? redirectParam : '/dashboard';
         window.location.href = safeTarget;
       }
@@ -173,11 +175,10 @@ function LoginFormContent() {
       const res = await fetch('/api/auth/google?action=status');
       const data = await res.json();
       if (data.configured) {
-        const targetUrl = redirectParam || (mode === 'login' ? '/dashboard' : '/dashboard');
+        const targetUrl = redirectParam || '/dashboard';
         window.location.href = `/api/auth/google?redirect=${encodeURIComponent(targetUrl)}`;
         return;
       }
-      // If client ID not configured in .env yet, open Google sign-in helper
       setShowGoogleModal(true);
     } catch {
       setShowGoogleModal(true);
@@ -211,105 +212,95 @@ function LoginFormContent() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950 flex flex-col justify-center py-10 sm:px-6 lg:px-8 font-sans selection:bg-rose-500 selection:text-white">
+    <div className="min-h-screen bg-[#fafaf9] text-stone-900 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans selection:bg-rose-100 selection:text-rose-900">
       {/* Top back link */}
-      <div className="sm:mx-auto sm:w-full sm:max-w-md px-4 mb-4 flex items-center justify-between">
+      <div className="w-full max-w-md mx-auto mb-4 flex items-center justify-between">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-stone-500 hover:text-stone-900 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-3.5 h-3.5" />
           <span>Về trang chủ</span>
         </Link>
 
         {isAccessingAdmin && (
           <Link
             href="/login"
-            className="text-xs font-semibold text-rose-600 hover:underline"
+            className="text-xs font-medium text-rose-600 hover:underline"
           >
             Đăng nhập khách hàng
           </Link>
         )}
       </div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md px-4">
-        <div className="bg-white dark:bg-stone-900 py-8 px-6 sm:px-10 shadow-2xl rounded-3xl border border-stone-200/80 dark:border-stone-800">
-          {/* Logo & Headline */}
+      <div className="w-full max-w-md mx-auto">
+        <div className="bg-white py-8 px-6 sm:px-8 rounded-2xl border border-stone-200/90 shadow-xs">
+          {/* Brand & Headline */}
           <div className="text-center mb-6">
-            <Link href="/" className="inline-flex items-center gap-1.5 font-serif font-bold text-3xl text-rose-600 mb-2">
-              <span>💍 LoveStory</span>
+            <Link href="/" className="inline-flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-xl bg-rose-50 border border-rose-200/60 flex items-center justify-center text-rose-600">
+                <Heart className="w-4 h-4 fill-rose-600" />
+              </div>
+              <span className="font-serif font-bold text-2xl text-stone-900 tracking-tight">
+                LoveStory
+              </span>
             </Link>
-            <h2 className="text-xl font-serif font-bold text-stone-900 dark:text-white">
+            <h1 className="text-lg font-serif font-bold text-stone-900">
               {isAccessingAdmin
-                ? 'Đăng Nhập Quản Trị Hệ Thống'
+                ? 'Đăng nhập Quản trị hệ thống'
                 : mode === 'login'
                 ? 'Chào mừng bạn trở lại'
                 : 'Tạo tài khoản thiệp cưới'}
-            </h2>
+            </h1>
             <p className="text-xs text-stone-500 mt-1">
               {isAccessingAdmin
-                ? 'Khu vực dành cho Quản Trị Viên. Nếu bạn là khách hàng, hãy đăng nhập để vào Studio.'
-                : 'Đồng bộ dữ liệu thiệp cưới, lưu danh sách khách mời và sổ lưu bút'}
+                ? 'Khu vực quản trị hệ thống. Khách hàng vui lòng đăng nhập tài khoản thường.'
+                : 'Đồng bộ dữ liệu thiệp cưới, quản lý khách mời và sổ lưu bút'}
             </p>
           </div>
 
           {/* Alert: Forbidden Role when trying to access Admin */}
           {isForbiddenUser && (
-            <div className="mb-5 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-3 shadow-inner">
-              <div className="flex items-center gap-2 font-bold text-amber-400">
-                <ShieldAlert className="w-4 h-4 shrink-0" />
-                <span>Bạn đang đăng nhập tài khoản Khách Hàng</span>
+            <div className="mb-5 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-2.5">
+              <div className="flex items-center gap-2 font-semibold text-amber-900">
+                <ShieldAlert className="w-4 h-4 shrink-0 text-amber-700" />
+                <span>Tài khoản khách hàng không có quyền truy cập Quản trị</span>
               </div>
-              <p className="text-[11px] text-stone-300 leading-relaxed">
-                Tài khoản <strong className="text-white">{user?.email}</strong> là tài khoản người dùng, không có quyền truy cập trang Quản Trị Admin.
+              <p className="text-[11px] text-amber-800 leading-relaxed">
+                Tài khoản <strong>{user?.email}</strong> là tài khoản người dùng thông thường.
               </p>
-
-              {/* Clear Action Buttons for Customers */}
-              <div className="space-y-2 pt-1">
+              <div className="flex items-center gap-2 pt-1">
                 <Link
                   href="/dashboard"
-                  className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-bold text-xs shadow-md shadow-rose-600/20 transition-all flex items-center justify-center gap-2 active:scale-95"
+                  className="flex-1 py-1.5 px-3 rounded-lg bg-stone-900 hover:bg-stone-800 text-white font-medium text-xs text-center transition-colors"
                 >
-                  <Wand2 className="w-4 h-4" />
-                  <span>Vào Bảng Điều Khiển Khách Hàng (Dashboard)</span>
+                  Vào Bảng điều khiển
                 </Link>
-
-                <div className="flex items-center gap-2">
-                  <Link
-                    href="/editor/studio"
-                    className="flex-1 py-1.5 px-3 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px] font-medium transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-rose-400" />
-                    <span>Vào Studio Soạn Thiệp</span>
-                  </Link>
-
-                  <Link
-                    href="/"
-                    className="flex-1 py-1.5 px-3 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px] font-medium transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                    <span>Về Trang Chủ</span>
-                  </Link>
-                </div>
+                <Link
+                  href="/editor/studio"
+                  className="flex-1 py-1.5 px-3 rounded-lg border border-stone-200 hover:bg-stone-50 text-stone-700 font-medium text-xs text-center transition-colors"
+                >
+                  Vào Studio
+                </Link>
               </div>
             </div>
           )}
 
           {/* Mode Switch Tabs */}
-          <div className="flex p-1 bg-stone-100 dark:bg-stone-800 rounded-2xl mb-4">
+          <div className="flex p-1 bg-stone-100 rounded-xl mb-4 text-xs">
             <button
               type="button"
               onClick={() => {
                 setError(null);
                 setMode('login');
               }}
-              className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-all ${
+              className={`flex-1 py-1.5 font-medium rounded-lg transition-all ${
                 mode === 'login'
-                  ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-white shadow-sm'
+                  ? 'bg-white text-stone-900 shadow-2xs font-semibold'
                   : 'text-stone-500 hover:text-stone-800'
               }`}
             >
-              Đăng Nhập
+              Đăng nhập
             </button>
             <button
               type="button"
@@ -317,13 +308,13 @@ function LoginFormContent() {
                 setError(null);
                 setMode('register');
               }}
-              className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-all ${
+              className={`flex-1 py-1.5 font-medium rounded-lg transition-all ${
                 mode === 'register'
-                  ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-white shadow-sm'
+                  ? 'bg-white text-stone-900 shadow-2xs font-semibold'
                   : 'text-stone-500 hover:text-stone-800'
               }`}
             >
-              Đăng Ký
+              Đăng ký
             </button>
           </div>
 
@@ -332,10 +323,10 @@ function LoginFormContent() {
             type="button"
             onClick={handleGoogleClick}
             disabled={isGoogleLoading || isSubmitting}
-            className="w-full py-2.5 px-4 mb-4 rounded-2xl border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 bg-white dark:bg-stone-900 flex items-center justify-center gap-3 text-xs font-semibold text-stone-700 dark:text-stone-200 transition-all shadow-xs hover:shadow active:scale-[0.99] cursor-pointer disabled:opacity-50"
+            className="w-full py-2.5 px-4 mb-4 rounded-xl border border-stone-200 hover:bg-stone-50 bg-white flex items-center justify-center gap-2.5 text-xs font-medium text-stone-700 transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
           >
             {isGoogleLoading ? (
-              <div className="w-4 h-4 border-2 border-stone-400 border-t-rose-500 rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-stone-300 border-t-stone-800 rounded-full animate-spin" />
             ) : (
               <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                 <path
@@ -362,25 +353,25 @@ function LoginFormContent() {
           {/* Divider: Hoặc bằng Email */}
           <div className="relative mb-4 flex items-center justify-center">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-stone-200 dark:border-stone-800" />
+              <div className="w-full border-t border-stone-200" />
             </div>
-            <div className="relative px-3 bg-white dark:bg-stone-900 text-[10px] uppercase font-bold tracking-wider text-stone-400">
-              Hoặc bằng email
+            <div className="relative px-3 bg-white text-[11px] font-medium text-stone-400">
+              hoặc bằng email
             </div>
           </div>
 
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs font-medium space-y-1">
+            <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium space-y-1">
               <p>{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3.5">
             {mode === 'register' && (
               <>
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
-                    Họ và Tên
+                  <label className="block text-xs font-medium text-stone-700 mb-1">
+                    Họ và tên
                   </label>
                   <div className="relative">
                     <UserIcon className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -389,14 +380,14 @@ function LoginFormContent() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Nguyễn Văn A"
-                      className="w-full pl-9 pr-3 py-2 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs outline-none focus:ring-2 focus:ring-rose-500"
+                      className="w-full pl-9 pr-3 py-2 bg-stone-50/60 border border-stone-200 rounded-xl text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
-                    Số Điện Thoại (Tùy chọn)
+                  <label className="block text-xs font-medium text-stone-700 mb-1">
+                    Số điện thoại (tùy chọn)
                   </label>
                   <div className="relative">
                     <Phone className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -405,7 +396,7 @@ function LoginFormContent() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="0912345678"
-                      className="w-full pl-9 pr-3 py-2 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs outline-none focus:ring-2 focus:ring-rose-500"
+                      className="w-full pl-9 pr-3 py-2 bg-stone-50/60 border border-stone-200 rounded-xl text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                     />
                   </div>
                 </div>
@@ -413,8 +404,8 @@ function LoginFormContent() {
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
-                Địa Chỉ Email
+              <label className="block text-xs font-medium text-stone-700 mb-1">
+                Địa chỉ email
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -423,14 +414,14 @@ function LoginFormContent() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full pl-9 pr-3 py-2 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs outline-none focus:ring-2 focus:ring-rose-500"
+                  className="w-full pl-9 pr-3 py-2 bg-stone-50/60 border border-stone-200 rounded-xl text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
-                Mật Khẩu
+              <label className="block text-xs font-medium text-stone-700 mb-1">
+                Mật khẩu
               </label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -439,12 +430,12 @@ function LoginFormContent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Tối thiểu 6 ký tự"
-                  className="w-full pl-9 pr-10 py-2 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs outline-none focus:ring-2 focus:ring-rose-500"
+                  className="w-full pl-9 pr-10 py-2 bg-stone-50/60 border border-stone-200 rounded-xl text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -454,80 +445,89 @@ function LoginFormContent() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-bold text-xs shadow-md shadow-rose-600/20 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="w-full py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-medium text-xs shadow-2xs transition-colors flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               {isSubmitting ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
                   <KeyRound className="w-4 h-4" />
-                  <span>{mode === 'login' ? 'Đăng Nhập Ngay' : 'Tạo Tài Khoản'}</span>
+                  <span>{mode === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'}</span>
                 </>
               )}
             </button>
           </form>
 
-          {/* Quick 1-Click Demo Logins */}
-          <div className="mt-6 pt-5 border-t border-stone-200 dark:border-stone-800 space-y-3">
-            <span className="text-[10px] uppercase tracking-wider font-bold text-stone-400 block text-center">
-              ⚡ Đăng nhập nhanh 1-Click:
+          {/* Quick Demo Logins */}
+          <div className="mt-6 pt-5 border-t border-stone-200/90 space-y-3">
+            <span className="text-[11px] font-medium text-stone-500 block text-center">
+              Đăng nhập nhanh mẫu thử nghiệm:
             </span>
 
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => handleDemoClick('chure')}
-                className="p-2 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-rose-400 bg-stone-50 dark:bg-stone-800 flex flex-col items-center justify-center text-center transition-all group"
+                className="p-2.5 rounded-xl border border-stone-200 hover:border-stone-300 hover:bg-stone-50/80 bg-white flex flex-col items-center justify-center text-center transition-colors group"
               >
-                <span className="text-xs font-bold text-stone-800 dark:text-stone-200 group-hover:text-rose-600">
-                  🤵 Chú Rể
+                <div className="w-6 h-6 rounded-lg bg-stone-100 flex items-center justify-center text-stone-600 mb-1 group-hover:text-stone-900">
+                  <UserCheck className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs font-medium text-stone-800">
+                  Chú Rể
                 </span>
-                <span className="text-[9px] text-stone-400">Gói Free</span>
+                <span className="text-[10px] text-stone-400">Gói Free</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleDemoClick('codau')}
-                className="p-2 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-rose-400 bg-stone-50 dark:bg-stone-800 flex flex-col items-center justify-center text-center transition-all group"
+                className="p-2.5 rounded-xl border border-stone-200 hover:border-stone-300 hover:bg-stone-50/80 bg-white flex flex-col items-center justify-center text-center transition-colors group"
               >
-                <span className="text-xs font-bold text-stone-800 dark:text-stone-200 group-hover:text-rose-600">
-                  👰 Cô Dâu
+                <div className="w-6 h-6 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600 mb-1">
+                  <Heart className="w-3.5 h-3.5 fill-rose-600" />
+                </div>
+                <span className="text-xs font-medium text-stone-800">
+                  Cô Dâu
                 </span>
-                <span className="text-[9px] text-stone-400">Gói 50k</span>
+                <span className="text-[10px] text-stone-400">Gói 50k</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleDemoClick('admin')}
-                className="p-2 rounded-xl border border-purple-200 dark:border-purple-900 hover:border-purple-400 bg-purple-50/50 dark:bg-purple-950/30 flex flex-col items-center justify-center text-center transition-all group"
+                className="p-2.5 rounded-xl border border-stone-200 hover:border-stone-300 hover:bg-stone-50/80 bg-white flex flex-col items-center justify-center text-center transition-colors group"
               >
-                <span className="text-xs font-bold text-purple-700 dark:text-purple-300 group-hover:text-purple-600">
-                  👑 Admin
+                <div className="w-6 h-6 rounded-lg bg-stone-900 flex items-center justify-center text-white mb-1">
+                  <Crown className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs font-medium text-stone-800">
+                  Admin
                 </span>
-                <span className="text-[9px] text-purple-500">VIP 200k</span>
+                <span className="text-[10px] text-stone-400">VIP 200k</span>
               </button>
             </div>
 
-            <div className="p-3 bg-stone-50 dark:bg-stone-800/60 rounded-xl border border-stone-200/80 dark:border-stone-700/80 text-[11px] text-stone-500 space-y-1.5">
-              <span className="font-semibold text-stone-700 dark:text-stone-300 block">
-                💡 Hoặc tự điền thông tin:
+            <div className="p-3 bg-stone-50 rounded-xl border border-stone-200/80 text-[11px] text-stone-600 space-y-1.5">
+              <span className="font-medium text-stone-700 block">
+                Hoặc tự điền tài khoản mẫu:
               </span>
               <div className="flex items-center justify-between">
-                <span>Admin: <code className="bg-stone-200 dark:bg-stone-700 px-1 rounded">admin@lovestory.me</code> / <code className="bg-stone-200 dark:bg-stone-700 px-1 rounded">Admin@LoveStory2026</code></span>
+                <span>Admin: <code className="bg-stone-200/70 text-stone-800 px-1 py-0.5 rounded font-mono text-[10px]">admin@lovestory.me</code></span>
                 <button
                   type="button"
                   onClick={() => handleQuickFill('admin@lovestory.me', 'Admin@LoveStory2026')}
-                  className="text-purple-600 hover:underline font-bold text-[10px]"
+                  className="text-stone-900 hover:underline font-medium text-[11px]"
                 >
                   Điền
                 </button>
               </div>
               <div className="flex items-center justify-between">
-                <span>User: <code className="bg-stone-200 dark:bg-stone-700 px-1 rounded">chure@lovestory.me</code> / <code className="bg-stone-200 dark:bg-stone-700 px-1 rounded">123456</code></span>
+                <span>User: <code className="bg-stone-200/70 text-stone-800 px-1 py-0.5 rounded font-mono text-[10px]">chure@lovestory.me</code></span>
                 <button
                   type="button"
                   onClick={() => handleQuickFill('chure@lovestory.me', '123456')}
-                  className="text-rose-600 hover:underline font-bold text-[10px]"
+                  className="text-stone-900 hover:underline font-medium text-[11px]"
                 >
                   Điền
                 </button>
@@ -535,12 +535,12 @@ function LoginFormContent() {
             </div>
           </div>
 
-          <div className="mt-4 pt-3 flex items-center justify-center gap-4 text-[10px] text-stone-400">
+          <div className="mt-4 pt-3 flex items-center justify-center gap-4 text-[11px] text-stone-500">
             <span className="flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Miễn phí trọn đời
+              <CheckCircle2 className="w-3.5 h-3.5 text-stone-400" /> Miễn phí tạo thiệp
             </span>
             <span className="flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-amber-500" /> Đồng bộ đám mây
+              <Cloud className="w-3.5 h-3.5 text-stone-400" /> Đồng bộ đám mây
             </span>
           </div>
         </div>
@@ -548,18 +548,18 @@ function LoginFormContent() {
 
       {/* Google Sign-In Quick Modal */}
       {showGoogleModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="w-full max-w-md bg-white dark:bg-stone-900 rounded-3xl shadow-2xl border border-stone-200 dark:border-stone-800 p-6 relative animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-2xs">
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-stone-200/90 p-6 relative">
             <button
               onClick={() => setShowGoogleModal(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-full text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              className="absolute top-4 right-4 p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
             >
               ✕
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center shadow-xs">
-                <svg className="w-6 h-6" viewBox="0 0 24 24">
+              <div className="w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center">
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -579,96 +579,70 @@ function LoginFormContent() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-serif font-bold text-stone-900 dark:text-white text-base">
-                  Đăng Nhập Bằng Google
+                <h3 className="text-sm font-semibold text-stone-900">
+                  Chọn tài khoản Google để đăng nhập
                 </h3>
                 <p className="text-[11px] text-stone-500">
-                  Chọn tài khoản để tạo phiên và đăng nhập ngay:
+                  Môi trường phát triển cục bộ
                 </p>
               </div>
             </div>
 
             <div className="space-y-2 mb-4">
-              {/* Account 1: Admin Owner Account */}
               <button
                 type="button"
                 onClick={() => handleSelectGoogleAccount('vinhtaithan@gmail.com', 'Vĩnh Tài (Admin)')}
-                className="w-full p-3 rounded-2xl border border-purple-200 dark:border-purple-900 hover:border-purple-500 bg-purple-50/50 dark:bg-purple-950/30 text-left transition-all flex items-center justify-between group"
+                className="w-full p-3 rounded-xl border border-stone-200 hover:border-stone-300 hover:bg-stone-50 flex items-center justify-between text-left transition-colors"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-purple-600 text-white font-bold text-xs flex items-center justify-center">
-                    VT
+                <div>
+                  <div className="text-xs font-semibold text-stone-900 flex items-center gap-1.5">
+                    <span>Vĩnh Tài</span>
+                    <span className="text-[10px] bg-stone-100 text-stone-700 px-1.5 py-0.5 rounded font-mono">Admin</span>
                   </div>
-                  <div>
-                    <h5 className="font-bold text-xs text-stone-900 dark:text-white group-hover:text-purple-600 transition-colors">
-                      vinhtaithan@gmail.com
-                    </h5>
-                    <p className="text-[10px] text-purple-600 dark:text-purple-400 font-medium">
-                      👑 Tài khoản Chủ sở hữu / Quản Trị Viên VIP
-                    </p>
-                  </div>
+                  <div className="text-[11px] text-stone-500 font-mono">vinhtaithan@gmail.com</div>
                 </div>
-                <span className="text-[10px] font-semibold text-purple-600 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full">
-                  Chọn
-                </span>
+                <span className="text-xs text-stone-400">&rarr;</span>
               </button>
 
-              {/* Account 2: Standard Wedding User */}
               <button
                 type="button"
-                onClick={() => handleSelectGoogleAccount('khachhang.cuoi@gmail.com', 'Khách Hàng Google')}
-                className="w-full p-3 rounded-2xl border border-stone-200 dark:border-stone-700 hover:border-rose-400 bg-stone-50 dark:bg-stone-800 text-left transition-all flex items-center justify-between group"
+                onClick={() => handleSelectGoogleAccount('khachhang.demo@gmail.com', 'Khách Hàng (Demo)')}
+                className="w-full p-3 rounded-xl border border-stone-200 hover:border-stone-300 hover:bg-stone-50 flex items-center justify-between text-left transition-colors"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-rose-500 text-white font-bold text-xs flex items-center justify-center">
-                    KH
-                  </div>
-                  <div>
-                    <h5 className="font-bold text-xs text-stone-900 dark:text-white group-hover:text-rose-600 transition-colors">
-                      khachhang.cuoi@gmail.com
-                    </h5>
-                    <p className="text-[10px] text-stone-400">
-                      💍 Tài khoản Khách hàng (Tạo thiệp cưới miễn phí)
-                    </p>
-                  </div>
+                <div>
+                  <div className="text-xs font-semibold text-stone-900">Khách Hàng Demo</div>
+                  <div className="text-[11px] text-stone-500 font-mono">khachhang.demo@gmail.com</div>
                 </div>
-                <span className="text-[10px] font-semibold text-stone-600 dark:text-stone-300 bg-stone-200 dark:bg-stone-700 px-2 py-0.5 rounded-full">
-                  Chọn
-                </span>
+                <span className="text-xs text-stone-400">&rarr;</span>
               </button>
             </div>
 
-            {/* Custom Google Email Input */}
-            <div className="pt-3 border-t border-stone-200 dark:border-stone-800">
-              <label className="block text-[11px] font-bold text-stone-600 dark:text-stone-300 mb-1.5">
-                Hoặc nhập địa chỉ Gmail cá nhân của bạn:
+            <div className="pt-3 border-t border-stone-200/80">
+              <label className="block text-[11px] font-medium text-stone-600 mb-1">
+                Hoặc nhập địa chỉ Gmail khác:
               </label>
               <div className="flex gap-2">
                 <input
                   type="email"
                   value={customGoogleEmail}
                   onChange={(e) => setCustomGoogleEmail(e.target.value)}
-                  placeholder="vi_du@gmail.com"
-                  className="flex-1 px-3 py-2 text-xs bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl outline-none focus:ring-2 focus:ring-rose-500"
+                  placeholder="your-email@gmail.com"
+                  className="flex-1 px-3 py-1.5 rounded-xl border border-stone-200 bg-stone-50 text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900"
                 />
                 <button
                   type="button"
-                  onClick={() => {
-                    if (customGoogleEmail && customGoogleEmail.includes('@')) {
-                      handleSelectGoogleAccount(customGoogleEmail, customGoogleEmail.split('@')[0]);
-                    } else {
-                      setError('Vui lòng nhập địa chỉ Gmail hợp lệ');
-                    }
-                  }}
-                  className="px-3 py-2 rounded-xl bg-stone-900 hover:bg-black text-white text-xs font-semibold transition-all whitespace-nowrap cursor-pointer"
+                  disabled={!customGoogleEmail.includes('@')}
+                  onClick={() =>
+                    handleSelectGoogleAccount(
+                      customGoogleEmail.trim(),
+                      customGoogleEmail.split('@')[0]
+                    )
+                  }
+                  className="px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 disabled:opacity-40 text-white text-xs font-medium transition-colors"
                 >
-                  Đăng nhập
+                  Xác nhận
                 </button>
               </div>
-            </div>
-
-            <div className="mt-3 p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-[10px] text-amber-700 dark:text-amber-400 leading-relaxed">
-              💡 <strong>Lưu ý cấu hình:</strong> Để chuyển sang màn hình chọn tài khoản Google chuẩn quốc tế (Google OAuth Consent Screen), chỉ cần cấu hình <code>GOOGLE_CLIENT_ID</code> và <code>GOOGLE_CLIENT_SECRET</code> trong file <code>.env</code> hoặc Vercel Environment Variables.
             </div>
           </div>
         </div>
@@ -681,8 +655,8 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-stone-50 dark:bg-stone-950 flex items-center justify-center">
-          <div className="w-8 h-8 rounded-full border-2 border-rose-500 border-t-transparent animate-spin" />
+        <div className="min-h-screen bg-[#fafaf9] flex items-center justify-center">
+          <div className="w-6 h-6 border-2 border-stone-300 border-t-stone-800 rounded-full animate-spin" />
         </div>
       }
     >

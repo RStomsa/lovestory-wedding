@@ -413,18 +413,18 @@ export default function AssetsManagerClient({
       <audio ref={audioPlayerRef} onEnded={() => setPlayingTrackId(null)} />
 
       {/* Header with Title & Quick Link to Admin Studio */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-3xl bg-stone-900/80 border border-stone-800 shadow-xl backdrop-blur-md">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-3xl bg-white border border-stone-200/90 shadow-xs">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20 text-[10px] font-bold uppercase tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 border border-stone-200 text-[10px] font-bold uppercase tracking-wider">
               Studio Assets Hub
             </span>
-            <span className="text-xs text-stone-400">Admin Only</span>
+            <span className="text-xs text-stone-500">Admin Only</span>
           </div>
           <h1 className="text-2xl font-serif font-bold text-white tracking-wide">
             Quản Lý Tài Nguyên Studio
           </h1>
-          <p className="text-xs text-stone-400 mt-0.5">
+          <p className="text-xs text-stone-500 mt-0.5">
             Thêm mới phông chữ, hình đồ họa sticker và bài hát đám cưới. Mọi cập nhật sẽ tự động hiển thị tức thì cho khách hàng trong trình thiết kế.
           </p>
         </div>
@@ -432,7 +432,7 @@ export default function AssetsManagerClient({
         {/* Quick action button: Go to Admin Studio */}
         <Link
           href="/admin/studio"
-          className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-purple-600/20 active:scale-95 transition-all"
+          className="px-4 py-2.5 rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-medium text-xs shadow-2xs active:scale-95 transition-all"
         >
           <Wand2 className="w-4 h-4" />
           <span>Mở Admin Studio Soạn Mẫu</span>
@@ -456,20 +456,20 @@ export default function AssetsManagerClient({
             )}
             <span>{message.text}</span>
           </div>
-          <button onClick={() => setMessage(null)} className="text-stone-400 hover:text-white">
+          <button onClick={() => setMessage(null)} className="text-stone-500 hover:text-white">
             ✕
           </button>
         </div>
       )}
 
       {/* Main Tabs Navigation */}
-      <div className="flex items-center gap-2 border-b border-stone-800 pb-2 overflow-x-auto no-scrollbar">
+      <div className="flex items-center gap-2 border-b border-stone-200/90 pb-2 overflow-x-auto no-scrollbar">
         <button
           onClick={() => setActiveTab('fonts')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
             activeTab === 'fonts'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20'
-              : 'bg-stone-900/60 text-stone-400 hover:text-white hover:bg-stone-800'
+              ? 'bg-stone-900 text-white shadow-2xs font-semibold'
+              : 'bg-white text-stone-500 hover:text-white hover:bg-stone-800'
           }`}
         >
           <Type className="w-3.5 h-3.5" />
@@ -480,8 +480,8 @@ export default function AssetsManagerClient({
           onClick={() => setActiveTab('graphics')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
             activeTab === 'graphics'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20'
-              : 'bg-stone-900/60 text-stone-400 hover:text-white hover:bg-stone-800'
+              ? 'bg-stone-900 text-white shadow-2xs font-semibold'
+              : 'bg-white text-stone-500 hover:text-white hover:bg-stone-800'
           }`}
         >
           <Palette className="w-3.5 h-3.5" />
@@ -492,8 +492,8 @@ export default function AssetsManagerClient({
           onClick={() => setActiveTab('music')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
             activeTab === 'music'
-              ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20'
-              : 'bg-stone-900/60 text-stone-400 hover:text-white hover:bg-stone-800'
+              ? 'bg-stone-900 text-white shadow-2xs font-semibold'
+              : 'bg-white text-stone-500 hover:text-white hover:bg-stone-800'
           }`}
         >
           <Music className="w-3.5 h-3.5" />
@@ -506,16 +506,16 @@ export default function AssetsManagerClient({
       ========================================================================= */}
       {activeTab === 'fonts' && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-stone-900/60 p-4 rounded-2xl border border-stone-800">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-stone-200/90">
             {/* Search */}
             <div className="relative flex-1 max-w-sm">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-500" />
               <input
                 type="text"
                 value={searchFont}
                 onChange={(e) => setSearchFont(e.target.value)}
                 placeholder="Tìm phông chữ theo tên hoặc mô tả..."
-                className="w-full pl-9 pr-3 py-1.5 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white placeholder-stone-500 focus:outline-none focus:border-purple-500"
+                className="w-full pl-9 pr-3 py-1.5 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900"
               />
             </div>
 
@@ -532,8 +532,8 @@ export default function AssetsManagerClient({
                   onClick={() => setFontCategoryFilter(c.id as any)}
                   className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold whitespace-nowrap transition-all ${
                     fontCategoryFilter === c.id
-                      ? 'bg-stone-800 text-purple-400 border border-purple-500/30'
-                      : 'text-stone-400 hover:text-white hover:bg-stone-800/40'
+                      ? 'bg-stone-800 text-stone-700 border border-stone-900/30'
+                      : 'text-stone-500 hover:text-white hover:bg-stone-800/40'
                   }`}
                 >
                   {c.label}
@@ -544,7 +544,7 @@ export default function AssetsManagerClient({
             {/* Add Font Button */}
             <button
               onClick={() => setShowAddFontModal(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all"
+              className="px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Thêm Phông Chữ</span>
@@ -556,17 +556,17 @@ export default function AssetsManagerClient({
             {filteredFonts.map((font) => (
               <div
                 key={font.id}
-                className="p-4 rounded-2xl bg-stone-900/60 border border-stone-800 hover:border-stone-700 transition-all flex flex-col justify-between group"
+                className="p-4 rounded-2xl bg-white border border-stone-200/90 hover:border-stone-200/80 transition-all flex flex-col justify-between group"
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-white">{font.name}</span>
-                      <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-stone-800 text-stone-400 border border-stone-700">
+                      <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-stone-800 text-stone-500 border border-stone-200/80">
                         {font.category}
                       </span>
                       {font.isCustom && (
-                        <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold">
+                        <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-700 border border-stone-200 font-semibold">
                           Tùy chỉnh
                         </span>
                       )}
@@ -584,7 +584,7 @@ export default function AssetsManagerClient({
                   </div>
 
                   {/* Visual Typeface Sample Preview */}
-                  <div className="p-3 bg-stone-950/80 rounded-xl border border-stone-800/80 my-2 overflow-hidden">
+                  <div className="p-3 bg-stone-50/60 rounded-xl border border-stone-200/80 my-2 overflow-hidden">
                     <span
                       className="block text-2xl text-amber-200 leading-tight truncate"
                       style={{ fontFamily: font.family }}
@@ -600,10 +600,10 @@ export default function AssetsManagerClient({
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-[10px] text-stone-400 pt-1">
+                <div className="flex items-center justify-between text-[10px] text-stone-500 pt-1">
                   <span>{font.desc}</span>
                   {font.googleFont && (
-                    <span className="font-mono text-purple-400/80 truncate max-w-[120px]">{font.googleFont}</span>
+                    <span className="font-mono text-stone-700/80 truncate max-w-[120px]">{font.googleFont}</span>
                   )}
                 </div>
               </div>
@@ -617,16 +617,16 @@ export default function AssetsManagerClient({
       ========================================================================= */}
       {activeTab === 'graphics' && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-stone-900/60 p-4 rounded-2xl border border-stone-800">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-stone-200/90">
             {/* Search */}
             <div className="relative flex-1 max-w-sm">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-500" />
               <input
                 type="text"
                 value={searchGfx}
                 onChange={(e) => setSearchGfx(e.target.value)}
                 placeholder="Tìm đồ họa theo tên..."
-                className="w-full pl-9 pr-3 py-1.5 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white placeholder-stone-500 focus:outline-none focus:border-purple-500"
+                className="w-full pl-9 pr-3 py-1.5 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900"
               />
             </div>
 
@@ -648,8 +648,8 @@ export default function AssetsManagerClient({
                   onClick={() => setGfxCategoryFilter(c)}
                   className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold whitespace-nowrap transition-all ${
                     gfxCategoryFilter === c
-                      ? 'bg-stone-800 text-purple-400 border border-purple-500/30'
-                      : 'text-stone-400 hover:text-white hover:bg-stone-800/40'
+                      ? 'bg-stone-800 text-stone-700 border border-stone-900/30'
+                      : 'text-stone-500 hover:text-white hover:bg-stone-800/40'
                   }`}
                 >
                   {c === 'all' ? 'Tất cả' : c}
@@ -660,7 +660,7 @@ export default function AssetsManagerClient({
             {/* Add Graphic Button */}
             <button
               onClick={() => setShowAddGfxModal(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all"
+              className="px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Thêm Đồ Họa</span>
@@ -672,7 +672,7 @@ export default function AssetsManagerClient({
             {filteredGraphics.map((item) => (
               <div
                 key={item.id}
-                className="p-3 rounded-2xl bg-stone-900/60 border border-stone-800 hover:border-stone-700 transition-all flex flex-col items-center justify-between group relative shadow-2xs"
+                className="p-3 rounded-2xl bg-white border border-stone-200/90 hover:border-stone-200/80 transition-all flex flex-col items-center justify-between group relative shadow-2xs"
               >
                 {/* Delete button for custom graphics */}
                 {item.isCustom && (
@@ -686,7 +686,7 @@ export default function AssetsManagerClient({
                 )}
 
                 {/* Preview Image */}
-                <div className="w-20 h-20 flex items-center justify-center p-2 mb-2 bg-stone-950/60 rounded-xl border border-stone-800/60">
+                <div className="w-20 h-20 flex items-center justify-center p-2 mb-2 bg-stone-50/60 rounded-xl border border-stone-200/80">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={item.src}
@@ -703,7 +703,7 @@ export default function AssetsManagerClient({
                     {item.category}
                   </span>
                   {item.isCustom && (
-                    <span className="inline-block text-[8px] uppercase tracking-wider px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 font-semibold mt-1">
+                    <span className="inline-block text-[8px] uppercase tracking-wider px-1.5 py-0.2 rounded bg-purple-500/20 text-stone-700 font-semibold mt-1">
                       Mới thêm
                     </span>
                   )}
@@ -719,23 +719,23 @@ export default function AssetsManagerClient({
       ========================================================================= */}
       {activeTab === 'music' && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-stone-900/60 p-4 rounded-2xl border border-stone-800">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-stone-200/90">
             {/* Search */}
             <div className="relative flex-1 max-w-sm">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-500" />
               <input
                 type="text"
                 value={searchMusic}
                 onChange={(e) => setSearchMusic(e.target.value)}
                 placeholder="Tìm bài hát theo tên hoặc ca sĩ..."
-                className="w-full pl-9 pr-3 py-1.5 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white placeholder-stone-500 focus:outline-none focus:border-purple-500"
+                className="w-full pl-9 pr-3 py-1.5 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900"
               />
             </div>
 
             {/* Add Music Button */}
             <button
               onClick={() => setShowAddMusicModal(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all"
+              className="px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Thêm Bài Hát Mới</span>
@@ -751,8 +751,8 @@ export default function AssetsManagerClient({
                   key={track.id}
                   className={`p-3.5 rounded-2xl border flex items-center justify-between transition-all ${
                     isPlaying
-                      ? 'bg-purple-950/30 border-purple-500/50 shadow-md shadow-purple-950/20'
-                      : 'bg-stone-900/60 border-stone-800 hover:border-stone-700'
+                      ? 'bg-purple-950/30 border-stone-900/50 shadow-md shadow-purple-950/20'
+                      : 'bg-white border-stone-200/90 hover:border-stone-200/80'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -772,12 +772,12 @@ export default function AssetsManagerClient({
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-bold text-white truncate">{track.title}</span>
                         {track.isCustom && (
-                          <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 font-semibold">
+                          <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.2 rounded bg-purple-500/20 text-stone-700 font-semibold">
                             Admin tải lên
                           </span>
                         )}
                       </div>
-                      <span className="text-[10px] text-stone-400 font-medium block truncate">
+                      <span className="text-[10px] text-stone-500 font-medium block truncate">
                         {track.artist || 'LoveStory Wedding Collection'}
                       </span>
                     </div>
@@ -810,18 +810,18 @@ export default function AssetsManagerClient({
       ========================================================================= */}
       {showAddFontModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
+          <div className="bg-stone-900 border border-stone-200/90 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
             <h3 className="text-lg font-bold text-white mb-1">Thêm Phông Chữ Mới Vào Hệ Thống</h3>
-            <p className="text-xs text-stone-400 mb-4">
+            <p className="text-xs text-stone-500 mb-4">
               Nhập tên phông chữ từ Google Fonts. Phông mới sẽ hiển thị cho toàn bộ khách hàng trong Studio.
             </p>
 
             <form onSubmit={handleAddFont} className="space-y-3">
               {/* Tải tệp font từ máy tính */}
-              <div className="p-3 bg-stone-950/60 rounded-2xl border border-dashed border-stone-700 hover:border-purple-500 transition-colors">
+              <div className="p-3 bg-stone-50/60 rounded-2xl border border-dashed border-stone-200/80 hover:border-stone-900 transition-colors">
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-xs font-semibold text-stone-200 flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5 text-purple-400" />
+                    <Upload className="w-3.5 h-3.5 text-stone-700" />
                     Tải tệp font từ máy (.ttf, .otf, .woff, .woff2)
                   </span>
                   {newFontFileUrl && (
@@ -845,7 +845,7 @@ export default function AssetsManagerClient({
                   <span>{isUploadingFont ? 'Đang tải tệp lên...' : newFontFileUrl ? 'Đổi tệp font khác' : 'Chọn tệp phông chữ từ máy tính'}</span>
                 </button>
                 {newFontFileUrl && (
-                  <p className="text-[10px] text-purple-400 font-mono mt-1.5 truncate">
+                  <p className="text-[10px] text-stone-700 font-mono mt-1.5 truncate">
                     Đường dẫn: {newFontFileUrl}
                   </p>
                 )}
@@ -864,7 +864,7 @@ export default function AssetsManagerClient({
                   placeholder="Ví dụ: Playfair Display, Great Vibes, Allura..."
                   value={newFontName}
                   onChange={(e) => setNewFontName(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
+                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
                 />
               </div>
 
@@ -876,7 +876,7 @@ export default function AssetsManagerClient({
                   value={newFontGoogle}
                   onChange={(e) => setNewFontGoogle(e.target.value)}
                   disabled={!!newFontFileUrl}
-                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500 disabled:opacity-40"
+                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900 disabled:opacity-40"
                 />
               </div>
 
@@ -885,7 +885,7 @@ export default function AssetsManagerClient({
                 <select
                   value={newFontCategory}
                   onChange={(e) => setNewFontCategory(e.target.value as any)}
-                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
+                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
                 >
                   <option value="script">Viết tay &amp; Thư pháp (Script)</option>
                   <option value="serif">Có chân &amp; Cổ điển (Serif)</option>
@@ -900,7 +900,7 @@ export default function AssetsManagerClient({
                   placeholder="Ví dụ: Lãng mạn bay bổng, Hoàng gia kiêu sa..."
                   value={newFontDesc}
                   onChange={(e) => setNewFontDesc(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
+                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
                 />
               </div>
 
@@ -908,14 +908,14 @@ export default function AssetsManagerClient({
                 <button
                   type="button"
                   onClick={() => setShowAddFontModal(false)}
-                  className="px-4 py-2 rounded-xl border border-stone-700 text-stone-300 hover:bg-stone-800 text-xs font-medium"
+                  className="px-4 py-2 rounded-xl border border-stone-200/80 text-stone-300 hover:bg-stone-800 text-xs font-medium"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingFont}
-                  className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-md disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-stone-900 hover:bg-purple-500 text-white text-xs font-bold shadow-md disabled:opacity-50"
                 >
                   {isSubmittingFont ? 'Đang thêm...' : 'Lưu Phông Chữ'}
                 </button>
@@ -930,9 +930,9 @@ export default function AssetsManagerClient({
       ========================================================================= */}
       {showAddGfxModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
+          <div className="bg-stone-900 border border-stone-200/90 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
             <h3 className="text-lg font-bold text-white mb-1">Thêm Đồ Họa &amp; Sticker Mới</h3>
-            <p className="text-xs text-stone-400 mb-4">
+            <p className="text-xs text-stone-500 mb-4">
               Tải ảnh PNG không nền (transparent) hoặc dán URL SVG/hình ảnh vào thư viện Studio.
             </p>
 
@@ -945,7 +945,7 @@ export default function AssetsManagerClient({
                   placeholder="Ví dụ: Nơ ruy băng hoa hồng, Vòng hoa vintage..."
                   value={newGfxName}
                   onChange={(e) => setNewGfxName(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
+                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
                 />
               </div>
 
@@ -954,7 +954,7 @@ export default function AssetsManagerClient({
                 <select
                   value={newGfxCategory}
                   onChange={(e) => setNewGfxCategory(e.target.value as any)}
-                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
+                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
                 >
                   <option value="Yếu tố đám cưới">Yếu tố đám cưới</option>
                   <option value="Văn hóa Việt">Văn hóa Việt</option>
@@ -974,7 +974,7 @@ export default function AssetsManagerClient({
                   <button
                     type="button"
                     onClick={() => gfxFileInputRef.current?.click()}
-                    className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 font-medium"
+                    className="text-[11px] text-stone-700 hover:text-stone-700 flex items-center gap-1 font-medium"
                   >
                     <Upload className="w-3 h-3" />
                     <span>Chọn tệp từ máy...</span>
@@ -995,20 +995,20 @@ export default function AssetsManagerClient({
                   placeholder="Hoặc dán URL ảnh / SVG: /assets/wedding/... hoặc https://..."
                   value={newGfxSrc}
                   onChange={(e) => setNewGfxSrc(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
+                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
                 />
 
                 {isUploadingGfx && (
-                  <p className="text-[10px] text-purple-400 mt-1 animate-pulse">Đang tải tệp ảnh lên máy chủ...</p>
+                  <p className="text-[10px] text-stone-700 mt-1 animate-pulse">Đang tải tệp ảnh lên máy chủ...</p>
                 )}
 
                 {newGfxSrc && (
-                  <div className="mt-2 p-2 bg-stone-950 rounded-xl border border-stone-800 flex items-center gap-3">
+                  <div className="mt-2 p-2 bg-stone-50/60 rounded-xl border border-stone-200/90 flex items-center gap-3">
                     <div className="w-12 h-12 flex items-center justify-center p-1 bg-stone-900 rounded-lg">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={newGfxSrc} alt="Preview" className="max-w-full max-h-full object-contain" />
                     </div>
-                    <span className="text-[10px] text-stone-400 font-mono truncate">{newGfxSrc}</span>
+                    <span className="text-[10px] text-stone-500 font-mono truncate">{newGfxSrc}</span>
                   </div>
                 )}
               </div>
@@ -1016,21 +1016,21 @@ export default function AssetsManagerClient({
               {/* Dimensions */}
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[10px] text-stone-400 block mb-1">Chiều Rộng (px)</label>
+                  <label className="text-[10px] text-stone-500 block mb-1">Chiều Rộng (px)</label>
                   <input
                     type="number"
                     value={newGfxWidth}
                     onChange={(e) => setNewGfxWidth(Number(e.target.value))}
-                    className="w-full px-3 py-1.5 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white"
+                    className="w-full px-3 py-1.5 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-stone-400 block mb-1">Chiều Cao (px)</label>
+                  <label className="text-[10px] text-stone-500 block mb-1">Chiều Cao (px)</label>
                   <input
                     type="number"
                     value={newGfxHeight}
                     onChange={(e) => setNewGfxHeight(Number(e.target.value))}
-                    className="w-full px-3 py-1.5 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white"
+                    className="w-full px-3 py-1.5 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white"
                   />
                 </div>
               </div>
@@ -1039,14 +1039,14 @@ export default function AssetsManagerClient({
                 <button
                   type="button"
                   onClick={() => setShowAddGfxModal(false)}
-                  className="px-4 py-2 rounded-xl border border-stone-700 text-stone-300 hover:bg-stone-800 text-xs font-medium"
+                  className="px-4 py-2 rounded-xl border border-stone-200/80 text-stone-300 hover:bg-stone-800 text-xs font-medium"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingGfx}
-                  className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-md disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-stone-900 hover:bg-purple-500 text-white text-xs font-bold shadow-md disabled:opacity-50"
                 >
                   {isSubmittingGfx ? 'Đang thêm...' : 'Lưu Đồ Họa'}
                 </button>
@@ -1061,9 +1061,9 @@ export default function AssetsManagerClient({
       ========================================================================= */}
       {showAddMusicModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-stone-900 border border-stone-800 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
+          <div className="bg-stone-900 border border-stone-200/90 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
             <h3 className="text-lg font-bold text-white mb-1">Thêm Bài Hát Mới Vào Thư Viện</h3>
-            <p className="text-xs text-stone-400 mb-4">
+            <p className="text-xs text-stone-500 mb-4">
               Tải tệp MP3 hoặc dán liên kết âm thanh trực tiếp. Khách hàng có thể chọn bài hát này làm nhạc nền thiệp cưới.
             </p>
 
@@ -1076,7 +1076,7 @@ export default function AssetsManagerClient({
                   placeholder="Ví dụ: Beautiful In White, Cưới Nhau Đi, I Do..."
                   value={newMusicTitle}
                   onChange={(e) => setNewMusicTitle(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
+                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
                 />
               </div>
 
@@ -1087,7 +1087,7 @@ export default function AssetsManagerClient({
                   placeholder="Ví dụ: Shane Filan, Đức Phúc, 911..."
                   value={newMusicArtist}
                   onChange={(e) => setNewMusicArtist(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
+                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
                 />
               </div>
 
@@ -1097,7 +1097,7 @@ export default function AssetsManagerClient({
                   <button
                     type="button"
                     onClick={() => musicFileInputRef.current?.click()}
-                    className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 font-medium"
+                    className="text-[11px] text-stone-700 hover:text-stone-700 flex items-center gap-1 font-medium"
                   >
                     <Upload className="w-3 h-3" />
                     <span>Tải tệp MP3 từ máy...</span>
@@ -1118,11 +1118,11 @@ export default function AssetsManagerClient({
                   placeholder="Dán link âm thanh /assets/wedding/mp3/... hoặc https://..."
                   value={newMusicUrl}
                   onChange={(e) => setNewMusicUrl(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-950 border border-stone-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
+                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
                 />
 
                 {isUploadingMusic && (
-                  <p className="text-[10px] text-purple-400 mt-1 animate-pulse">Đang tải tệp MP3 lên máy chủ...</p>
+                  <p className="text-[10px] text-stone-700 mt-1 animate-pulse">Đang tải tệp MP3 lên máy chủ...</p>
                 )}
               </div>
 
@@ -1130,14 +1130,14 @@ export default function AssetsManagerClient({
                 <button
                   type="button"
                   onClick={() => setShowAddMusicModal(false)}
-                  className="px-4 py-2 rounded-xl border border-stone-700 text-stone-300 hover:bg-stone-800 text-xs font-medium"
+                  className="px-4 py-2 rounded-xl border border-stone-200/80 text-stone-300 hover:bg-stone-800 text-xs font-medium"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingMusic}
-                  className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-md disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-stone-900 hover:bg-purple-500 text-white text-xs font-bold shadow-md disabled:opacity-50"
                 >
                   {isSubmittingMusic ? 'Đang thêm...' : 'Lưu Bài Hát'}
                 </button>

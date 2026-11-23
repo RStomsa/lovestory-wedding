@@ -370,20 +370,20 @@ export default function TemplatesManagerClient({
   return (
     <div className="space-y-6">
       {/* Top Banner & Action Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-gradient-to-r from-stone-900 via-stone-900/90 to-purple-950/30 border border-stone-800 shadow-xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-white border border-stone-200/90 shadow-xs">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-purple-500/20 text-purple-300 border border-purple-500/30">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-stone-100 text-stone-700 border border-stone-200">
               Quản Trị Giao Diện &amp; Template
             </span>
-            <span className="text-xs text-stone-400">
+            <span className="text-xs text-stone-500">
               {catalogTemplates.length} Mẫu thiệp đang mở
             </span>
           </div>
           <h1 className="text-2xl font-serif font-bold text-white tracking-tight">
             Kho Mẫu Thiệp Cưới &amp; Sự Kiện Online
           </h1>
-          <p className="text-xs text-stone-400 max-w-2xl">
+          <p className="text-xs text-stone-500 max-w-2xl">
             Quản lý danh sách mẫu thiệp trên thị trường, định giá từng mẫu hoặc gói VIP, và phát hành giao diện mới cho khách hàng sử dụng ngay trong Studio.
           </p>
         </div>
@@ -391,16 +391,16 @@ export default function TemplatesManagerClient({
         <div className="flex items-center gap-2.5 shrink-0">
           <Link
             href="/admin/studio"
-            className="px-5 py-3 rounded-2xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 hover:text-white border border-purple-500/30 font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all transform active:scale-95"
+            className="px-5 py-3 rounded-2xl bg-purple-500/20 hover:bg-purple-500/30 text-stone-700 hover:text-white border border-stone-900/30 font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all transform active:scale-95"
           >
-            <Sparkles className="w-4 h-4 text-purple-400" />
+            <Sparkles className="w-4 h-4 text-stone-700" />
             <span>Soạn Mẫu Trong Studio</span>
           </Link>
 
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 transition-all transform active:scale-95"
+            className="px-5 py-3 rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-medium text-xs shadow-2xs flex items-center justify-center gap-2 transition-all transform active:scale-95"
           >
             <Plus className="w-4 h-4" />
             <span>Phát Hành Nhanh</span>
@@ -429,14 +429,14 @@ export default function TemplatesManagerClient({
 
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-stone-800 gap-2 overflow-x-auto no-scrollbar">
+      <div className="flex border-b border-stone-200/90 gap-2 overflow-x-auto no-scrollbar">
         <button
           type="button"
           onClick={() => setActiveTab('catalog')}
           className={`pb-3 px-4 text-xs font-bold transition-all flex items-center gap-2 border-b-2 whitespace-nowrap ${
             activeTab === 'catalog'
-              ? 'border-purple-500 text-purple-400'
-              : 'border-transparent text-stone-400 hover:text-stone-200'
+              ? 'border-stone-900 text-stone-900 font-semibold'
+              : 'border-transparent text-stone-500 hover:text-stone-200'
           }`}
         >
           <Layers className="w-4 h-4" />
@@ -448,8 +448,8 @@ export default function TemplatesManagerClient({
           onClick={() => setActiveTab('harvested')}
           className={`pb-3 px-4 text-xs font-bold transition-all flex items-center gap-2 border-b-2 whitespace-nowrap ${
             activeTab === 'harvested'
-              ? 'border-purple-500 text-purple-400'
-              : 'border-transparent text-stone-400 hover:text-stone-200'
+              ? 'border-stone-900 text-stone-900 font-semibold'
+              : 'border-transparent text-stone-500 hover:text-stone-200'
           }`}
         >
           <Sparkles className="w-4 h-4 text-amber-400" />
@@ -461,8 +461,8 @@ export default function TemplatesManagerClient({
           onClick={() => setActiveTab('engines')}
           className={`pb-3 px-4 text-xs font-bold transition-all flex items-center gap-2 border-b-2 whitespace-nowrap ${
             activeTab === 'engines'
-              ? 'border-purple-500 text-purple-400'
-              : 'border-transparent text-stone-400 hover:text-stone-200'
+              ? 'border-stone-900 text-stone-900 font-semibold'
+              : 'border-transparent text-stone-500 hover:text-stone-200'
           }`}
         >
           <Settings2 className="w-4 h-4" />
@@ -474,8 +474,8 @@ export default function TemplatesManagerClient({
           onClick={() => setActiveTab('typography-effects')}
           className={`pb-3 px-4 text-xs font-bold transition-all flex items-center gap-2 border-b-2 whitespace-nowrap ${
             activeTab === 'typography-effects'
-              ? 'border-purple-500 text-purple-400'
-              : 'border-transparent text-stone-400 hover:text-stone-200'
+              ? 'border-stone-900 text-stone-900 font-semibold'
+              : 'border-transparent text-stone-500 hover:text-stone-200'
           }`}
         >
           <Type className="w-4 h-4 text-pink-400" />
@@ -487,7 +487,7 @@ export default function TemplatesManagerClient({
       {activeTab === 'catalog' && (
         <div className="space-y-4">
           {/* Filter Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 rounded-2xl bg-stone-900/60 border border-stone-800">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 rounded-2xl bg-white border border-stone-200/90">
             {/* Search */}
             <div className="relative w-full sm:w-72">
               <Search className="w-3.5 h-3.5 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -496,7 +496,7 @@ export default function TemplatesManagerClient({
                 placeholder="Tìm mẫu theo tên, mã hoặc mô tả..."
                 value={searchCatalog}
                 onChange={(e) => setSearchCatalog(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-950/70 border border-stone-800 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-purple-500"
+                className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900"
               />
             </div>
 
@@ -505,7 +505,7 @@ export default function TemplatesManagerClient({
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="px-3 py-1.5 rounded-xl bg-stone-950/70 border border-stone-800 text-xs text-stone-300 focus:outline-none focus:border-purple-500"
+                className="px-3 py-1.5 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-stone-300 focus:outline-none focus:border-stone-900"
               >
                 <option value="all">Tất cả danh mục</option>
                 <option value="wedding">Thiệp cưới</option>
@@ -518,7 +518,7 @@ export default function TemplatesManagerClient({
               <select
                 value={tierFilter}
                 onChange={(e) => setTierFilter(e.target.value)}
-                className="px-3 py-1.5 rounded-xl bg-stone-950/70 border border-stone-800 text-xs text-stone-300 focus:outline-none focus:border-purple-500"
+                className="px-3 py-1.5 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-stone-300 focus:outline-none focus:border-stone-900"
               >
                 <option value="all">Tất cả phân hạng</option>
                 <option value="FREE">Miễn phí (Free)</option>
@@ -540,11 +540,11 @@ export default function TemplatesManagerClient({
               return (
                 <div
                   key={tpl.id}
-                  className="rounded-2xl border border-stone-800 bg-stone-900/60 overflow-hidden flex flex-col justify-between hover:border-purple-500/50 transition-all group"
+                  className="rounded-2xl border border-stone-200/90 bg-white overflow-hidden flex flex-col justify-between hover:border-stone-900/50 transition-all group"
                 >
                   {/* Image & Header */}
                   <div>
-                    <div className="relative aspect-[3/4] bg-stone-950 overflow-hidden border-b border-stone-800">
+                    <div className="relative aspect-[3/4] bg-stone-50/60 overflow-hidden border-b border-stone-200/90">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={tpl.longThumbnail}
@@ -555,11 +555,11 @@ export default function TemplatesManagerClient({
                       {/* Badges on Thumbnail */}
                       <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
                         {tpl.badge && (
-                          <span className="px-2 py-0.5 rounded-md bg-stone-900/90 backdrop-blur-xs text-amber-300 text-[10px] font-bold border border-amber-500/30">
+                          <span className="px-2 py-0.5 rounded-md bg-white backdrop-blur-xs text-amber-300 text-[10px] font-bold border border-amber-500/30">
                             {tpl.badge}
                           </span>
                         )}
-                        <span className="px-2 py-0.5 rounded-md bg-stone-900/80 backdrop-blur-xs text-stone-300 text-[9px] font-medium border border-stone-700">
+                        <span className="px-2 py-0.5 rounded-md bg-white backdrop-blur-xs text-stone-300 text-[9px] font-medium border border-stone-200/80">
                           Engine: {tpl.baseTemplateId}
                         </span>
                       </div>
@@ -581,10 +581,10 @@ export default function TemplatesManagerClient({
                       </div>
 
                       {/* Hover action overlay */}
-                      <div className="absolute inset-0 bg-stone-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-4">
+                      <div className="absolute inset-0 bg-stone-50/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-4">
                         <Link
                           href={`/admin/studio?template=${encodeURIComponent(tpl.slug || tpl.id)}`}
-                          className="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs text-center flex items-center justify-center gap-1.5 shadow-lg"
+                          className="w-full py-2 rounded-xl bg-stone-900 hover:bg-purple-500 text-white font-bold text-xs text-center flex items-center justify-center gap-1.5 shadow-lg"
                         >
                           <Sparkles className="w-3.5 h-3.5" />
                           <span>Soạn trong Admin Studio</span>
@@ -618,12 +618,12 @@ export default function TemplatesManagerClient({
                         )}
                       </div>
 
-                      <p className="text-[11px] text-stone-400 line-clamp-2 leading-relaxed">
+                      <p className="text-[11px] text-stone-500 line-clamp-2 leading-relaxed">
                         {tpl.description}
                       </p>
 
                       <div className="flex items-center justify-between text-[11px] pt-1">
-                        <span className="text-stone-400">
+                        <span className="text-stone-500">
                           {tpl.category === 'wedding'
                             ? 'Thiệp cưới'
                             : tpl.category === 'birthday'
@@ -647,21 +647,21 @@ export default function TemplatesManagerClient({
                   </div>
 
                   {/* Direct Card Action Buttons */}
-                  <div className="px-4 py-2.5 border-t border-stone-800 bg-stone-950/30 flex items-center gap-2">
+                  <div className="px-4 py-2.5 border-t border-stone-200/90 bg-stone-50/60 flex items-center gap-2">
                     <Link
                       href={`/admin/studio?template=${encodeURIComponent(tpl.slug || tpl.id)}`}
-                      className="flex-1 py-2 px-3 rounded-xl bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+                      className="flex-1 py-2 px-3 rounded-xl bg-stone-900/20 hover:bg-stone-900 text-stone-700 hover:text-white border border-stone-900/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                      <Sparkles className="w-3.5 h-3.5 text-stone-700" />
                       <span>Soạn Studio</span>
                     </Link>
 
                     <button
                       type="button"
                       onClick={() => handleOpenEditModal(tpl)}
-                      className="py-2 px-3 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+                      className="py-2 px-3 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-200/80 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
                     >
-                      <Settings2 className="w-3.5 h-3.5 text-stone-400" />
+                      <Settings2 className="w-3.5 h-3.5 text-stone-500" />
                       <span>Sửa</span>
                     </button>
 
@@ -669,16 +669,16 @@ export default function TemplatesManagerClient({
                       href={`/${tpl.slug || tpl.id}`}
                       target="_blank"
                       title="Xem thử ngoài web"
-                      className="p-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-stone-200 border border-stone-700 transition-all flex items-center justify-center"
+                      className="p-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-500 hover:text-stone-200 border border-stone-200/80 transition-all flex items-center justify-center"
                     >
                       <Eye className="w-3.5 h-3.5" />
                     </Link>
                   </div>
 
                   {/* Card Footer */}
-                  <div className="px-4 py-2.5 border-t border-stone-800/80 bg-stone-950/40 flex items-center justify-between text-[10px] text-stone-500 font-mono">
+                  <div className="px-4 py-2.5 border-t border-stone-200/80 bg-stone-50/60 flex items-center justify-between text-[10px] text-stone-500 font-mono">
                     <span className="truncate max-w-[120px]">{tpl.id}</span>
-                    <span className="text-stone-400">
+                    <span className="text-stone-500">
                       👁 {tpl.views.toLocaleString('vi-VN')} • ❤️ {tpl.likes.toLocaleString('vi-VN')}
                     </span>
                   </div>
@@ -708,19 +708,19 @@ export default function TemplatesManagerClient({
                   key={tpl.id}
                   className={`rounded-2xl border transition-all overflow-hidden flex flex-col justify-between ${
                     tpl.isActive
-                      ? 'bg-stone-900/70 border-stone-800'
-                      : 'bg-stone-950/40 border-stone-800/40 opacity-70'
+                      ? 'bg-white border-stone-200/90'
+                      : 'bg-stone-50/60 border-stone-200/80 opacity-70'
                   }`}
                 >
                   {/* Top Info */}
                   <div className="p-5">
                     <div className="flex items-start gap-4">
                       {/* Thumbnail */}
-                      <div className="relative w-24 h-28 rounded-xl overflow-hidden border border-stone-700 shrink-0 bg-stone-800">
+                      <div className="relative w-24 h-28 rounded-xl overflow-hidden border border-stone-200/80 shrink-0 bg-stone-800">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={tpl.thumbnail} alt={tpl.name} className="w-full h-full object-cover" />
                         {tpl.badge && (
-                          <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded-md bg-stone-900/80 backdrop-blur-xs text-amber-300 text-[9px] font-bold">
+                          <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded-md bg-white backdrop-blur-xs text-amber-300 text-[9px] font-bold">
                             {tpl.badge}
                           </span>
                         )}
@@ -737,14 +737,14 @@ export default function TemplatesManagerClient({
                             className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition-all ${
                               tpl.isActive
                                 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                : 'bg-stone-800 text-stone-500 border border-stone-700'
+                                : 'bg-stone-800 text-stone-500 border border-stone-200/80'
                             }`}
                           >
                             {tpl.isActive ? '● ĐANG BẬT' : '○ ĐÃ TẮT'}
                           </button>
                         </div>
 
-                        <p className="text-xs text-stone-400 mb-2 line-clamp-2">{tpl.description}</p>
+                        <p className="text-xs text-stone-500 mb-2 line-clamp-2">{tpl.description}</p>
 
                         {/* Tier Selector */}
                         <div className="flex items-center gap-2 mb-2">
@@ -755,7 +755,7 @@ export default function TemplatesManagerClient({
                             className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
                               tpl.tier === 'BASIC'
                                 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-xs'
-                                : 'bg-stone-800/60 text-stone-400 border border-stone-700/60 hover:text-stone-300'
+                                : 'bg-stone-800/60 text-stone-500 border border-stone-200/80/60 hover:text-stone-300'
                             }`}
                           >
                             🎁 Cơ Bản (Miễn Phí)
@@ -770,7 +770,7 @@ export default function TemplatesManagerClient({
                             className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 ${
                               tpl.tier === 'VIP'
                                 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-xs'
-                                : 'bg-stone-800/60 text-stone-400 border border-stone-700/60 hover:text-stone-300'
+                                : 'bg-stone-800/60 text-stone-500 border border-stone-200/80/60 hover:text-stone-300'
                             }`}
                           >
                             <Crown className="w-3 h-3 text-amber-400" />
@@ -780,10 +780,10 @@ export default function TemplatesManagerClient({
 
                         {/* Edit Price & Badge Form */}
                         {isEditing ? (
-                          <div className="space-y-2 mt-2 p-2 rounded-xl bg-stone-950/80 border border-stone-800">
+                          <div className="space-y-2 mt-2 p-2 rounded-xl bg-stone-50/60 border border-stone-200/90">
                             <div className="grid grid-cols-2 gap-2">
                               <div>
-                                <label className="block text-[10px] text-stone-400 mb-0.5 font-semibold">
+                                <label className="block text-[10px] text-stone-500 mb-0.5 font-semibold">
                                   Giá bán lẻ (VNĐ)
                                 </label>
                                 <input
@@ -791,11 +791,11 @@ export default function TemplatesManagerClient({
                                   step="5000"
                                   value={editPrice}
                                   onChange={(e) => setEditPrice(Number(e.target.value))}
-                                  className="w-full px-2 py-1 rounded-lg text-xs bg-stone-900 border border-stone-700 text-white focus:outline-none"
+                                  className="w-full px-2 py-1 rounded-lg text-xs bg-stone-900 border border-stone-200/80 text-white focus:outline-none"
                                 />
                               </div>
                               <div>
-                                <label className="block text-[10px] text-stone-400 mb-0.5 font-semibold">
+                                <label className="block text-[10px] text-stone-500 mb-0.5 font-semibold">
                                   Huy hiệu (Badge)
                                 </label>
                                 <input
@@ -803,7 +803,7 @@ export default function TemplatesManagerClient({
                                   value={editBadge}
                                   onChange={(e) => setEditBadge(e.target.value)}
                                   placeholder="Hot, VIP..."
-                                  className="w-full px-2 py-1 rounded-lg text-xs bg-stone-900 border border-stone-700 text-white focus:outline-none"
+                                  className="w-full px-2 py-1 rounded-lg text-xs bg-stone-900 border border-stone-200/80 text-white focus:outline-none"
                                 />
                               </div>
                             </div>
@@ -811,7 +811,7 @@ export default function TemplatesManagerClient({
                               <button
                                 type="button"
                                 onClick={() => setEditingId(null)}
-                                className="px-2 py-1 rounded-md text-[10px] text-stone-400 hover:text-stone-200"
+                                className="px-2 py-1 rounded-md text-[10px] text-stone-500 hover:text-stone-200"
                               >
                                 Hủy
                               </button>
@@ -823,7 +823,7 @@ export default function TemplatesManagerClient({
                                     badge: editBadge.trim() || null,
                                   })
                                 }
-                                className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-purple-600 hover:bg-purple-500 text-white flex items-center gap-1"
+                                className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-stone-900 hover:bg-purple-500 text-white flex items-center gap-1"
                               >
                                 <Save className="w-3 h-3" />
                                 <span>Lưu Thay Đổi</span>
@@ -831,7 +831,7 @@ export default function TemplatesManagerClient({
                             </div>
                           </div>
                         ) : (
-                          <div className="flex items-center justify-between text-[11px] text-stone-400 mt-1">
+                          <div className="flex items-center justify-between text-[11px] text-stone-500 mt-1">
                             <div>
                               {tpl.tier === 'VIP' ? (
                                 <span className="text-amber-400 font-bold">
@@ -848,7 +848,7 @@ export default function TemplatesManagerClient({
                                 setEditPrice(tpl.price);
                                 setEditBadge(tpl.badge || '');
                               }}
-                              className="text-purple-400 hover:text-purple-300 font-medium underline"
+                              className="text-stone-700 hover:text-stone-700 font-medium underline"
                             >
                               Sửa giá &amp; badge
                             </button>
@@ -859,7 +859,7 @@ export default function TemplatesManagerClient({
                   </div>
 
                   {/* Bottom Stats */}
-                  <div className="px-5 py-3 border-t border-stone-800/80 bg-stone-950/30 flex items-center justify-between text-xs text-stone-400">
+                  <div className="px-5 py-3 border-t border-stone-200/80 bg-stone-50/60 flex items-center justify-between text-xs text-stone-500">
                     <div className="flex items-center gap-3 text-[11px]">
                       <span>Mã: <code className="text-stone-300 font-mono">{tpl.id}</code></span>
                       <span>•</span>
@@ -869,7 +869,7 @@ export default function TemplatesManagerClient({
                     <Link
                       href={`/editor/studio?template=${encodeURIComponent(tpl.slug || tpl.id)}`}
                       target="_blank"
-                      className="text-stone-400 hover:text-white flex items-center gap-1 text-[11px] font-medium"
+                      className="text-stone-500 hover:text-white flex items-center gap-1 text-[11px] font-medium"
                     >
                       <Palette className="w-3 h-3" />
                       <span>Thử trong Studio</span>
@@ -889,7 +889,7 @@ export default function TemplatesManagerClient({
       {activeTab === 'harvested' && (
         <div className="space-y-4">
           {/* Filter Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 rounded-2xl bg-stone-900/60 border border-stone-800">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 rounded-2xl bg-white border border-stone-200/90">
             {/* Search */}
             <div className="relative w-full sm:w-80">
               <Search className="w-3.5 h-3.5 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -898,7 +898,7 @@ export default function TemplatesManagerClient({
                 placeholder="Tìm kiếm trong 188 mẫu thực tế..."
                 value={searchHarvested}
                 onChange={(e) => setSearchHarvested(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-950/70 border border-stone-800 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-purple-500"
+                className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900"
               />
             </div>
 
@@ -916,8 +916,8 @@ export default function TemplatesManagerClient({
                   onClick={() => setHarvestedFilter(cat.id as any)}
                   className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
                     harvestedFilter === cat.id
-                      ? 'bg-purple-600 text-white shadow-xs'
-                      : 'bg-stone-800 text-stone-400 hover:text-stone-200'
+                      ? 'bg-stone-900 text-white shadow-xs'
+                      : 'bg-stone-800 text-stone-500 hover:text-stone-200'
                   }`}
                 >
                   {cat.label}
@@ -940,10 +940,10 @@ export default function TemplatesManagerClient({
               return (
                 <div
                   key={item.slug || idx}
-                  className="group relative flex flex-col rounded-2xl bg-stone-900/90 border border-stone-800 hover:border-purple-500/60 shadow-lg overflow-hidden transition-all duration-300"
+                  className="group relative flex flex-col rounded-2xl bg-white border border-stone-200/90 hover:border-stone-900/60 shadow-lg overflow-hidden transition-all duration-300"
                 >
                   {/* Thumbnail */}
-                  <div className="relative aspect-[9/13] w-full bg-stone-950 overflow-hidden">
+                  <div className="relative aspect-[9/13] w-full bg-stone-50/60 overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={thumbUrl}
@@ -970,13 +970,13 @@ export default function TemplatesManagerClient({
 
                     {/* Slug badge */}
                     <div className="absolute top-2 right-2 z-10">
-                      <span className="px-2 py-0.5 rounded-md bg-stone-900/80 backdrop-blur-xs text-stone-300 text-[10px] font-mono">
+                      <span className="px-2 py-0.5 rounded-md bg-white backdrop-blur-xs text-stone-300 text-[10px] font-mono">
                         {item.slug}
                       </span>
                     </div>
 
                     {/* Hover Actions Overlay */}
-                    <div className="absolute inset-0 bg-stone-950/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">
+                    <div className="absolute inset-0 bg-stone-50/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">
                       <Link
                         href={`/editor/studio?template=${encodeURIComponent(item.slug)}`}
                         target="_blank"
@@ -989,7 +989,7 @@ export default function TemplatesManagerClient({
                       <button
                         type="button"
                         onClick={() => handlePromoteHarvested(item)}
-                        className="w-full py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 font-semibold text-xs text-center flex items-center justify-center gap-1.5 border border-stone-700"
+                        className="w-full py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 font-semibold text-xs text-center flex items-center justify-center gap-1.5 border border-stone-200/80"
                       >
                         <Plus className="w-3.5 h-3.5 text-amber-400" />
                         <span>Phát Hành Vào Kho</span>
@@ -1003,16 +1003,16 @@ export default function TemplatesManagerClient({
                       <h4 className="font-bold text-xs text-white line-clamp-1" title={cleanTitle}>
                         {cleanTitle}
                       </h4>
-                      <p className="text-[10px] text-stone-400 font-mono mt-0.5">
+                      <p className="text-[10px] text-stone-500 font-mono mt-0.5">
                         Mã: {item.slug}
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-between pt-1 border-t border-stone-800/60 text-[11px]">
+                    <div className="flex items-center justify-between pt-1 border-t border-stone-200/80 text-[11px]">
                       <Link
                         href={`/editor/studio?template=${encodeURIComponent(item.slug)}`}
                         target="_blank"
-                        className="text-purple-400 hover:text-purple-300 font-medium flex items-center gap-1 text-[11px]"
+                        className="text-stone-700 hover:text-stone-700 font-medium flex items-center gap-1 text-[11px]"
                       >
                         <span>Soạn thảo</span>
                         <ExternalLink className="w-2.5 h-2.5" />
@@ -1040,16 +1040,16 @@ export default function TemplatesManagerClient({
       {activeTab === 'typography-effects' && (
         <div className="space-y-8">
           {/* Section 1: Typography System */}
-          <div className="space-y-4 p-6 rounded-3xl bg-stone-900/60 border border-stone-800">
+          <div className="space-y-4 p-6 rounded-3xl bg-white border border-stone-200/90">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-stone-700 uppercase tracking-wider">
                   Typography Engine
                 </span>
                 <h3 className="text-xl font-serif font-bold text-white mt-0.5">
                   1. Hệ Thống Phông Chữ Cưới (Typography Showroom)
                 </h3>
-                <p className="text-xs text-stone-400 mt-1 max-w-2xl">
+                <p className="text-xs text-stone-500 mt-1 max-w-2xl">
                   Danh sách các phông chữ được tích hợp sẵn trong trình soạn thảo Studio. Khách hàng và Admin có thể áp dụng tức thì cho bất kỳ dòng tiêu đề hoặc nội dung thiệp nào.
                 </p>
               </div>
@@ -1058,8 +1058,8 @@ export default function TemplatesManagerClient({
             {/* Font Categories Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
               {/* Group 1: Calligraphy / Script */}
-              <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800/80 space-y-3">
-                <div className="flex items-center justify-between border-b border-stone-800 pb-2">
+              <div className="p-4 rounded-2xl bg-stone-50/60 border border-stone-200/80 space-y-3">
+                <div className="flex items-center justify-between border-b border-stone-200/90 pb-2">
                   <span className="text-xs font-bold text-amber-300 uppercase tracking-wider">
                     Chữ Viết Tay &amp; Thư Pháp
                   </span>
@@ -1067,24 +1067,24 @@ export default function TemplatesManagerClient({
                 </div>
 
                 <div className="space-y-3">
-                  <div className="p-3 rounded-xl bg-stone-900/70 border border-stone-800">
-                    <span className="text-[10px] text-stone-400 block font-mono">Pinyon Script</span>
+                  <div className="p-3 rounded-xl bg-white border border-stone-200/90">
+                    <span className="text-[10px] text-stone-500 block font-mono">Pinyon Script</span>
                     <p style={{ fontFamily: 'Pinyon Script, cursive' }} className="text-2xl text-amber-200 mt-1">
                       Save The Date
                     </p>
                     <span className="text-[10px] text-stone-500 mt-1 block">Dùng cho tiêu đề bìa, ngày cưới hoàng gia</span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-stone-900/70 border border-stone-800">
-                    <span className="text-[10px] text-stone-400 block font-mono">Great Vibes</span>
+                  <div className="p-3 rounded-xl bg-white border border-stone-200/90">
+                    <span className="text-[10px] text-stone-500 block font-mono">Great Vibes</span>
                     <p style={{ fontFamily: 'Great Vibes, cursive' }} className="text-2xl text-rose-300 mt-1">
                       Thanh Hằng &amp; Minh Trí
                     </p>
                     <span className="text-[10px] text-stone-500 mt-1 block">Dùng cho tên cô dâu chú rể lãng mạn</span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-stone-900/70 border border-stone-800">
-                    <span className="text-[10px] text-stone-400 block font-mono">Paris Regular</span>
+                  <div className="p-3 rounded-xl bg-white border border-stone-200/90">
+                    <span className="text-[10px] text-stone-500 block font-mono">Paris Regular</span>
                     <p style={{ fontFamily: 'Paris Regular, cursive' }} className="text-xl text-stone-200 mt-1">
                       Our Love Story
                     </p>
@@ -1094,33 +1094,33 @@ export default function TemplatesManagerClient({
               </div>
 
               {/* Group 2: Editorial Serif */}
-              <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800/80 space-y-3">
-                <div className="flex items-center justify-between border-b border-stone-800 pb-2">
-                  <span className="text-xs font-bold text-purple-300 uppercase tracking-wider">
+              <div className="p-4 rounded-2xl bg-stone-50/60 border border-stone-200/80 space-y-3">
+                <div className="flex items-center justify-between border-b border-stone-200/90 pb-2">
+                  <span className="text-xs font-bold text-stone-700 uppercase tracking-wider">
                     Chữ Có Chân Thanh Lịch
                   </span>
                   <span className="text-[10px] text-stone-500 font-mono">Serif</span>
                 </div>
 
                 <div className="space-y-3">
-                  <div className="p-3 rounded-xl bg-stone-900/70 border border-stone-800">
-                    <span className="text-[10px] text-stone-400 block font-mono">Playfair Display</span>
+                  <div className="p-3 rounded-xl bg-white border border-stone-200/90">
+                    <span className="text-[10px] text-stone-500 block font-mono">Playfair Display</span>
                     <p style={{ fontFamily: 'Playfair Display, serif' }} className="text-lg font-bold text-stone-100 mt-1 tracking-wider">
                       WEDDING INVITATION
                     </p>
                     <span className="text-[10px] text-stone-500 mt-1 block">Chuẩn bìa tạp chí Vogue, sang trọng và quyền quý</span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-stone-900/70 border border-stone-800">
-                    <span className="text-[10px] text-stone-400 block font-mono">Cormorant Garamond</span>
+                  <div className="p-3 rounded-xl bg-white border border-stone-200/90">
+                    <span className="text-[10px] text-stone-500 block font-mono">Cormorant Garamond</span>
                     <p style={{ fontFamily: 'Cormorant Garamond, serif' }} className="text-lg italic text-amber-200/90 mt-1">
                       &quot;Yêu là cùng nhau đi suốt cuộc đời&quot;
                     </p>
                     <span className="text-[10px] text-stone-500 mt-1 block">Dùng cho các câu trích dẫn thơ, triết lý tình yêu</span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-stone-900/70 border border-stone-800">
-                    <span className="text-[10px] text-stone-400 block font-mono">Cinzel / Bodoni</span>
+                  <div className="p-3 rounded-xl bg-white border border-stone-200/90">
+                    <span className="text-[10px] text-stone-500 block font-mono">Cinzel / Bodoni</span>
                     <p className="text-sm font-serif font-bold text-stone-300 mt-1 tracking-widest uppercase">
                       28 . 12 . 2026
                     </p>
@@ -1130,8 +1130,8 @@ export default function TemplatesManagerClient({
               </div>
 
               {/* Group 3: Clean Sans-serif */}
-              <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800/80 space-y-3">
-                <div className="flex items-center justify-between border-b border-stone-800 pb-2">
+              <div className="p-4 rounded-2xl bg-stone-50/60 border border-stone-200/80 space-y-3">
+                <div className="flex items-center justify-between border-b border-stone-200/90 pb-2">
                   <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider">
                     Chữ Hiện Đại Rõ Ràng
                   </span>
@@ -1139,24 +1139,24 @@ export default function TemplatesManagerClient({
                 </div>
 
                 <div className="space-y-3">
-                  <div className="p-3 rounded-xl bg-stone-900/70 border border-stone-800">
-                    <span className="text-[10px] text-stone-400 block font-mono">Montserrat</span>
+                  <div className="p-3 rounded-xl bg-white border border-stone-200/90">
+                    <span className="text-[10px] text-stone-500 block font-mono">Montserrat</span>
                     <p className="text-sm font-sans font-semibold text-stone-200 mt-1">
                       Trung Tâm Hội Nghị Tiệc Cưới White Palace
                     </p>
                     <span className="text-[10px] text-stone-500 mt-1 block">Dễ đọc cho địa chỉ, bản đồ, thời gian tiệc</span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-stone-900/70 border border-stone-800">
-                    <span className="text-[10px] text-stone-400 block font-mono">Be Vietnam Pro / Inter</span>
+                  <div className="p-3 rounded-xl bg-white border border-stone-200/90">
+                    <span className="text-[10px] text-stone-500 block font-mono">Be Vietnam Pro / Inter</span>
                     <p className="text-xs font-sans text-stone-300 mt-1">
                       Số tài khoản: 1903678888 • Vietcombank
                     </p>
                     <span className="text-[10px] text-stone-500 mt-1 block">Tối ưu hiển thị số tài khoản VietQR và biểu mẫu RSVP</span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-stone-900/70 border border-stone-800">
-                    <span className="text-[10px] text-stone-400 block font-mono">Tabular Nums (Chống lệch số)</span>
+                  <div className="p-3 rounded-xl bg-white border border-stone-200/90">
+                    <span className="text-[10px] text-stone-500 block font-mono">Tabular Nums (Chống lệch số)</span>
                     <p className="text-lg font-mono font-bold text-amber-400 mt-1 tracking-wider">
                       28 : 14 : 09 : 45
                     </p>
@@ -1168,20 +1168,20 @@ export default function TemplatesManagerClient({
 
             {/* Guide to Add New Font */}
             <div className="p-4 rounded-2xl bg-purple-950/20 border border-purple-800/30 text-xs text-stone-300 space-y-2">
-              <span className="font-bold text-purple-300 flex items-center gap-1.5">
+              <span className="font-bold text-stone-700 flex items-center gap-1.5">
                 <Code2 className="w-4 h-4" />
                 Hướng dẫn Admin thêm Phông Chữ Mới vào Studio:
               </span>
-              <ol className="list-decimal list-inside space-y-1 text-[11px] text-stone-400 leading-relaxed">
-                <li>Copy file phông chữ định dạng <code className="text-purple-300 font-mono">.woff2</code> hoặc <code className="text-purple-300 font-mono">.ttf</code> vào thư mục <code className="text-purple-300 font-mono">public/assets/fonts/</code>.</li>
-                <li>Khai báo cú pháp <code className="text-purple-300 font-mono">@font-face</code> trong <code className="text-purple-300 font-mono">src/app/globals.css</code> (hoặc import từ Google Fonts).</li>
-                <li>Mở file <code className="text-purple-300 font-mono">StudioRightInspector.tsx</code> và thêm thẻ <code className="text-purple-300 font-mono">&lt;option value=&quot;Tên Phông&quot;&gt;</code> vào danh sách phông. Phông mới sẽ lập tức sẵn sàng cho khách hàng sử dụng!</li>
+              <ol className="list-decimal list-inside space-y-1 text-[11px] text-stone-500 leading-relaxed">
+                <li>Copy file phông chữ định dạng <code className="text-stone-700 font-mono">.woff2</code> hoặc <code className="text-stone-700 font-mono">.ttf</code> vào thư mục <code className="text-stone-700 font-mono">public/assets/fonts/</code>.</li>
+                <li>Khai báo cú pháp <code className="text-stone-700 font-mono">@font-face</code> trong <code className="text-stone-700 font-mono">src/app/globals.css</code> (hoặc import từ Google Fonts).</li>
+                <li>Mở file <code className="text-stone-700 font-mono">StudioRightInspector.tsx</code> và thêm thẻ <code className="text-stone-700 font-mono">&lt;option value=&quot;Tên Phông&quot;&gt;</code> vào danh sách phông. Phông mới sẽ lập tức sẵn sàng cho khách hàng sử dụng!</li>
               </ol>
             </div>
           </div>
 
           {/* Section 2: Effects & Animation System */}
-          <div className="space-y-4 p-6 rounded-3xl bg-stone-900/60 border border-stone-800">
+          <div className="space-y-4 p-6 rounded-3xl bg-white border border-stone-200/90">
             <div>
               <span className="text-[10px] font-bold text-pink-400 uppercase tracking-wider">
                 Animation Engine
@@ -1189,7 +1189,7 @@ export default function TemplatesManagerClient({
               <h3 className="text-xl font-serif font-bold text-white mt-0.5">
                 2. Hệ Thống Hiệu Ứng Rơi &amp; Chuyển Động (Effects Engine)
               </h3>
-              <p className="text-xs text-stone-400 mt-1 max-w-2xl">
+              <p className="text-xs text-stone-500 mt-1 max-w-2xl">
                 Bao gồm 7 hiệu ứng hạt rơi chuẩn điện ảnh, các chuyển động liên tục cho thành phần trang trí, và các tiện ích tương tác độc quyền.
               </p>
             </div>
@@ -1207,7 +1207,7 @@ export default function TemplatesManagerClient({
               ].map((fx, idx) => (
                 <div
                   key={idx}
-                  className="p-3.5 rounded-2xl bg-stone-950/80 border border-stone-800 text-center space-y-1.5 hover:border-pink-500/50 transition-colors"
+                  className="p-3.5 rounded-2xl bg-stone-50/60 border border-stone-200/90 text-center space-y-1.5 hover:border-pink-500/50 transition-colors"
                 >
                   <span className="text-3xl block">{fx.icon}</span>
                   <span className="text-xs font-bold text-white block">{fx.title}</span>
@@ -1218,11 +1218,11 @@ export default function TemplatesManagerClient({
 
             {/* Continuous Motion & Performance Rules */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-              <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800 space-y-2">
+              <div className="p-4 rounded-2xl bg-stone-50/60 border border-stone-200/90 space-y-2">
                 <span className="text-xs font-bold text-amber-300 block">
                   Chuyển Động Liên Tục Của Thành Phần (Continuous Motion)
                 </span>
-                <ul className="space-y-1.5 text-[11px] text-stone-400">
+                <ul className="space-y-1.5 text-[11px] text-stone-500">
                   <li>• <strong className="text-stone-200">Bay lơ lửng (Floating 2.0s)</strong>: Chuyển động nhấp nhô nhẹ nhàng tựa sóng nước cho hoa, con dấu sáp và chữ nghệ thuật.</li>
                   <li>• <strong className="text-stone-200">Nhịp tim (Pulse)</strong>: Co giãn nhẹ theo nhịp đập 60-70 bpm cho nút bấm liên hệ và trái tim.</li>
                   <li>• <strong className="text-stone-200">Xoay tròn 360° (Rotate)</strong>: Xoay liên tục mượt mà cho đĩa than vinyl phát nhạc đám cưới.</li>
@@ -1230,11 +1230,11 @@ export default function TemplatesManagerClient({
                 </ul>
               </div>
 
-              <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800 space-y-2">
+              <div className="p-4 rounded-2xl bg-stone-50/60 border border-stone-200/90 space-y-2">
                 <span className="text-xs font-bold text-emerald-400 block">
                   Quy Chuẩn Bảo Vệ Hiệu Năng &amp; Phần Cứng
                 </span>
-                <ul className="space-y-1.5 text-[11px] text-stone-400">
+                <ul className="space-y-1.5 text-[11px] text-stone-500">
                   <li>• <strong className="text-stone-200">FPS Capped 30-35 FPS</strong>: Đảm bảo hiệu ứng mượt mà nhưng không làm nóng máy hay tốn pin thiết bị di động.</li>
                   <li>• <strong className="text-stone-200">Tự động tạm dừng (Auto-Pause)</strong>: Khi người dùng đổi tab (<code className="text-emerald-300 font-mono">document.hidden</code>), toàn bộ canvas animation sẽ ngủ đông để tiết kiệm 100% tài nguyên CPU/GPU.</li>
                   <li>• <strong className="text-stone-200">Chống tràn VRAM</strong>: Tuyệt đối không dùng <code className="text-emerald-300 font-mono">will-change: transform</code> trên các danh sách ảnh dài.</li>
@@ -1246,7 +1246,7 @@ export default function TemplatesManagerClient({
           {/* Section 3: Admin Workflow to Add New Templates */}
           <div className="p-6 rounded-3xl bg-gradient-to-r from-purple-950/30 via-stone-900 to-stone-900 border border-purple-800/30 space-y-4">
             <div>
-              <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
+              <span className="text-[10px] font-bold text-stone-700 uppercase tracking-wider">
                 Admin Operations
               </span>
               <h3 className="text-xl font-serif font-bold text-white mt-0.5">
@@ -1255,32 +1255,32 @@ export default function TemplatesManagerClient({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800 space-y-2">
-                <div className="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xs">
+              <div className="p-4 rounded-2xl bg-stone-50/60 border border-stone-200/90 space-y-2">
+                <div className="w-8 h-8 rounded-full bg-purple-500/20 text-stone-700 flex items-center justify-center font-bold text-xs">
                   1
                 </div>
                 <h4 className="font-bold text-xs text-white">Phát hành từ 188 Mẫu Thực Tế</h4>
-                <p className="text-[11px] text-stone-400 leading-relaxed">
+                <p className="text-[11px] text-stone-500 leading-relaxed">
                   Chuyển sang tab <strong>&quot;Thư Viện 188 Mẫu Thực Tế&quot;</strong>, chọn mẫu mong muốn và bấm nút <strong>&quot;+ Mở bán&quot;</strong>. Form sẽ tự động điền sẵn tên, hình ảnh và danh mục để phát hành chỉ với 1 click.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800 space-y-2">
+              <div className="p-4 rounded-2xl bg-stone-50/60 border border-stone-200/90 space-y-2">
                 <div className="w-8 h-8 rounded-full bg-pink-500/20 text-pink-400 flex items-center justify-center font-bold text-xs">
                   2
                 </div>
                 <h4 className="font-bold text-xs text-white">Tự Thiết Kế Mẫu Bằng Studio</h4>
-                <p className="text-[11px] text-stone-400 leading-relaxed">
+                <p className="text-[11px] text-stone-500 leading-relaxed">
                   Admin truy cập <strong>/editor/studio</strong>, kéo thả tự do hình ảnh, văn bản, hiệu ứng hạt và nhạc nền. Sau khi hoàn thiện, xuất dữ liệu JSON và đưa vào kho Presets để làm mẫu độc quyền.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800 space-y-2">
+              <div className="p-4 rounded-2xl bg-stone-50/60 border border-stone-200/90 space-y-2">
                 <div className="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">
                   3
                 </div>
                 <h4 className="font-bold text-xs text-white">Nút &quot;+ Phát Hành Mẫu Mới&quot;</h4>
-                <p className="text-[11px] text-stone-400 leading-relaxed">
+                <p className="text-[11px] text-stone-500 leading-relaxed">
                   Bấm nút màu tím ở góc trên bên phải trang Quản trị, nhập tên mẫu, chọn Động cơ gốc (C165 chữ vàng, Tạp chí, Hoa hồng...), phân hạng gói (Miễn phí, Basic, VIP) và tải ảnh bìa lên.
                 </p>
               </div>
@@ -1301,11 +1301,11 @@ export default function TemplatesManagerClient({
           />
 
           {/* Modal Container */}
-          <div className="relative w-full max-w-2xl bg-stone-900 border border-stone-800 rounded-3xl shadow-2xl p-6 z-10 overflow-hidden space-y-5">
+          <div className="relative w-full max-w-2xl bg-stone-900 border border-stone-200/90 rounded-3xl shadow-2xl p-6 z-10 overflow-hidden space-y-5">
             {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-stone-800">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-200/90">
               <div>
-                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-stone-700 uppercase tracking-wider">
                   Admin Studio Publishing
                 </span>
                 <h2 className="text-lg font-serif font-bold text-white">
@@ -1315,7 +1315,7 @@ export default function TemplatesManagerClient({
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="p-1.5 rounded-full text-stone-400 hover:text-white hover:bg-stone-800 transition-colors"
+                className="p-1.5 rounded-full text-stone-500 hover:text-white hover:bg-stone-800 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1335,7 +1335,7 @@ export default function TemplatesManagerClient({
                     placeholder="VD: Hoàng Gia Scrollytelling"
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-purple-500"
+                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900"
                   />
                 </div>
 
@@ -1349,7 +1349,7 @@ export default function TemplatesManagerClient({
                     placeholder="VD: hoang-gia-scrollytelling"
                     value={formSlug}
                     onChange={(e) => setFormSlug(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-purple-500 font-mono"
+                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900 font-mono"
                   />
                 </div>
               </div>
@@ -1363,7 +1363,7 @@ export default function TemplatesManagerClient({
                   <select
                     value={formCategory}
                     onChange={(e) => setFormCategory(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-stone-200 focus:outline-none focus:border-purple-500"
+                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-stone-200 focus:outline-none focus:border-stone-900"
                   >
                     <option value="wedding">Thiệp cưới (Wedding)</option>
                     <option value="birthday">Thiệp sinh nhật (Birthday)</option>
@@ -1380,7 +1380,7 @@ export default function TemplatesManagerClient({
                   <select
                     value={formBaseEngine}
                     onChange={(e) => setFormBaseEngine(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-stone-200 focus:outline-none focus:border-purple-500 font-mono"
+                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-stone-200 focus:outline-none focus:border-stone-900 font-mono"
                   >
                     <option value="burgundy">burgundy — Scrollytelling Điện Ảnh Sang Trọng</option>
                     <option value="floral">floral — Lãng Mạn Hoa Cỏ Tự Nhiên</option>
@@ -1405,7 +1405,7 @@ export default function TemplatesManagerClient({
                       else if (t === 'BASIC') setFormPrice(50000);
                       else setFormPrice(30000);
                     }}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-stone-200 focus:outline-none focus:border-purple-500"
+                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-stone-200 focus:outline-none focus:border-stone-900"
                   >
                     <option value="FREE">Miễn phí (Free)</option>
                     <option value="BASIC">Gói Cơ Bản (50k/năm)</option>
@@ -1423,7 +1423,7 @@ export default function TemplatesManagerClient({
                     disabled={formTier === 'FREE'}
                     value={formPrice}
                     onChange={(e) => setFormPrice(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white focus:outline-none focus:border-purple-500 disabled:opacity-50"
+                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900 disabled:opacity-50"
                   />
                 </div>
 
@@ -1436,7 +1436,7 @@ export default function TemplatesManagerClient({
                     placeholder="Hot, Mới, VIP Luxury..."
                     value={formBadge}
                     onChange={(e) => setFormBadge(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-purple-500"
+                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900"
                   />
                 </div>
               </div>
@@ -1453,7 +1453,7 @@ export default function TemplatesManagerClient({
                     placeholder="https://..."
                     value={formThumbnail}
                     onChange={(e) => setFormThumbnail(e.target.value)}
-                    className="flex-1 px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-purple-500 font-mono"
+                    className="flex-1 px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900 font-mono"
                   />
                 </div>
 
@@ -1465,7 +1465,7 @@ export default function TemplatesManagerClient({
                       key={preset.name}
                       type="button"
                       onClick={() => setFormThumbnail(preset.url)}
-                      className="px-2 py-0.5 rounded-md text-[10px] bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700/60"
+                      className="px-2 py-0.5 rounded-md text-[10px] bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-200/80/60"
                     >
                       {preset.name}
                     </button>
@@ -1474,8 +1474,8 @@ export default function TemplatesManagerClient({
 
                 {/* Live Preview of Thumbnail */}
                 {formThumbnail && (
-                  <div className="mt-2 p-2 rounded-xl bg-stone-950/60 border border-stone-800 flex items-center gap-3">
-                    <div className="w-12 h-16 rounded-lg overflow-hidden border border-stone-700 shrink-0 bg-stone-800">
+                  <div className="mt-2 p-2 rounded-xl bg-stone-50/60 border border-stone-200/90 flex items-center gap-3">
+                    <div className="w-12 h-16 rounded-lg overflow-hidden border border-stone-200/80 shrink-0 bg-stone-800">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={formThumbnail}
@@ -1487,7 +1487,7 @@ export default function TemplatesManagerClient({
                         }}
                       />
                     </div>
-                    <div className="text-[11px] text-stone-400 flex-1 min-w-0">
+                    <div className="text-[11px] text-stone-500 flex-1 min-w-0">
                       <span className="text-stone-300 font-semibold block">Xem trước ảnh bìa hiển thị</span>
                       <span className="truncate block font-mono text-[10px] text-stone-500">{formThumbnail}</span>
                     </div>
@@ -1504,24 +1504,24 @@ export default function TemplatesManagerClient({
                   rows={2}
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white placeholder-stone-500 focus:outline-none focus:border-purple-500 resize-none"
+                  className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900 resize-none"
                 />
               </div>
 
               {/* Actions */}
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-stone-800">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-stone-200/90">
                 <button
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-400 hover:text-white transition-colors"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-500 hover:text-white transition-colors"
                 >
                   Hủy Bỏ
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all transform active:scale-95 disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-medium text-xs shadow-2xs flex items-center gap-2 transition-all transform active:scale-95 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <span>Đang phát hành...</span>
@@ -1542,12 +1542,12 @@ export default function TemplatesManagerClient({
       {/* MODAL: CHỈNH SỬA THÔNG TIN MẪU THIỆP                     */}
       {/* ======================================================== */}
       {editingCatalogTemplate && (
-        <div className="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-stone-900 border border-stone-800 rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl relative max-h-[92vh] overflow-y-auto text-stone-100">
+        <div className="fixed inset-0 z-50 bg-stone-50/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-stone-900 border border-stone-200/90 rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl relative max-h-[92vh] overflow-y-auto text-stone-100">
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-stone-800 pb-4">
+            <div className="flex items-center justify-between border-b border-stone-200/90 pb-4">
               <div className="space-y-0.5">
-                <span className="text-[10px] uppercase font-bold text-purple-400 tracking-wider">
+                <span className="text-[10px] uppercase font-bold text-stone-700 tracking-wider">
                   Chỉnh Sửa Giao Diện &amp; Bảng Giá
                 </span>
                 <h3 className="text-lg font-serif font-bold text-white">
@@ -1557,7 +1557,7 @@ export default function TemplatesManagerClient({
               <button
                 type="button"
                 onClick={() => setEditingCatalogTemplate(null)}
-                className="p-1.5 rounded-xl hover:bg-stone-800 text-stone-400 hover:text-white transition-colors"
+                className="p-1.5 rounded-xl hover:bg-stone-800 text-stone-500 hover:text-white transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1574,7 +1574,7 @@ export default function TemplatesManagerClient({
                   required
                   value={editFormName}
                   onChange={(e) => setEditFormName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white focus:outline-none focus:border-purple-500"
+                  className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900"
                 />
               </div>
 
@@ -1587,7 +1587,7 @@ export default function TemplatesManagerClient({
                   <select
                     value={editFormCategory}
                     onChange={(e) => setEditFormCategory(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white focus:outline-none focus:border-purple-500"
+                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900"
                   >
                     <option value="wedding">Thiệp cưới (Wedding)</option>
                     <option value="birthday">Thiệp sinh nhật (Birthday)</option>
@@ -1610,7 +1610,7 @@ export default function TemplatesManagerClient({
                       else if (t === 'BASIC') setEditFormPrice(50000);
                       else if (t === 'PREMIUM') setEditFormPrice(30000);
                     }}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white focus:outline-none focus:border-purple-500"
+                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900"
                   >
                     <option value="FREE">Miễn phí (Free - 300 views)</option>
                     <option value="BASIC">Gói Chuẩn (Basic - 50.000 đ)</option>
@@ -1630,7 +1630,7 @@ export default function TemplatesManagerClient({
                     value={editFormPrice}
                     onChange={(e) => setEditFormPrice(Number(e.target.value))}
                     disabled={editFormTier === 'FREE'}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white focus:outline-none focus:border-purple-500 disabled:opacity-50"
+                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900 disabled:opacity-50"
                   />
                 </div>
 
@@ -1643,7 +1643,7 @@ export default function TemplatesManagerClient({
                     value={editFormBadge}
                     placeholder="Hot VIP, Bán chạy, Mới..."
                     onChange={(e) => setEditFormBadge(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white focus:outline-none focus:border-purple-500"
+                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900"
                   />
                 </div>
               </div>
@@ -1658,12 +1658,12 @@ export default function TemplatesManagerClient({
                   required
                   value={editFormThumbnail}
                   onChange={(e) => setEditFormThumbnail(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white focus:outline-none focus:border-purple-500"
+                  className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900"
                 />
 
                 {editFormThumbnail && (
-                  <div className="mt-2 p-2 rounded-xl bg-stone-950/60 border border-stone-800 flex items-center gap-3">
-                    <div className="w-12 h-16 rounded-lg overflow-hidden border border-stone-700 shrink-0 bg-stone-800">
+                  <div className="mt-2 p-2 rounded-xl bg-stone-50/60 border border-stone-200/90 flex items-center gap-3">
+                    <div className="w-12 h-16 rounded-lg overflow-hidden border border-stone-200/80 shrink-0 bg-stone-800">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={editFormThumbnail}
@@ -1675,7 +1675,7 @@ export default function TemplatesManagerClient({
                         }}
                       />
                     </div>
-                    <div className="text-[11px] text-stone-400 flex-1 min-w-0">
+                    <div className="text-[11px] text-stone-500 flex-1 min-w-0">
                       <span className="text-stone-300 font-semibold block">Ảnh bìa hiển thị</span>
                       <span className="truncate block font-mono text-[10px] text-stone-500">{editFormThumbnail}</span>
                     </div>
@@ -1692,15 +1692,15 @@ export default function TemplatesManagerClient({
                   rows={2}
                   value={editFormDescription}
                   onChange={(e) => setEditFormDescription(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-xs text-white focus:outline-none focus:border-purple-500 resize-none"
+                  className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900 resize-none"
                 />
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-between pt-3 border-t border-stone-800">
+              <div className="flex items-center justify-between pt-3 border-t border-stone-200/90">
                 <Link
                   href={`/admin/studio?template=${encodeURIComponent(editingCatalogTemplate.slug || editingCatalogTemplate.id)}`}
-                  className="px-4 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-purple-500/30"
+                  className="px-4 py-2 rounded-xl bg-stone-900/20 hover:bg-stone-900/30 text-stone-700 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-stone-900/30"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Mở Soạn Trong Studio</span>
@@ -1711,14 +1711,14 @@ export default function TemplatesManagerClient({
                     type="button"
                     disabled={isSavingEdit}
                     onClick={() => setEditingCatalogTemplate(null)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-400 hover:text-white transition-colors"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-500 hover:text-white transition-colors"
                   >
                     Hủy
                   </button>
                   <button
                     type="submit"
                     disabled={isSavingEdit}
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all transform active:scale-95 disabled:opacity-50"
+                    className="px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-medium text-xs shadow-2xs flex items-center gap-2 transition-all transform active:scale-95 disabled:opacity-50"
                   >
                     {isSavingEdit ? (
                       <span>Đang lưu...</span>
