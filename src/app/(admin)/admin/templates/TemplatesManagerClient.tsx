@@ -176,6 +176,7 @@ export default function TemplatesManagerClient({
     setFormBadge('VIP');
     setFormBaseEngine('burgundy');
     setFormThumbnail(
+      item.coverImage ||
       item.longThumbnail ||
       item.images?.[0] ||
       'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80'
@@ -934,22 +935,24 @@ export default function TemplatesManagerClient({
                 : `Mẫu Thiệp ${item.slug}`;
 
               const thumbUrl =
+                item.coverImage ||
                 item.longThumbnail ||
-                (item.images && item.images.length > 0 ? item.images[0] : '/assets/wedding/templates/c165/photo_01.webp');
+                (item.images && item.images.length > 0 ? item.images[0] : null) ||
+                'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80';
 
               return (
                 <div
                   key={item.slug || idx}
-                  className="group relative flex flex-col rounded-2xl bg-white border border-stone-200/90 hover:border-stone-900/60 shadow-lg overflow-hidden transition-all duration-300"
+                  className="group relative flex flex-col rounded-2xl bg-white border border-stone-200/90 hover:border-stone-400 hover:shadow-xs overflow-hidden transition-all duration-300"
                 >
                   {/* Thumbnail */}
-                  <div className="relative aspect-[9/13] w-full bg-stone-50/60 overflow-hidden">
+                  <div className="relative aspect-[9/13] w-full bg-stone-100 overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={thumbUrl}
                       alt={cleanTitle}
                       loading="lazy"
-                      className="w-full h-auto object-cover object-top transition-transform duration-[6000ms] ease-linear group-hover:-translate-y-[calc(100%-240px)]"
+                      className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src =
                           'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80';
@@ -958,11 +961,11 @@ export default function TemplatesManagerClient({
 
                     {/* Image count and audio badge */}
                     <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
-                      <span className="px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-xs text-white text-[10px] font-mono font-semibold">
+                      <span className="px-2 py-0.5 rounded-md bg-stone-900/80 backdrop-blur-xs text-white text-[10px] font-mono font-medium">
                         {item.imagesCount || 10} ảnh
                       </span>
                       {item.audios && item.audios.length > 0 && (
-                        <span className="px-2 py-0.5 rounded-md bg-purple-900/80 backdrop-blur-xs text-purple-200 text-[9px] font-medium flex items-center gap-1">
+                        <span className="px-2 py-0.5 rounded-md bg-stone-900/80 backdrop-blur-xs text-white text-[9px] font-medium flex items-center gap-1">
                           <Music className="w-2.5 h-2.5" /> Có nhạc
                         </span>
                       )}
@@ -970,28 +973,28 @@ export default function TemplatesManagerClient({
 
                     {/* Slug badge */}
                     <div className="absolute top-2 right-2 z-10">
-                      <span className="px-2 py-0.5 rounded-md bg-white backdrop-blur-xs text-stone-300 text-[10px] font-mono">
+                      <span className="px-2 py-0.5 rounded-md bg-stone-900/80 backdrop-blur-xs text-white text-[10px] font-mono">
                         {item.slug}
                       </span>
                     </div>
 
                     {/* Hover Actions Overlay */}
-                    <div className="absolute inset-0 bg-stone-50/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">
+                    <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-2xs opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3.5 z-20">
                       <Link
                         href={`/editor/studio?template=${encodeURIComponent(item.slug)}`}
                         target="_blank"
-                        className="w-full py-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs text-center flex items-center justify-center gap-1.5 shadow-lg"
+                        className="w-full py-2 rounded-xl bg-white hover:bg-stone-100 text-stone-900 font-medium text-xs text-center flex items-center justify-center gap-1.5 shadow-md transition-colors"
                       >
-                        <Palette className="w-3.5 h-3.5" />
+                        <Palette className="w-3.5 h-3.5 text-stone-700" />
                         <span>Mở Trong Studio</span>
                       </Link>
 
                       <button
                         type="button"
                         onClick={() => handlePromoteHarvested(item)}
-                        className="w-full py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 font-semibold text-xs text-center flex items-center justify-center gap-1.5 border border-stone-200/80"
+                        className="w-full py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-medium text-xs text-center flex items-center justify-center gap-1.5 shadow-md transition-colors"
                       >
-                        <Plus className="w-3.5 h-3.5 text-amber-400" />
+                        <Plus className="w-3.5 h-3.5" />
                         <span>Phát Hành Vào Kho</span>
                       </button>
                     </div>
@@ -1000,19 +1003,19 @@ export default function TemplatesManagerClient({
                   {/* Info */}
                   <div className="p-3.5 flex-1 flex flex-col justify-between space-y-2">
                     <div>
-                      <h4 className="font-bold text-xs text-white line-clamp-1" title={cleanTitle}>
+                      <h4 className="font-medium text-xs text-stone-900 line-clamp-1" title={cleanTitle}>
                         {cleanTitle}
                       </h4>
-                      <p className="text-[10px] text-stone-500 font-mono mt-0.5">
+                      <p className="text-[10px] text-stone-400 font-mono mt-0.5">
                         Mã: {item.slug}
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-between pt-1 border-t border-stone-200/80 text-[11px]">
+                    <div className="flex items-center justify-between pt-1 border-t border-stone-100 text-[11px]">
                       <Link
                         href={`/editor/studio?template=${encodeURIComponent(item.slug)}`}
                         target="_blank"
-                        className="text-stone-700 hover:text-stone-700 font-medium flex items-center gap-1 text-[11px]"
+                        className="text-stone-600 hover:text-stone-900 font-medium flex items-center gap-1 text-[11px] transition-colors"
                       >
                         <span>Soạn thảo</span>
                         <ExternalLink className="w-2.5 h-2.5" />
@@ -1021,7 +1024,7 @@ export default function TemplatesManagerClient({
                       <button
                         type="button"
                         onClick={() => handlePromoteHarvested(item)}
-                        className="text-amber-400 hover:text-amber-300 font-semibold text-[11px]"
+                        className="text-stone-900 hover:underline font-medium text-[11px]"
                       >
                         + Mở bán
                       </button>
