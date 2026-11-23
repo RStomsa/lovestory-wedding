@@ -28,6 +28,7 @@ import {
 
 // Dynamically import react-moveable to ensure SSR safe
 const Moveable = dynamic(() => import('react-moveable'), { ssr: false });
+const DynamicMoveable = Moveable as any;
 
 export default function StudioCanvas() {
   const {
@@ -51,11 +52,14 @@ export default function StudioCanvas() {
     setTextEditModalElementId,
     setPhotoPickerModalElementId,
     hiddenElementIds,
+    undo,
+    redo,
   } = useStudioStore();
 
   const isTouchFriendly = isMobileView && !desktopModeOnMobile;
 
   const canvasRef = useRef<HTMLDivElement>(null);
+  const moveableRef = useRef<any>(null);
   const [moveableTarget, setMoveableTarget] = useState<HTMLElement | null>(null);
   const [showLayerMenu, setShowLayerMenu] = useState(false);
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
@@ -132,6 +136,104 @@ export default function StudioCanvas() {
       setEditingTextId(null);
     }
   };
+
+  // =========================================================================
+  // KEYBOARD SHORTCUTS: Delete / Backspace, Arrow Keys (1px/10px), Undo/Redo
+  // =========================================================================
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // 1. Ignore if typing in input, textarea, select or contenteditable
+      const target = e.target as HTMLElement | null;
+      const isInputActive =
+        editingTextId !== null ||
+        target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.tagName === 'SELECT' ||
+        target?.isContentEditable;
+
+      if (isInputActive) return;
+
+      // Global Undo / Redo
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        redo();
+        return;
+      }
+
+      // Actions below require a selected element
+      if (!selectedId) return;
+
+      // 2. Delete / Backspace: Remove selected element
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        removeElement(selectedId);
+        selectElement(null);
+        setMoveableTarget(null);
+        return;
+      }
+
+      // 3. Escape: Deselect
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        selectElement(null);
+        setMoveableTarget(null);
+        setEditingTextId(null);
+        return;
+      }
+
+      // 4. Duplicate (Ctrl + D / Cmd + D)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'd') {
+        e.preventDefault();
+        duplicateElement(selectedId);
+        return;
+      }
+
+      // 5. Arrow Keys: Nudge position (1px normal, 10px with Shift)
+      const step = e.shiftKey ? 10 : 1;
+      let deltaX = 0;
+      let deltaY = 0;
+
+      if (e.key === 'ArrowLeft') deltaX = -step;
+      else if (e.key === 'ArrowRight') deltaX = step;
+      else if (e.key === 'ArrowUp') deltaY = -step;
+      else if (e.key === 'ArrowDown') deltaY = step;
+
+      if (deltaX !== 0 || deltaY !== 0) {
+        e.preventDefault();
+        const currentEl = elements.find((el) => el.id === selectedId);
+        if (!currentEl) return;
+
+        const nextX = currentEl.x + deltaX;
+        const nextY = currentEl.y + deltaY;
+
+        // Instant DOM update for 60fps responsiveness
+        const domNode = document.getElementById(`canvas-node-${selectedId}`);
+        if (domNode) {
+          domNode.style.left = `${nextX}px`;
+          domNode.style.top = `${nextY}px`;
+        }
+
+        updateElement(selectedId, { x: nextX, y: nextY }, true);
+
+        // Update Moveable controller bounding box
+        requestAnimationFrame(() => {
+          moveableRef.current?.updateRect();
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedId, editingTextId, elements, removeElement, selectElement, updateElement, duplicateElement, undo, redo]);
 
   // =========================================================================
   // DRAG & DROP DIRECTLY FROM DESKTOP ONTO CANVAS (0ms OPTIMISTIC UI)
@@ -497,6 +599,7 @@ export default function StudioCanvas() {
 
   return (
     <div
+      id="studio-canvas-scroll-container"
       className="relative flex-1 overflow-auto bg-stone-100 dark:bg-stone-950 flex flex-col items-center p-2 sm:p-4 md:p-8 select-none touch-pan-y"
       style={{ minHeight: 'calc(100vh - 4rem)' }}
       onClick={handleCanvasClick}
@@ -786,6 +889,7 @@ export default function StudioCanvas() {
           {/* Moveable Bounding Box Controller with Smart Snapping Guidelines (Desktop only) */}
           {!isTouchFriendly && selectedId && moveableTarget && (
             <Moveable
+              {...({ ref: moveableRef } as any)}
               target={moveableTarget}
               container={typeof document !== 'undefined' ? (document.getElementById('studio-main-canvas') as HTMLElement | null) : null}
               draggable={true}
