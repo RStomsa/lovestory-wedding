@@ -888,8 +888,8 @@ export default function StudioCanvas() {
 
           {/* Moveable Bounding Box Controller with Smart Snapping Guidelines (Desktop only) */}
           {!isTouchFriendly && selectedId && moveableTarget && (
-            <Moveable
-              {...({ ref: moveableRef } as any)}
+            <DynamicMoveable
+              ref={moveableRef}
               target={moveableTarget}
               container={typeof document !== 'undefined' ? (document.getElementById('studio-main-canvas') as HTMLElement | null) : null}
               draggable={true}
@@ -914,16 +914,16 @@ export default function StudioCanvas() {
               renderDirections={['nw', 'n', 'ne', 'w', 'e', 'sw', 's', 'se']}
               edge={false}
               zoom={zoom}
-              onDragStart={({ set, target }) => {
+              onDragStart={({ set, target }: any) => {
                 const left = parseFloat(target.style.left) || 0;
                 const top = parseFloat(target.style.top) || 0;
                 set([left, top]);
               }}
-              onDrag={({ target, left, top }) => {
+              onDrag={({ target, left, top }: any) => {
                 target.style.left = `${left}px`;
                 target.style.top = `${top}px`;
               }}
-              onDragEnd={({ target, isDrag }) => {
+              onDragEnd={({ target, isDrag }: any) => {
                 if (!isDrag) return;
                 const left = parseFloat(target.style.left);
                 const top = parseFloat(target.style.top);
@@ -931,19 +931,19 @@ export default function StudioCanvas() {
                   updateElement(selectedId, { x: Math.round(left), y: Math.round(top) }, true);
                 }
               }}
-              onResizeStart={({ setOrigin, dragStart, target }) => {
+              onResizeStart={({ setOrigin, dragStart, target }: any) => {
                 setOrigin(['%', '%']);
                 const left = parseFloat(target.style.left) || 0;
                 const top = parseFloat(target.style.top) || 0;
                 dragStart && dragStart.set([left, top]);
               }}
-              onResize={({ target, width, height, drag }) => {
+              onResize={({ target, width, height, drag }: any) => {
                 target.style.width = `${width}px`;
                 target.style.height = `${height}px`;
                 target.style.left = `${drag.left}px`;
                 target.style.top = `${drag.top}px`;
               }}
-              onResizeEnd={({ target }) => {
+              onResizeEnd={({ target }: any) => {
                 const width = parseFloat(target.style.width);
                 const height = parseFloat(target.style.height);
                 const left = parseFloat(target.style.left);
@@ -959,10 +959,10 @@ export default function StudioCanvas() {
                   true
                 );
               }}
-              onRotate={({ target, rotation }) => {
+              onRotate={({ target, rotation }: any) => {
                 target.style.transform = `rotate(${rotation}deg)`;
               }}
-              onRotateEnd={({ target }) => {
+              onRotateEnd={({ target }: any) => {
                 const match = target.style.transform.match(/rotate\(([-\d.]+)deg\)/);
                 const rot = match ? Math.round(parseFloat(match[1])) : 0;
                 updateElement(selectedId, { rotation: ((rot % 360) + 360) % 360 }, true);

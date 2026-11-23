@@ -23,6 +23,7 @@ import {
 import { useStudioStore } from './studioStore';
 import { STUDIO_FONTS, resolveFontFamily } from '@/lib/studioFonts';
 import { GRAPHICS_CATALOG } from '@/data/graphicsCatalog';
+import { WEDDING_TEXT_TEMPLATES } from '@/data/weddingTextTemplates';
 import StudioPreviewModal from './StudioPreviewModal';
 import {
   CalendarWidgetIcon,
@@ -32,6 +33,12 @@ import {
   CallWidgetIcon,
   RsvpWidgetIcon,
   GiftboxWidgetIcon,
+  WishesWidgetIcon,
+  MusicPlayerWidgetIcon,
+  StoryTimelineWidgetIcon,
+  DressCodeWidgetIcon,
+  FamilyInfoWidgetIcon,
+  VideoWidgetIcon,
 } from './StudioWidgetIcons';
 
 export default function StudioMobileBottomSheet() {
@@ -47,6 +54,7 @@ export default function StudioMobileBottomSheet() {
     sendToBack,
     addElement,
     canvas,
+    weddingProfile,
     setCanvasBackground,
     setFallingEffect,
     triggerPreviewAnim,
@@ -57,6 +65,7 @@ export default function StudioMobileBottomSheet() {
 
   // Sub tab for the 'add' drawer: 'text' | 'image' | 'graphic' | 'widget' | 'shape'
   const [addCategory, setAddCategory] = useState<'text' | 'image' | 'graphic' | 'widget' | 'shape'>('text');
+  const [mobileTextCat, setMobileTextCat] = useState<string>('all');
 
   // Map sheet aliases to categories
   React.useEffect(() => {
@@ -74,14 +83,30 @@ export default function StudioMobileBottomSheet() {
   if (!activeMobileSheet) return null;
 
   // Helper to place newly inserted elements in the user's visible viewport
-  const getSmartInsertY = (elemHeight: number = 150) => {
-    const canvasNode = document.getElementById('studio-main-canvas');
-    const scrollContainer = canvasNode?.parentElement?.parentElement;
-    if (scrollContainer && scrollContainer.scrollTop > 50) {
-      return Math.round(scrollContainer.scrollTop + 140);
+  const getSmartInsertY = (_elemHeight: number = 120) => {
+    // 1. If an element is currently selected, place right below it
+    const { selectedId, elements: currentElements, zoom = 1 } = useStudioStore.getState();
+    if (selectedId) {
+      const selected = currentElements.find((e) => e.id === selectedId);
+      if (selected) {
+        return Math.round(selected.y + selected.height + 20);
+      }
     }
-    const maxY = elements.reduce((max, e) => Math.max(max, e.y + e.height), 0);
-    return maxY > 0 ? maxY + 30 : 350;
+
+    // 2. Otherwise calculate current viewport center on canvas
+    const scrollContainer =
+      document.getElementById('studio-canvas-scroll-container') ||
+      document.getElementById('studio-main-canvas')?.parentElement?.parentElement;
+
+    if (scrollContainer) {
+      const scrollTop = scrollContainer.scrollTop || 0;
+      const clientHeight = scrollContainer.clientHeight || 700;
+      const centerCanvasY = Math.round((scrollTop + clientHeight / 2 - _elemHeight / 2) / Math.max(zoom, 0.2));
+      return Math.max(40, centerCanvasY);
+    }
+
+    // 3. Fallback to upper section of canvas
+    return 300;
   };
 
   const close = () => setActiveMobileSheet(null);
@@ -838,80 +863,94 @@ export default function StudioMobileBottomSheet() {
 
                 {/* Tab: Text */}
                 {addCategory === 'text' && (
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => {
-                        addElement({
-                          type: 'text',
-                          x: 40,
-                          y: getSmartInsertY(80),
-                          width: 420,
-                          height: 80,
-                          rotation: 0,
-                          opacity: 1,
-                          text: 'Thêm Tiêu Đề Lớn',
-                          fontFamily: 'Pinyon Script',
-                          fontSize: 64,
-                          color: '#8C7355',
-                          textAlign: 'center',
-                        });
-                        close();
-                      }}
-                      className="w-full p-3 rounded-2xl bg-stone-50 dark:bg-stone-800 border border-stone-200 text-left hover:border-rose-400"
-                    >
-                      <span className="font-serif text-xl block text-stone-900 dark:text-white">Thêm Tiêu Đề Lớn</span>
-                      <span className="text-[10px] text-stone-400">Pinyon Script • Cỡ 64px</span>
-                    </button>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between px-1">
+                      <h4 className="text-xs font-bold text-stone-800 dark:text-stone-200">Mẫu văn bản</h4>
+                      <span className="text-[10px] text-stone-400">Chạm để chèn</span>
+                    </div>
 
-                    <button
-                      onClick={() => {
-                        addElement({
-                          type: 'text',
-                          x: 40,
-                          y: getSmartInsertY(40),
-                          width: 420,
-                          height: 40,
-                          rotation: 0,
-                          opacity: 1,
-                          text: 'Hoàng Long & Mai Chi',
-                          fontFamily: 'Playfair Display',
-                          fontSize: 22,
-                          color: '#63554D',
-                          textAlign: 'center',
-                          letterSpacing: 2,
-                        });
-                        close();
-                      }}
-                      className="w-full p-3 rounded-2xl bg-stone-50 dark:bg-stone-800 border border-stone-200 text-left hover:border-rose-400"
-                    >
-                      <span className="font-serif text-base block text-stone-900 dark:text-white">Tên Cô Dâu Chú Rể</span>
-                      <span className="text-[10px] text-stone-400">Playfair Display • Cỡ 22px</span>
-                    </button>
+                    {/* Filter Pills on Mobile */}
+                    <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-none text-[11px]">
+                      {[
+                        { id: 'all', label: 'Tất cả' },
+                        { id: 'couple', label: 'Tên cặp đôi' },
+                        { id: 'date', label: 'Ngày cưới' },
+                        { id: 'title', label: 'Nghi lễ' },
+                        { id: 'invitation', label: 'Lời mời' },
+                      ].map((cat) => (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => setMobileTextCat(cat.id)}
+                          className={`px-2.5 py-1 rounded-full whitespace-nowrap transition-colors font-medium text-[10px] cursor-pointer ${
+                            mobileTextCat === cat.id
+                              ? 'bg-stone-900 text-white dark:bg-white dark:text-stone-900 font-bold shadow-2xs'
+                              : 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400'
+                          }`}
+                        >
+                          {cat.label}
+                        </button>
+                      ))}
+                    </div>
 
-                    <button
-                      onClick={() => {
-                        addElement({
-                          type: 'text',
-                          x: 40,
-                          y: getSmartInsertY(60),
-                          width: 420,
-                          height: 60,
-                          rotation: 0,
-                          opacity: 1,
-                          text: 'Trân trọng kính mời quý khách tới tham dự buổi tiệc thành hôn chung vui cùng gia đình chúng tôi',
-                          fontFamily: 'sans-serif',
-                          fontSize: 14,
-                          color: '#555555',
-                          textAlign: 'center',
-                          lineHeight: 1.4,
-                        });
-                        close();
-                      }}
-                      className="w-full p-3 rounded-2xl bg-stone-50 dark:bg-stone-800 border border-stone-200 text-left hover:border-rose-400"
-                    >
-                      <span className="text-xs block text-stone-900 dark:text-white">Đoạn văn bản lời mời cưới</span>
-                      <span className="text-[10px] text-stone-400">Sans-serif • Cỡ 14px</span>
-                    </button>
+                    {/* Preset Cards List */}
+                    <div className="space-y-2.5 max-h-[380px] overflow-y-auto p-1">
+                      {WEDDING_TEXT_TEMPLATES.filter(
+                        (t) => mobileTextCat === 'all' || t.category === mobileTextCat
+                      ).map((item) => {
+                        const displayText =
+                          item.getDynamicText && weddingProfile.isLinked
+                            ? item.getDynamicText(weddingProfile)
+                            : item.sampleText;
+
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => {
+                              addElement({
+                                type: 'text',
+                                x: Math.max(20, Math.round((canvas.width - (item.defaultWidth || 400)) / 2)),
+                                y: getSmartInsertY(item.defaultHeight || 60),
+                                width: item.defaultWidth || 400,
+                                height: item.defaultHeight || 60,
+                                rotation: 0,
+                                opacity: 1,
+                                text: displayText,
+                                fontFamily: item.fontFamily,
+                                fontSize: item.fontSize,
+                                fontWeight: item.fontWeight || 'normal',
+                                fontStyle: item.fontStyle || 'normal',
+                                color: item.color,
+                                letterSpacing: item.letterSpacing || 0,
+                                lineHeight: item.lineHeight || 1.3,
+                                textAlign: item.textAlign || 'center',
+                              });
+                              close();
+                            }}
+                            className="w-full text-left p-3.5 rounded-2xl bg-[#FBF1EA] dark:bg-stone-800 border border-[#EDDCD2] dark:border-stone-700 active:scale-95 transition-all shadow-2xs flex flex-col items-center justify-center min-h-[88px]"
+                          >
+                            <div
+                              className="w-full flex items-center justify-center text-center px-1 py-0.5 leading-tight select-none"
+                              style={{
+                                fontFamily: resolveFontFamily(item.fontFamily),
+                                fontSize: `${item.previewFontSize || Math.round(item.fontSize * 0.7)}px`,
+                                fontWeight: item.fontWeight || 'normal',
+                                fontStyle: item.fontStyle || 'normal',
+                                color: item.color,
+                                letterSpacing: item.letterSpacing ? `${item.letterSpacing}px` : undefined,
+                                lineHeight: item.lineHeight || 1.3,
+                              }}
+                            >
+                              {displayText}
+                            </div>
+                            <span className="text-[10px] text-[#8C7A6B] dark:text-stone-400 font-sans mt-2 text-center">
+                              {item.title}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
 
@@ -954,6 +993,12 @@ export default function StudioMobileBottomSheet() {
                       { type: 'countdown', title: 'Đếm ngược', iconNode: <CountdownWidgetIcon />, height: 120 },
                       { type: 'calendar', title: 'Lịch cưới', iconNode: <CalendarWidgetIcon />, height: 330 },
                       { type: 'rsvp', title: 'Form RSVP', iconNode: <RsvpWidgetIcon />, height: 340 },
+                      { type: 'wishes', title: 'Sổ lưu bút & Lời chúc', iconNode: <WishesWidgetIcon />, height: 340 },
+                      { type: 'music_player', title: 'Đĩa than phát nhạc', iconNode: <MusicPlayerWidgetIcon />, height: 240 },
+                      { type: 'story_timeline', title: 'Dòng thời gian tình yêu', iconNode: <StoryTimelineWidgetIcon />, height: 340 },
+                      { type: 'dresscode', title: 'Bảng màu trang phục', iconNode: <DressCodeWidgetIcon />, height: 180 },
+                      { type: 'family_info', title: 'Gia đình hai bên', iconNode: <FamilyInfoWidgetIcon />, height: 220 },
+                      { type: 'video', title: 'Video cưới', iconNode: <VideoWidgetIcon />, height: 280 },
                       { type: 'map', title: 'Bản đồ', iconNode: <MapWidgetIcon />, height: 250 },
                       { type: 'giftbox', title: 'QR mừng cưới', iconNode: <GiftboxWidgetIcon />, height: 280 },
                       { type: 'call', title: 'Nút gọi', iconNode: <CallWidgetIcon />, height: 70 },

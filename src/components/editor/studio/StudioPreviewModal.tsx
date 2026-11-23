@@ -328,11 +328,16 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col items-center justify-between p-2 sm:p-4 animate-in fade-in duration-200">
       {/* Top Header Controls Bar */}
       <div className="w-full max-w-4xl bg-stone-900/90 text-white rounded-2xl px-4 py-2.5 flex items-center justify-between border border-stone-800 shadow-xl backdrop-blur-md mb-2">
-        <div className="flex items-center gap-3">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-xs sm:text-sm font-bold tracking-tight">
-            Xem trước trải nghiệm khách mời (Live Guest View)
-          </span>
+        <div className="flex items-center gap-3 overflow-hidden">
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+          <div className="truncate">
+            <span className="text-xs sm:text-sm font-bold tracking-tight block truncate">
+              Xem trước trải nghiệm khách mời (Live Guest View)
+            </span>
+            <span className="text-[10px] text-rose-400 font-medium flex items-center gap-1">
+              <span>🎵 Lưu ý: Nhạc nền, hình ảnh và font chữ đều có thể thay đổi tùy thích</span>
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">

@@ -21,24 +21,146 @@ export interface HarvestedRawTemplate {
 const HARVESTED_DIR = path.join(process.cwd(), 'src', 'data', 'harvested_templates');
 
 export const HARVESTED_SLUG_MAP: Record<string, string> = {
-  'our-love-begins': 'thiep-cuoi-61',
-  'tpl-61': 'thiep-cuoi-61',
-  'tpl-wedding-01': 'thiep-cuoi-61',
-  'thiep-cuoi-61': 'thiep-cuoi-61',
+  // 1. C165 - Save The Date Cream Gold
   'save-the-date-cream-gold': 'thiep-cuoi-165',
   'thiep-cuoi-165': 'thiep-cuoi-165',
   'tpl-165': 'thiep-cuoi-165',
   'c165': 'thiep-cuoi-165',
+  'tpl-wedding-165': 'thiep-cuoi-165',
+  'thiep-cuoi-hoang-gia': 'thiep-cuoi-165',
+  'royal-wedding': 'thiep-cuoi-165',
+
+  // 2. C61 - Our Love Begins
+  'our-love-begins': 'thiep-cuoi-61',
+  'tpl-61': 'thiep-cuoi-61',
+  'tpl-wedding-01': 'thiep-cuoi-61',
+  'thiep-cuoi-61': 'thiep-cuoi-61',
+
+  // 3. C39 - Our Love Story Rose
   'our-love-story-rose': 'thiep-cuoi-39',
   'thiep-cuoi-39': 'thiep-cuoi-39',
   'tpl-39': 'thiep-cuoi-39',
   'tpl-wedding-02': 'thiep-cuoi-39',
+
+  // 4. C44 - Envelope Chamomile
   'envelope-chamomile': 'thiep-cuoi-44',
   'thiep-cuoi-44': 'thiep-cuoi-44',
   'tpl-44': 'thiep-cuoi-44',
   'tpl-wedding-03': 'thiep-cuoi-44',
-  'thiep-cuoi-hoang-gia': 'thiep-cuoi-165',
-  'royal-wedding': 'thiep-cuoi-165',
+
+  // 5. C47 - Wedding Car Illustration
+  'wedding-car-illustration': 'thiep-cuoi-47',
+  'tpl-wedding-04': 'thiep-cuoi-47',
+  'thiep-cuoi-47': 'thiep-cuoi-47',
+
+  // 6. C42 - Marry Me Pink Pastel
+  'marry-me-pink-pastel': 'thiep-cuoi-42',
+  'tpl-wedding-05': 'thiep-cuoi-42',
+  'thiep-cuoi-42': 'thiep-cuoi-42',
+
+  // 7. C2 - Fall In Love Meadow
+  'fall-in-love-meadow': 'thiep-cuoi-2',
+  'tpl-wedding-06': 'thiep-cuoi-2',
+  'thiep-cuoi-2': 'thiep-cuoi-2',
+
+  // 8. C38 - Burgundy Handwritten
+  'burgundy-handwritten': 'thiep-cuoi-38',
+  'tpl-wedding-07': 'thiep-cuoi-38',
+  'thiep-cuoi-38': 'thiep-cuoi-38',
+
+  // 9. C46 - Arch White Burgundy
+  'arch-white-burgundy': 'thiep-cuoi-46',
+  'tpl-wedding-08': 'thiep-cuoi-46',
+  'thiep-cuoi-46': 'thiep-cuoi-46',
+
+  // 10. C1 - Blue Ocean Film Strip
+  'blue-ocean-film-strip': 'thiep-cuoi-1',
+  'tpl-wedding-09': 'thiep-cuoi-1',
+  'thiep-cuoi-1': 'thiep-cuoi-1',
+
+  // 11. C36 - Silver White Arch
+  'silver-white-arch': 'thiep-cuoi-36',
+  'tpl-wedding-10': 'thiep-cuoi-36',
+  'thiep-cuoi-36': 'thiep-cuoi-36',
+
+  // 12. C148 - Envelope Sage Polaroid
+  'envelope-sage-polaroid': 'thiep-cuoi-148',
+  'tpl-wedding-11': 'thiep-cuoi-148',
+  'thiep-cuoi-148': 'thiep-cuoi-148',
+
+  // 13. C114 - Watercolor Pink Floral
+  'watercolor-pink-floral': 'thiep-cuoi-114',
+  'tpl-wedding-12': 'thiep-cuoi-114',
+  'thiep-cuoi-114': 'thiep-cuoi-114',
+
+  // 14. C40 - Studio White Calendar
+  'studio-white-calendar': 'thiep-cuoi-40',
+  'tpl-wedding-13': 'thiep-cuoi-40',
+  'thiep-cuoi-40': 'thiep-cuoi-40',
+
+  // 15. C16 - Rose Arch Gate
+  'rose-arch-gate': 'thiep-cuoi-52',
+  'tpl-wedding-14': 'thiep-cuoi-52',
+  'thiep-cuoi-16': 'thiep-cuoi-52',
+  'thiep-cuoi-52': 'thiep-cuoi-52',
+
+  // 16. C48 - Green Envelope Hill
+  'green-envelope-hill': 'thiep-cuoi-48',
+  'tpl-wedding-15': 'thiep-cuoi-48',
+  'thiep-cuoi-48': 'thiep-cuoi-48',
+
+  // 17. C117 - Red Envelope Cream Flower
+  'red-envelope-cream-flower': 'thiep-cuoi-117',
+  'tpl-wedding-16': 'thiep-cuoi-117',
+  'thiep-cuoi-117': 'thiep-cuoi-117',
+
+  // 18. C19 - Beige Lace Dress
+  'beige-lace-dress': 'thiep-cuoi-145',
+  'tpl-wedding-17': 'thiep-cuoi-145',
+  'thiep-cuoi-19': 'thiep-cuoi-145',
+  'thiep-cuoi-145': 'thiep-cuoi-145',
+
+  // 19. C139 - Red Rose Champagne
+  'red-rose-champagne': 'thiep-cuoi-139',
+  'tpl-wedding-18': 'thiep-cuoi-139',
+  'thiep-cuoi-139': 'thiep-cuoi-139',
+
+  // 20. C56 - White Grey Red Ribbon
+  'white-grey-red-ribbon': 'thiep-cuoi-56',
+  'tpl-wedding-19': 'thiep-cuoi-56',
+  'thiep-cuoi-56': 'thiep-cuoi-56',
+
+  // 21. phong-bi-do - Red Envelope Tradition
+  'red-envelope-tradition': 'phong-bi-do',
+  'tpl-wedding-20': 'phong-bi-do',
+  'phong-bi-do': 'phong-bi-do',
+
+  // 22. thiep-cuoi-tone-xanh - Chibi Nha Co Hy
+  'chibi-nha-co-hy': 'thiep-cuoi-tone-xanh',
+  'tpl-wedding-21': 'thiep-cuoi-tone-xanh',
+  'thiep-cuoi-tone-xanh': 'thiep-cuoi-tone-xanh',
+
+  // 23. C53 - Blue Envelope Timeline
+  'blue-envelope-timeline': 'thiep-cuoi-55',
+  'tpl-wedding-22': 'thiep-cuoi-55',
+  'thiep-cuoi-53': 'thiep-cuoi-55',
+  'thiep-cuoi-55': 'thiep-cuoi-55',
+
+  // 24. C5 - Chibi Red Tan Hon
+  'chibi-red-tan-hon': 'thiep-cuoi-5',
+  'tpl-wedding-23': 'thiep-cuoi-5',
+  'thiep-cuoi-5': 'thiep-cuoi-5',
+
+  // 25. C23 - Forest Moonlight
+  'forest-moonlight': 'thiep-cuoi-23',
+  'tpl-wedding-24': 'thiep-cuoi-23',
+  'thiep-cuoi-23': 'thiep-cuoi-23',
+
+  // Base template mappings
+  'pastel': 'thiep-cuoi-44',
+  'floral': 'thiep-cuoi-42',
+  'retro': 'thiep-cuoi-2',
+  'burgundy': 'thiep-cuoi-38',
 };
 
 /**
@@ -74,6 +196,7 @@ export function convertHarvestedToStudioPreset(raw: HarvestedRawTemplate): Studi
         .replace(/&nbsp;/g, ' ')
         .replace(/&amp;/g, '&')
         .replace(/&quot;/g, '"')
+        .replace(/cinelove(\.me)?/gi, 'LoveStory')
         .replace(/\s+/g, ' ')
         .trim()
     )
@@ -89,6 +212,7 @@ export function convertHarvestedToStudioPreset(raw: HarvestedRawTemplate): Studi
     ? raw.title
         .replace(/-\s*Thiệp online LoveStory.*$/i, '')
         .replace(/-\s*CineLove.*$/i, '')
+        .replace(/cinelove/gi, 'LoveStory')
         .trim()
     : `Mẫu Thiệp ${raw.slug}`;
 
@@ -486,8 +610,37 @@ export function convertHarvestedToStudioPreset(raw: HarvestedRawTemplate): Studi
 
   const totalHeight = Math.max(currentY + 80, 5200);
 
+  const isRedRose =
+    raw.slug.includes('rose') ||
+    raw.slug.includes('burgundy') ||
+    raw.slug.includes('hoa-hong') ||
+    raw.slug.includes('thiep-cuoi-38') ||
+    raw.slug.includes('thiep-cuoi-39') ||
+    raw.slug.includes('thiep-cuoi-139') ||
+    raw.slug.includes('thiep-cuoi-117') ||
+    raw.slug.includes('thiep-cuoi-5') ||
+    raw.slug.includes('phong-bi-do');
+
+  const isSageGreen =
+    raw.slug.includes('sage') ||
+    raw.slug.includes('polaroid') ||
+    raw.slug.includes('green') ||
+    raw.slug.includes('thiep-cuoi-148') ||
+    raw.slug.includes('thiep-cuoi-48');
+
+  const isOceanBlue =
+    raw.slug.includes('blue') ||
+    raw.slug.includes('ocean') ||
+    raw.slug.includes('xanh') ||
+    raw.slug.includes('thiep-cuoi-1') ||
+    raw.slug.includes('thiep-cuoi-53') ||
+    raw.slug.includes('thiep-cuoi-tone-xanh');
+
+  const bgColor = isRedRose ? '#FAF0F2' : isSageGreen ? '#F4F7F4' : isOceanBlue ? '#F2F7FA' : '#FAF7F2';
+  const effectType: 'hearts' | 'snow' = isRedRose ? 'hearts' : 'snow';
+
   return {
-    id: `harvested-${raw.slug}`,
+    id: raw.slug,
     slug: raw.slug,
     name: cleanTitle,
     category: raw.slug.includes('sinh-nhat')
@@ -500,17 +653,17 @@ export function convertHarvestedToStudioPreset(raw: HarvestedRawTemplate): Studi
     imagesCount: images.length,
     description: `Mẫu thiết kế cao cấp "${cleanTitle}" với ${images.length} ảnh thực tế sắc nét và hiệu ứng tương tác hoàn chỉnh.`,
     config: {
-      width: 500,
-      height: totalHeight,
-      background: isC39 ? '#FAF0F2' : '#FAF7F2',
-      title: cleanTitle,
-      audioTitle: 'Nhạc nền LoveStory',
-      audioUrl: audio,
-      fallingEffect: { enabled: true, type: isC39 ? 'hearts' : 'snow' },
-    },
-    elements,
-  };
-}
+        width: 500,
+        height: totalHeight,
+        background: bgColor,
+        title: cleanTitle,
+        audioTitle: 'Nhạc nền LoveStory',
+        audioUrl: audio,
+        fallingEffect: { enabled: true, type: effectType },
+      },
+      elements,
+    };
+  }
 
 /**
  * Resolve any template by slug or ID with ZERO-MOCK guarantee:
@@ -525,14 +678,7 @@ export function getStudioTemplate(slugOrId: string): StudioTemplatePreset | null
     return custom;
   }
 
-  // 2. Check if slug maps to an authentic harvested template
-  const mappedSlug = HARVESTED_SLUG_MAP[norm] || norm;
-  const rawHarvested = getHarvestedRawTemplate(mappedSlug);
-  if (rawHarvested && rawHarvested.images && rawHarvested.images.length > 0) {
-    return convertHarvestedToStudioPreset(rawHarvested);
-  }
-
-  // 3. Check Catalog templates (CATALOG_TEMPLATES & customTemplates)
+  // 2. Check Catalog templates first (retaining catalog item ID, slug, name, thumbnail)
   try {
     const catalogList = getAllCatalogTemplates();
     const catalogItem = catalogList.find(
@@ -569,35 +715,67 @@ export function getStudioTemplate(slugOrId: string): StudioTemplatePreset | null
         };
       }
 
-      // Check if baseTemplateId or slug maps to harvested raw
-      const candidateBase = catalogItem.baseTemplateId
-        ? HARVESTED_SLUG_MAP[catalogItem.baseTemplateId.toLowerCase()] || catalogItem.baseTemplateId
-        : HARVESTED_SLUG_MAP[catalogItem.slug.toLowerCase()];
+      // Check HARVESTED_SLUG_MAP for catalog slug first, then baseTemplateId, then fallback
+      const candidateKey =
+        HARVESTED_SLUG_MAP[catalogItem.slug.toLowerCase()] ||
+        (catalogItem.baseTemplateId
+          ? HARVESTED_SLUG_MAP[catalogItem.baseTemplateId.toLowerCase()] || catalogItem.baseTemplateId
+          : null) ||
+        catalogItem.slug;
 
-      if (candidateBase) {
-        const rawBase = getHarvestedRawTemplate(candidateBase);
-        if (rawBase) {
-          const converted = convertHarvestedToStudioPreset(rawBase);
-          return {
-            ...converted,
-            id: catalogItem.id,
-            slug: catalogItem.slug,
-            name: catalogItem.name,
-            thumbnail: catalogItem.longThumbnail || converted.thumbnail,
-            description: catalogItem.description || converted.description,
-            config: {
-              ...converted.config,
-              title: catalogItem.name,
-            },
-          };
-        }
+      const rawBase = getHarvestedRawTemplate(candidateKey);
+      if (rawBase && rawBase.images && rawBase.images.length > 0) {
+        const converted = convertHarvestedToStudioPreset(rawBase);
+        return {
+          ...converted,
+          id: catalogItem.id,
+          slug: catalogItem.slug,
+          name: catalogItem.name,
+          thumbnail: catalogItem.longThumbnail || converted.thumbnail,
+          description: catalogItem.description || converted.description,
+          config: {
+            ...converted.config,
+            title: catalogItem.name,
+          },
+        };
       }
     }
   } catch (err) {
     console.error('Error resolving catalog template in studio converter:', err);
   }
 
-  // 4. Fallback: Curated Studio presets (if any match)
+  // 3. Direct Harvested Slug mapping
+  const mappedSlug = HARVESTED_SLUG_MAP[norm] || norm;
+  const rawHarvested = getHarvestedRawTemplate(mappedSlug);
+  if (rawHarvested && rawHarvested.images && rawHarvested.images.length > 0) {
+    return convertHarvestedToStudioPreset(rawHarvested);
+  }
+
+  // 4. Fuzzy fallback in harvested index.json
+  try {
+    const indexFile = path.join(HARVESTED_DIR, 'index.json');
+    if (fs.existsSync(indexFile)) {
+      const idxList = JSON.parse(fs.readFileSync(indexFile, 'utf-8')) as HarvestedRawTemplate[];
+      const cleanNorm = norm.replace(/^tpl-/, '').replace(/^c-?/, '');
+      const match = idxList.find(
+        (item) =>
+          item.slug?.toLowerCase() === norm ||
+          item.slug?.toLowerCase() === `thiep-cuoi-${cleanNorm}` ||
+          item.slug?.toLowerCase()?.includes(norm) ||
+          item.title?.toLowerCase().includes(norm)
+      );
+      if (match?.slug) {
+        const rawFuzzy = getHarvestedRawTemplate(match.slug);
+        if (rawFuzzy && rawFuzzy.images && rawFuzzy.images.length > 0) {
+          return convertHarvestedToStudioPreset(rawFuzzy);
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Error fuzzy searching harvested templates:', err);
+  }
+
+  // 5. Fallback: Curated Studio presets (if any match)
   const curated = STUDIO_TEMPLATE_PRESETS.find(
     (p) => p.slug.toLowerCase() === norm || p.id.toLowerCase() === norm
   );

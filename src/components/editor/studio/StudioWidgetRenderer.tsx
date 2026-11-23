@@ -15,6 +15,12 @@ import {
   User,
   Users,
   Image as ImageIcon,
+  MessageSquare,
+  Music,
+  Play,
+  Volume2,
+  Film,
+  Send,
 } from 'lucide-react';
 import { CanvasElement } from './studioTypes';
 
@@ -427,6 +433,295 @@ export default function StudioWidgetRenderer({ element }: Props) {
         <span className="text-[10px] text-stone-400 text-center block">
           Chạm vào ảnh để xem trọn bộ sưu tập
         </span>
+      </div>
+    );
+  }
+
+  // 10. WISHES / SỔ LƯU BÚT & LỜI CHÚC
+  if (widgetType === 'wishes') {
+    return (
+      <div className="w-full h-full bg-[#FCFBF7] dark:bg-stone-900/90 rounded-2xl p-4 border border-[#EADBCE] dark:border-stone-800 shadow-sm flex flex-col justify-between select-none">
+        <div>
+          <div className="flex items-center justify-between pb-2 border-b border-[#EADBCE]/80 dark:border-stone-800">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-rose-500/10 flex items-center justify-center">
+                <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500/40" />
+              </div>
+              <h4 className="font-serif text-sm font-bold text-[#3A2E2B] dark:text-stone-100">
+                {widgetConfig.title || 'Sổ Lưu Bút & Lời Chúc'}
+              </h4>
+            </div>
+            <span className="text-[10px] text-[#8C7355] font-semibold bg-[#F5EFE6] px-2 py-0.5 rounded-full">
+              12 lời chúc
+            </span>
+          </div>
+
+          <div className="space-y-2 mt-2.5">
+            <div className="p-2 rounded-xl bg-white dark:bg-stone-800/80 border border-stone-100 dark:border-stone-700/60 shadow-2xs">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-bold text-stone-800 dark:text-stone-200">Bạn Thu Trang</span>
+                <span className="text-[9px] text-stone-400">Vừa xong</span>
+              </div>
+              <p className="text-[11px] text-stone-600 dark:text-stone-300 leading-snug">
+                Chúc hai bạn trăm năm hạnh phúc, đầu bạc răng long và luôn ngọt ngào như ngày đầu! ❤️
+              </p>
+            </div>
+
+            <div className="p-2 rounded-xl bg-white dark:bg-stone-800/80 border border-stone-100 dark:border-stone-700/60 shadow-2xs">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-bold text-stone-800 dark:text-stone-200">Tuấn Anh & Nhóm bạn</span>
+                <span className="text-[9px] text-stone-400">10 phút trước</span>
+              </div>
+              <p className="text-[11px] text-stone-600 dark:text-stone-300 leading-snug">
+                Mừng ngày hạnh phúc của hai bạn! Chúc cô dâu chú rể sớm có quý tử nha! 🎉
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-2 border-t border-[#EADBCE]/60 flex gap-1.5 items-center">
+          <input
+            type="text"
+            readOnly
+            placeholder="Gửi lời chúc mừng đến cô dâu chú rể..."
+            className="flex-1 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl px-2.5 py-1.5 text-xs text-stone-700 dark:text-stone-200 placeholder:text-stone-400 focus:outline-none"
+          />
+          <button
+            type="button"
+            className="px-3 py-1.5 rounded-xl bg-[#8C7355] hover:bg-[#735D43] text-white text-xs font-medium flex items-center gap-1 shrink-0 shadow-xs"
+          >
+            <Send className="w-3 h-3" />
+            <span>Gửi</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 11. MUSIC PLAYER / ĐĨA THAN ÂM NHẠC TƯƠNG TÁC
+  if (widgetType === 'music_player') {
+    return (
+      <div className="w-full h-full bg-[#18181B] text-white rounded-2xl p-3 border border-stone-800 shadow-md flex items-center gap-3 select-none overflow-hidden relative">
+        {/* Vinyl Disc with Spinning Graphic */}
+        <div className="w-20 h-20 rounded-full bg-stone-900 border-2 border-stone-700 shadow-lg flex items-center justify-center shrink-0 relative animate-[spin_8s_linear_infinite]">
+          {/* Vinyl Grooves */}
+          <div className="w-16 h-16 rounded-full border border-stone-800 border-dashed" />
+          <div className="w-12 h-12 rounded-full border border-stone-800" />
+          {/* Disc Center Label */}
+          <div className="w-7 h-7 rounded-full bg-rose-600 flex items-center justify-center absolute">
+            <div className="w-2 h-2 rounded-full bg-stone-900" />
+          </div>
+        </div>
+
+        {/* Tone Arm Needle */}
+        <div className="absolute left-[70px] top-3 w-5 h-8 pointer-events-none opacity-80">
+          <div className="w-1.5 h-6 bg-amber-400 rotate-25 origin-top rounded-full shadow-xs" />
+        </div>
+
+        {/* Info & Controls */}
+        <div className="flex-1 min-w-0 pr-1">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[10px] font-bold text-rose-400 tracking-wider uppercase font-mono">
+              Đĩa Than Nhạc Cưới
+            </span>
+          </div>
+          <h4 className="text-xs font-bold truncate text-white">
+            {widgetConfig.audioTitle || 'Beautiful In White'}
+          </h4>
+          <p className="text-[10px] text-stone-400 truncate">
+            {widgetConfig.artist || 'Shane Filan • Nhạc nền LoveStory'}
+          </p>
+
+          <div className="flex items-center gap-2 mt-2">
+            <button
+              type="button"
+              className="w-7 h-7 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center shadow-xs"
+            >
+              <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
+            </button>
+            <div className="flex-1 h-1.5 bg-stone-800 rounded-full overflow-hidden">
+              <div className="w-2/5 h-full bg-gradient-to-r from-rose-500 to-amber-400 rounded-full" />
+            </div>
+            <Volume2 className="w-3.5 h-3.5 text-stone-400" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 12. STORY TIMELINE / DÒNG THỜI GIAN TÌNH YÊU
+  if (widgetType === 'story_timeline') {
+    return (
+      <div className="w-full h-full bg-[#FAF7F2] dark:bg-stone-900/90 rounded-2xl p-4 border border-[#EADBCE] dark:border-stone-800 shadow-sm select-none flex flex-col justify-between">
+        <div className="text-center pb-2 border-b border-[#EADBCE]/80 dark:border-stone-800">
+          <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#8C7355]">Câu chuyện của chúng mình</span>
+          <h4 className="font-serif text-sm font-bold text-[#3A2E2B] dark:text-stone-100">Dòng Thời Gian Tình Yêu</h4>
+        </div>
+
+        <div className="relative pl-6 space-y-3.5 my-2">
+          {/* Vertical dashed line */}
+          <div className="absolute left-2.5 top-1 bottom-1 w-0.5 border-l-2 border-dashed border-rose-300 dark:border-rose-900" />
+
+          {/* Node 1 */}
+          <div className="relative">
+            <div className="absolute -left-[21px] top-0.5 w-3.5 h-3.5 rounded-full bg-white border-2 border-rose-500 flex items-center justify-center">
+              <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+            </div>
+            <span className="text-[10px] font-bold text-rose-600">20.10.2021</span>
+            <p className="text-xs font-semibold text-stone-800 dark:text-stone-200">Lần đầu gặp gỡ</p>
+            <p className="text-[10px] text-stone-500 leading-tight">Buổi chiều thu nhẹ nhàng tại quán cà phê quen thuộc</p>
+          </div>
+
+          {/* Node 2 */}
+          <div className="relative">
+            <div className="absolute -left-[21px] top-0.5 w-3.5 h-3.5 rounded-full bg-rose-500 flex items-center justify-center">
+              <Heart className="w-2 h-2 text-white fill-white" />
+            </div>
+            <span className="text-[10px] font-bold text-rose-600">14.02.2024</span>
+            <p className="text-xs font-semibold text-stone-800 dark:text-stone-200">Lời cầu hôn ngọt ngào</p>
+            <p className="text-[10px] text-stone-500 leading-tight">Dưới ánh hoàng hôn Đà Lạt rực rỡ, em đã nói &quot;Yes!&quot;</p>
+          </div>
+
+          {/* Node 3 */}
+          <div className="relative">
+            <div className="absolute -left-[21px] top-0.5 w-3.5 h-3.5 rounded-full bg-white border-2 border-amber-500 flex items-center justify-center">
+              <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+            </div>
+            <span className="text-[10px] font-bold text-amber-600">2026</span>
+            <p className="text-xs font-semibold text-stone-800 dark:text-stone-200">Ngày chung đôi</p>
+            <p className="text-[10px] text-stone-500 leading-tight">Cùng nhau viết tiếp những chương hạnh phúc nhất</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 13. DRESS CODE / BẢNG MÀU TRANG PHỤC THAM DỰ
+  if (widgetType === 'dresscode') {
+    return (
+      <div className="w-full h-full bg-[#FAF7F2] dark:bg-stone-900/90 rounded-2xl p-3 border border-[#EADBCE] dark:border-stone-800 shadow-sm flex flex-col justify-between text-center select-none">
+        <div>
+          <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#8C7355]">Gợi Ý Trang Phục</span>
+          <h4 className="font-serif text-sm font-bold text-[#3A2E2B] dark:text-stone-100">Dress Code Tham Dự</h4>
+          <p className="text-[10px] text-stone-500 mt-0.5">
+            Để có những bức ảnh kỷ niệm thật hài hòa, kính mời quý khách mặc trang phục theo gợi ý:
+          </p>
+        </div>
+
+        <div className="flex items-center justify-center gap-3 my-1">
+          <div className="flex flex-col items-center gap-1">
+            <div className="w-7 h-7 rounded-full bg-[#FFFFFF] border border-stone-300 shadow-2xs" />
+            <span className="text-[9px] text-stone-600 dark:text-stone-400 font-medium">Trắng</span>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <div className="w-7 h-7 rounded-full bg-[#EADBC8] border border-stone-300 shadow-2xs" />
+            <span className="text-[9px] text-stone-600 dark:text-stone-400 font-medium">Be / Kem</span>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <div className="w-7 h-7 rounded-full bg-[#F3C5C5] border border-stone-300 shadow-2xs" />
+            <span className="text-[9px] text-stone-600 dark:text-stone-400 font-medium">Pastel</span>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <div className="w-7 h-7 rounded-full bg-[#7A1E28] border border-stone-700 shadow-2xs" />
+            <span className="text-[9px] text-stone-600 dark:text-stone-400 font-medium">Đỏ Rượu</span>
+          </div>
+        </div>
+
+        <span className="text-[9px] text-stone-400 italic">
+          * Quý khách có thể tự do lựa chọn trang phục lịch sự phù hợp
+        </span>
+      </div>
+    );
+  }
+
+  // 14. FAMILY INFO / THÔNG TIN HAI BÊN GIA ĐÌNH
+  if (widgetType === 'family_info') {
+    return (
+      <div className="w-full h-full bg-[#FCFBF7] dark:bg-stone-900/90 rounded-2xl p-3 border border-[#EADBCE] dark:border-stone-800 shadow-sm flex flex-col justify-between text-center select-none">
+        <div className="pb-1.5 border-b border-[#EADBCE]/80 dark:border-stone-800">
+          <span className="text-[9px] uppercase font-bold tracking-[0.25em] text-[#8C7355]">Hôn Phối Trân Trọng Kính Báo</span>
+          <h4 className="font-serif text-sm font-bold text-[#3A2E2B] dark:text-stone-100">Gia Đình Hai Bên</h4>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 my-1">
+          {/* Nhà Trai */}
+          <div className="p-2 rounded-xl bg-blue-50/50 dark:bg-stone-800/60 border border-blue-100 dark:border-stone-700/60">
+            <span className="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider block mb-1">
+              Nhà Trai
+            </span>
+            <p className="text-xs font-serif font-bold text-stone-800 dark:text-stone-200">
+              {widgetConfig.groomFather || 'Ông: Nguyễn Văn An'}
+            </p>
+            <p className="text-xs font-serif font-bold text-stone-800 dark:text-stone-200">
+              {widgetConfig.groomMother || 'Bà: Trần Thị Mai'}
+            </p>
+            <span className="text-[10px] text-stone-500 mt-1 block">
+              Trưởng Nam: {widgetConfig.groomName || 'Minh Trí'}
+            </span>
+          </div>
+
+          {/* Nhà Gái */}
+          <div className="p-2 rounded-xl bg-rose-50/50 dark:bg-stone-800/60 border border-rose-100 dark:border-stone-700/60">
+            <span className="text-[10px] font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider block mb-1">
+              Nhà Gái
+            </span>
+            <p className="text-xs font-serif font-bold text-stone-800 dark:text-stone-200">
+              {widgetConfig.brideFather || 'Ông: Lê Hoàng Long'}
+            </p>
+            <p className="text-xs font-serif font-bold text-stone-800 dark:text-stone-200">
+              {widgetConfig.brideMother || 'Bà: Phạm Thu Cúc'}
+            </p>
+            <span className="text-[10px] text-stone-500 mt-1 block">
+              Út Nữ: {widgetConfig.brideName || 'Ngọc Anh'}
+            </span>
+          </div>
+        </div>
+
+        <span className="text-[9px] text-stone-400">
+          Kính mời quý quan viên hai họ và bạn bè thân hữu tới dự
+        </span>
+      </div>
+    );
+  }
+
+  // 15. VIDEO WIDGET / VIDEO KỶ NIỆM CƯỚI
+  if (widgetType === 'video') {
+    return (
+      <div className="w-full h-full bg-stone-900 rounded-2xl overflow-hidden border border-stone-800 shadow-md relative select-none flex flex-col justify-between p-3 text-white">
+        {/* Background poster preview */}
+        <div className="absolute inset-0 z-0 opacity-40">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/assets/wedding/templates/c165/photo_01.webp"
+            alt="Video poster"
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        {/* Top badge */}
+        <div className="relative z-10 flex items-center justify-between">
+          <span className="px-2 py-0.5 rounded-full bg-rose-600/90 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+            <Film className="w-3 h-3" />
+            <span>Wedding Film</span>
+          </span>
+          <span className="text-[10px] bg-black/60 px-2 py-0.5 rounded-full font-mono">03:45</span>
+        </div>
+
+        {/* Center Play Button */}
+        <div className="relative z-10 flex flex-col items-center justify-center my-auto">
+          <div className="w-12 h-12 rounded-full bg-white/90 text-rose-600 flex items-center justify-center shadow-xl hover:scale-110 transition-transform">
+            <Play className="w-5 h-5 fill-rose-600 ml-0.5" />
+          </div>
+        </div>
+
+        {/* Bottom title */}
+        <div className="relative z-10 text-center">
+          <h4 className="text-xs font-bold truncate">
+            {widgetConfig.videoTitle || 'Hành Trình Tình Yêu • Wedding Trailer (4K)'}
+          </h4>
+          <span className="text-[10px] text-stone-300">Chạm để phát video kỷ niệm</span>
+        </div>
       </div>
     );
   }

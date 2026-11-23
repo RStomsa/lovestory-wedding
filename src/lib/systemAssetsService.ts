@@ -49,9 +49,30 @@ function writeJsonFile<T>(filePath: string, data: T): boolean {
 // ==========================================
 export async function getCustomFonts(): Promise<(StudioFont & { isCustom?: boolean })[]> {
   try {
-    const dbFonts = await prisma.customFont.findMany({
-      orderBy: { createdAt: 'desc' },
+    let dbFonts = await prisma.customFont.findMany({
+      orderBy: { createdAt: 'asc' },
     });
+
+    // Auto-seed initial curated wedding fonts into database if empty
+    if (!dbFonts || dbFonts.length === 0) {
+      try {
+        await prisma.customFont.createMany({
+          data: STUDIO_FONTS.map((f) => ({
+            name: f.name,
+            family: f.family,
+            googleFont: f.googleFont,
+            desc: f.desc,
+            category: f.category,
+          })),
+        });
+        dbFonts = await prisma.customFont.findMany({
+          orderBy: { createdAt: 'asc' },
+        });
+      } catch (seedErr) {
+        console.warn('Could not auto-seed fonts into database:', seedErr);
+      }
+    }
+
     if (dbFonts && dbFonts.length > 0) {
       return dbFonts.map((f) => ({
         id: f.id,
@@ -72,7 +93,10 @@ export async function getCustomFonts(): Promise<(StudioFont & { isCustom?: boole
 
 export async function getAllSystemFonts(): Promise<(StudioFont & { isCustom?: boolean })[]> {
   const custom = await getCustomFonts();
-  return [...custom, ...STUDIO_FONTS];
+  if (custom && custom.length > 0) {
+    return custom;
+  }
+  return STUDIO_FONTS;
 }
 
 export async function addCustomFont(fontData: {

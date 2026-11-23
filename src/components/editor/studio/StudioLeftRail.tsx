@@ -30,6 +30,8 @@ import { STUDIO_TEMPLATE_PRESETS } from '@/data/studioTemplatePresets';
 import { GRAPHICS_CATALOG, GraphicSticker } from '@/data/graphicsCatalog';
 import weddingMusicCatalog from '@/data/weddingMusicCatalog.json';
 import harvestedTemplates from '@/data/harvested_templates/index.json';
+import { resolveFontFamily } from '@/lib/studioFonts';
+import { WEDDING_TEXT_TEMPLATES } from '@/data/weddingTextTemplates';
 import {
   CalendarWidgetIcon,
   CountdownWidgetIcon,
@@ -42,6 +44,12 @@ import {
   GiftboxWidgetIcon,
   AlbumWidgetIcon,
   SlideshowWidgetIcon,
+  WishesWidgetIcon,
+  MusicPlayerWidgetIcon,
+  StoryTimelineWidgetIcon,
+  DressCodeWidgetIcon,
+  FamilyInfoWidgetIcon,
+  VideoWidgetIcon,
 } from './StudioWidgetIcons';
 
 export default function StudioLeftRail() {
@@ -66,6 +74,9 @@ export default function StudioLeftRail() {
   // Background sub-tabs: Màu nền | Hình nền
   const [bgSubTab, setBgSubTab] = useState<'color' | 'image'>('color');
 
+  // Text Template Category Filter
+  const [textTemplateCategory, setTextTemplateCategory] = useState<string>('all');
+
   // Replace mode state for image tab
   const [isReplaceMode, setIsReplaceMode] = useState(false);
 
@@ -79,14 +90,30 @@ export default function StudioLeftRail() {
   const gfxFileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Helper to place newly inserted elements in the user's visible viewport
-  const getSmartInsertY = (_elemHeight: number = 150) => {
-    const canvasNode = document.getElementById('studio-main-canvas');
-    const scrollContainer = canvasNode?.parentElement?.parentElement;
-    if (scrollContainer && scrollContainer.scrollTop > 100) {
-      return Math.round(scrollContainer.scrollTop + 180);
+  const getSmartInsertY = (_elemHeight: number = 120) => {
+    // 1. If an element is currently selected, place right below it
+    const { selectedId, elements: currentElements, zoom = 1 } = useStudioStore.getState();
+    if (selectedId) {
+      const selected = currentElements.find((e) => e.id === selectedId);
+      if (selected) {
+        return Math.round(selected.y + selected.height + 20);
+      }
     }
-    const maxY = elements.reduce((max, e) => Math.max(max, e.y + e.height), 0);
-    return maxY > 0 ? maxY + 40 : 400;
+
+    // 2. Otherwise calculate current viewport center on canvas
+    const scrollContainer =
+      document.getElementById('studio-canvas-scroll-container') ||
+      document.getElementById('studio-main-canvas')?.parentElement?.parentElement;
+
+    if (scrollContainer) {
+      const scrollTop = scrollContainer.scrollTop || 0;
+      const clientHeight = scrollContainer.clientHeight || 700;
+      const centerCanvasY = Math.round((scrollTop + clientHeight / 2 - _elemHeight / 2) / Math.max(zoom, 0.2));
+      return Math.max(40, centerCanvasY);
+    }
+
+    // 3. Fallback to upper section of canvas (never at bottom!)
+    return 300;
   };
 
   const handleUploadGraphics = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1011,7 +1038,7 @@ export default function StudioLeftRail() {
         )}
 
         {/* =========================================================================
-            TEXT / VĂN BẢN
+            TEXT / VĂN BẢN (MẪU VĂN BẢN CHUẨN ĐỒ HỌA + TYPOGRAPHY PRESETS)
         ========================================================================= */}
         {activeTab === 'text' && (
           <div className="space-y-4">
@@ -1039,77 +1066,153 @@ export default function StudioLeftRail() {
               </button>
             </div>
 
-            <h3 className="text-xs font-bold uppercase tracking-wider text-stone-500">Thêm Văn Bản</h3>
-            <button
-              onClick={() =>
-                addElement({
-                  type: 'text',
-                  x: 50,
-                  y: 400,
-                  width: 400,
-                  height: 60,
-                  rotation: 0,
-                  opacity: 1,
-                  text: 'Save The Date',
-                  fontFamily: 'Playfair Display',
-                  fontSize: 36,
-                  fontWeight: '700',
-                  color: '#8C7355',
-                  textAlign: 'center',
-                })
-              }
-              className="w-full p-3 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-rose-50 text-left font-serif font-bold text-base text-stone-900 dark:text-white transition-colors border border-stone-200 dark:border-stone-700 flex items-center justify-between"
-            >
-              <span>Thêm tiêu đề lớn</span>
-              <Plus className="w-4 h-4 text-stone-400" />
-            </button>
+            {/* MẪU VĂN BẢN (Exact Match to User Screenshot) */}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-stone-900 dark:text-white">Mẫu văn bản</h3>
+                <span className="text-[10px] text-stone-400 font-medium">Chạm để chèn</span>
+              </div>
 
-            <button
-              onClick={() =>
-                addElement({
-                  type: 'text',
-                  x: 50,
-                  y: 400,
-                  width: 400,
-                  height: 50,
-                  rotation: 0,
-                  opacity: 1,
-                  text: 'Mei Tiểu Mai & Mạn Tiểu Mạn',
-                  fontFamily: 'Paris Regular',
-                  fontSize: 26,
-                  color: '#8C7355',
-                  textAlign: 'center',
-                })
-              }
-              className="w-full p-3 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-rose-50 text-left font-serif italic text-sm text-stone-800 dark:text-stone-200 transition-colors border border-stone-200 dark:border-stone-700 flex items-center justify-between"
-            >
-              <span>Tên cô dâu chú rể</span>
-              <Plus className="w-4 h-4 text-stone-400" />
-            </button>
+              {/* Category Filter Pills */}
+              <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[11px]">
+                {[
+                  { id: 'all', label: 'Tất cả' },
+                  { id: 'couple', label: 'Tên cặp đôi' },
+                  { id: 'date', label: 'Ngày cưới' },
+                  { id: 'title', label: 'Nghi lễ' },
+                  { id: 'invitation', label: 'Lời mời' },
+                ].map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setTextTemplateCategory(cat.id)}
+                    className={`px-2.5 py-1 rounded-full whitespace-nowrap transition-colors font-medium text-[10px] cursor-pointer ${
+                      textTemplateCategory === cat.id
+                        ? 'bg-stone-900 text-white dark:bg-white dark:text-stone-900 font-bold shadow-2xs'
+                        : 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
 
-            <button
-              onClick={() =>
-                addElement({
-                  type: 'text',
-                  x: 50,
-                  y: 400,
-                  width: 400,
-                  height: 90,
-                  rotation: 0,
-                  opacity: 1,
-                  text: 'Hẹn gặp bạn trong ngày hạnh phúc của chúng mình. Sự hiện diện của bạn chính là niềm hạnh phúc trọn vẹn nhất.',
-                  fontFamily: 'Paris Regular',
-                  fontSize: 15,
-                  color: '#5c5248',
-                  textAlign: 'center',
-                  lineHeight: 1.6,
-                })
-              }
-              className="w-full p-3 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-rose-50 text-left text-xs text-stone-600 dark:text-stone-300 transition-colors border border-stone-200 dark:border-stone-700 flex items-center justify-between"
-            >
-              <span>Đoạn văn bản lời mời</span>
-              <Plus className="w-4 h-4 text-stone-400" />
-            </button>
+              {/* Preset Cards List */}
+              <div className="space-y-3">
+                {WEDDING_TEXT_TEMPLATES.filter(
+                  (t) => textTemplateCategory === 'all' || t.category === textTemplateCategory
+                ).map((item) => {
+                  const displayText =
+                    item.getDynamicText && weddingProfile.isLinked
+                      ? item.getDynamicText(weddingProfile)
+                      : item.sampleText;
+
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        const targetY = getSmartInsertY(item.defaultHeight || 60);
+                        addElement({
+                          type: 'text',
+                          x: Math.max(20, Math.round((canvas.width - (item.defaultWidth || 400)) / 2)),
+                          y: targetY,
+                          width: item.defaultWidth || 400,
+                          height: item.defaultHeight || 60,
+                          rotation: 0,
+                          opacity: 1,
+                          text: displayText,
+                          fontFamily: item.fontFamily,
+                          fontSize: item.fontSize,
+                          fontWeight: item.fontWeight || 'normal',
+                          fontStyle: item.fontStyle || 'normal',
+                          color: item.color,
+                          letterSpacing: item.letterSpacing || 0,
+                          lineHeight: item.lineHeight || 1.3,
+                          textAlign: item.textAlign || 'center',
+                        });
+                      }}
+                      className="w-full text-left p-4 rounded-2xl bg-[#FBF1EA] dark:bg-stone-850 border border-[#EDDCD2] dark:border-stone-700/80 shadow-2xs hover:shadow-md hover:border-rose-400/80 dark:hover:border-rose-500/50 hover:bg-[#F8EAE1] transition-all cursor-pointer group flex flex-col items-center justify-center min-h-[96px] relative overflow-hidden"
+                    >
+                      {/* Typography Preview (Center) */}
+                      <div
+                        className="w-full flex items-center justify-center text-center px-2 py-1 leading-tight select-none transition-transform group-hover:scale-[1.02]"
+                        style={{
+                          fontFamily: resolveFontFamily(item.fontFamily),
+                          fontSize: `${item.previewFontSize || Math.round(item.fontSize * 0.7)}px`,
+                          fontWeight: item.fontWeight || 'normal',
+                          fontStyle: item.fontStyle || 'normal',
+                          color: item.color,
+                          letterSpacing: item.letterSpacing ? `${item.letterSpacing}px` : undefined,
+                          lineHeight: item.lineHeight || 1.3,
+                        }}
+                      >
+                        {displayText}
+                      </div>
+
+                      {/* Subtitle Caption (Bottom) */}
+                      <span className="text-[11px] text-[#8C7A6B] dark:text-stone-400 font-sans mt-2.5 text-center group-hover:text-stone-900 dark:group-hover:text-stone-200 transition-colors">
+                        {item.title}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Custom Blank Text Options */}
+            <div className="pt-2 border-t border-stone-200 dark:border-stone-800 space-y-2">
+              <h4 className="text-[11px] font-bold uppercase tracking-wider text-stone-400">Văn bản tùy chỉnh</h4>
+              <button
+                type="button"
+                onClick={() =>
+                  addElement({
+                    type: 'text',
+                    x: 50,
+                    y: getSmartInsertY(60),
+                    width: 400,
+                    height: 60,
+                    rotation: 0,
+                    opacity: 1,
+                    text: 'Thêm Tiêu Đề',
+                    fontFamily: 'Playfair Display',
+                    fontSize: 34,
+                    fontWeight: '700',
+                    color: '#8C7355',
+                    textAlign: 'center',
+                  })
+                }
+                className="w-full p-2.5 rounded-xl bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700/60 text-left font-serif font-bold text-sm text-stone-800 dark:text-stone-200 transition-colors border border-stone-200 dark:border-stone-700 flex items-center justify-between"
+              >
+                <span>Thêm tiêu đề lớn</span>
+                <Plus className="w-4 h-4 text-stone-400" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  addElement({
+                    type: 'text',
+                    x: 50,
+                    y: getSmartInsertY(80),
+                    width: 400,
+                    height: 80,
+                    rotation: 0,
+                    opacity: 1,
+                    text: 'Nhập nội dung đoạn văn bản lời mời cưới hoặc thông điệp của bạn tại đây.',
+                    fontFamily: 'Paris Regular',
+                    fontSize: 15,
+                    color: '#5C5248',
+                    textAlign: 'center',
+                    lineHeight: 1.6,
+                  })
+                }
+                className="w-full p-2.5 rounded-xl bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700/60 text-left text-xs text-stone-600 dark:text-stone-300 transition-colors border border-stone-200 dark:border-stone-700 flex items-center justify-between"
+              >
+                <span>Thêm đoạn văn bản</span>
+                <Plus className="w-4 h-4 text-stone-400" />
+              </button>
+            </div>
           </div>
         )}
 
@@ -1364,7 +1467,7 @@ export default function StudioLeftRail() {
               </p>
             </div>
 
-            {/* Nhóm 1: Thông tin sự kiện (Screenshot 4) */}
+            {/* Nhóm 1: Thông tin sự kiện */}
             <div className="space-y-2">
               <span className="text-[11px] font-bold text-stone-600 dark:text-stone-300 block">
                 Thông tin sự kiện
@@ -1374,6 +1477,9 @@ export default function StudioLeftRail() {
                   { type: 'calendar', title: 'Lịch', iconNode: <CalendarWidgetIcon />, height: 330 },
                   { type: 'countdown', title: 'Đếm ngược', iconNode: <CountdownWidgetIcon />, height: 120 },
                   { type: 'map', title: 'Bản đồ', iconNode: <MapWidgetIcon />, height: 250 },
+                  { type: 'story_timeline', title: 'Dòng thời gian tình yêu', iconNode: <StoryTimelineWidgetIcon />, height: 340 },
+                  { type: 'dresscode', title: 'Bảng màu trang phục', iconNode: <DressCodeWidgetIcon />, height: 180 },
+                  { type: 'family_info', title: 'Thông tin hai bên gia đình', iconNode: <FamilyInfoWidgetIcon />, height: 220 },
                   { type: 'reminder', title: 'Lời nhắc lịch', iconNode: <ReminderWidgetIcon />, height: 70 },
                   { type: 'call', title: 'Nút gọi', iconNode: <CallWidgetIcon />, height: 70 },
                 ].map((w, idx) => (
@@ -1397,13 +1503,13 @@ export default function StudioLeftRail() {
                     <div className="h-10 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
                       {w.iconNode}
                     </div>
-                    <span className="text-xs font-semibold text-stone-800 dark:text-stone-200">{w.title}</span>
+                    <span className="text-xs font-semibold text-stone-800 dark:text-stone-200 leading-tight">{w.title}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Nhóm 2: Khách mời (Screenshot 4) */}
+            {/* Nhóm 2: Khách mời */}
             <div className="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
               <span className="text-[11px] font-bold text-stone-600 dark:text-stone-300 block">
                 Khách mời
@@ -1411,9 +1517,10 @@ export default function StudioLeftRail() {
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { type: 'rsvp', title: 'Form xác nhận tham dự', iconNode: <RsvpWidgetIcon />, height: 340 },
-                  { type: 'custom_form', title: 'Form tùy chỉnh', iconNode: <CustomFormWidgetIcon />, height: 340 },
-                  { type: 'guest_name', title: 'Tên khách mời tự động', iconNode: <GuestNameWidgetIcon />, height: 100 },
+                  { type: 'wishes', title: 'Sổ lưu bút & Lời chúc', iconNode: <WishesWidgetIcon />, height: 340 },
                   { type: 'giftbox', title: 'QR nhận quà', iconNode: <GiftboxWidgetIcon />, height: 280 },
+                  { type: 'guest_name', title: 'Tên khách mời tự động', iconNode: <GuestNameWidgetIcon />, height: 100 },
+                  { type: 'custom_form', title: 'Form tùy chỉnh', iconNode: <CustomFormWidgetIcon />, height: 340 },
                 ].map((w, idx) => (
                   <button
                     key={idx}
@@ -1443,13 +1550,15 @@ export default function StudioLeftRail() {
               </div>
             </div>
 
-            {/* Nhóm 3: Ảnh và video (Screenshot 4) */}
+            {/* Nhóm 3: Âm thanh và video */}
             <div className="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
               <span className="text-[11px] font-bold text-stone-600 dark:text-stone-300 block">
-                Ảnh và video
+                Âm thanh và video
               </span>
               <div className="grid grid-cols-2 gap-2">
                 {[
+                  { type: 'music_player', title: 'Đĩa than phát nhạc', iconNode: <MusicPlayerWidgetIcon />, height: 240 },
+                  { type: 'video', title: 'Video kỷ niệm cưới', iconNode: <VideoWidgetIcon />, height: 280 },
                   { type: 'album', title: 'Album ảnh', iconNode: <AlbumWidgetIcon />, height: 300 },
                   { type: 'slideshow', title: 'Trình chiếu ảnh', iconNode: <SlideshowWidgetIcon />, height: 300 },
                 ].map((w, idx) => (
@@ -1473,7 +1582,7 @@ export default function StudioLeftRail() {
                     <div className="h-10 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
                       {w.iconNode}
                     </div>
-                    <span className="text-xs font-semibold text-stone-800 dark:text-stone-200">{w.title}</span>
+                    <span className="text-xs font-semibold text-stone-800 dark:text-stone-200 leading-tight">{w.title}</span>
                   </button>
                 ))}
               </div>

@@ -154,3 +154,91 @@ export const SlideshowWidgetIcon = () => (
     <circle cx="32" cy="42" r="2" fill="#CBD5E1" />
   </svg>
 );
+
+export const WishesWidgetIcon = () => (
+  <svg className="w-10 h-10" viewBox="0 0 48 48" fill="none">
+    <rect x="8" y="12" width="32" height="26" rx="6" fill="#FFF5F7" stroke="#1E293B" strokeWidth="2.5" />
+    <path d="M8 15 L24 27 L40 15" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
+    <path
+      d="M24 25 C24 25 19 21.5 19 18 C19 16 20.5 14.5 22.5 14.5 C23.5 14.5 24 15 24 15 C24 15 24.5 14.5 25.5 14.5 C27.5 14.5 29 16 29 18 C29 21.5 24 25 24 25 Z"
+      fill="#FB7185"
+      stroke="#E11D48"
+      strokeWidth="1.2"
+    />
+    <circle cx="34" cy="30" r="1.5" fill="#F43F5E" />
+    <circle cx="38" cy="30" r="1.5" fill="#F43F5E" />
+  </svg>
+);
+
+export const MusicPlayerWidgetIcon = () => (
+  <svg className="w-10 h-10" viewBox="0 0 48 48" fill="none">
+    {/* Vinyl Disc Outer */}
+    <circle cx="22" cy="24" r="16" fill="#1E293B" />
+    <circle cx="22" cy="24" r="12" fill="none" stroke="#475569" strokeWidth="1" strokeDasharray="4 2" />
+    <circle cx="22" cy="24" r="6" fill="#E11D48" />
+    <circle cx="22" cy="24" r="2" fill="#FFFFFF" />
+    {/* Needle Arm */}
+    <path d="M38 12 L32 20 L30 19" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="38" cy="12" r="3" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.5" />
+    {/* Music Note */}
+    <path d="M38 26 L42 24 V34" stroke="#FB7185" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="40" cy="34" r="2" fill="#FB7185" />
+  </svg>
+);
+
+export const StoryTimelineWidgetIcon = () => (
+  <svg className="w-10 h-10" viewBox="0 0 48 48" fill="none">
+    {/* Timeline vertical bar */}
+    <line x1="16" y1="8" x2="16" y2="40" stroke="#CBD5E1" strokeWidth="2.5" strokeDasharray="3 3" />
+    {/* Node 1 */}
+    <circle cx="16" cy="14" r="5" fill="#FFF1F2" stroke="#E11D48" strokeWidth="2" />
+    <line x1="24" y1="14" x2="40" y2="14" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round" />
+    {/* Node 2 - Heart */}
+    <circle cx="16" cy="24" r="6" fill="#E11D48" />
+    <path d="M16 27 C16 27 13 25 13 23 C13 21.8 14 21 15 21 C15.6 21 16 21.4 16 21.4 C16 21.4 16.4 21 17 21 C18 21 19 21.8 19 23 C19 25 16 27 16 27 Z" fill="#FFFFFF" />
+    <line x1="25" y1="24" x2="38" y2="24" stroke="#E11D48" strokeWidth="2.5" strokeLinecap="round" />
+    {/* Node 3 */}
+    <circle cx="16" cy="34" r="5" fill="#FFF1F2" stroke="#E11D48" strokeWidth="2" />
+    <line x1="24" y1="34" x2="36" y2="34" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round" />
+  </svg>
+);
+
+export const DressCodeWidgetIcon = () => (
+  <svg className="w-10 h-10" viewBox="0 0 48 48" fill="none">
+    {/* Hanger Hook */}
+    <path d="M24 10 C24 8 26 7 27 9 C28 11 26 13 24 14" stroke="#B45309" strokeWidth="2" strokeLinecap="round" />
+    <path d="M12 22 L24 14 L36 22 H12 Z" fill="#FEF3C7" stroke="#B45309" strokeWidth="2" strokeLinejoin="round" />
+    {/* Color Palette Swatches */}
+    <circle cx="14" cy="33" r="5" fill="#E2E8F0" stroke="#94A3B8" strokeWidth="1.5" />
+    <circle cx="24" cy="33" r="5" fill="#FBCFE8" stroke="#F472B6" strokeWidth="1.5" />
+    <circle cx="34" cy="33" r="5" fill="#881337" stroke="#4C0519" strokeWidth="1.5" />
+  </svg>
+);
+
+export const FamilyInfoWidgetIcon = () => (
+  <svg className="w-10 h-10" viewBox="0 0 48 48" fill="none">
+    {/* Two pillars / Family card */}
+    <rect x="8" y="10" width="14" height="28" rx="4" fill="#EFF6FF" stroke="#3B82F6" strokeWidth="2" />
+    <rect x="26" y="10" width="14" height="28" rx="4" fill="#FFF1F2" stroke="#E11D48" strokeWidth="2" />
+    {/* Groom symbol */}
+    <circle cx="15" cy="18" r="3" fill="#3B82F6" />
+    <path d="M11 28 C11 24 19 24 19 28" stroke="#3B82F6" strokeWidth="2" />
+    {/* Bride symbol */}
+    <circle cx="33" cy="18" r="3" fill="#E11D48" />
+    <path d="M29 28 C29 24 37 24 37 28" stroke="#E11D48" strokeWidth="2" />
+    {/* Wedding knot center */}
+    <circle cx="24" cy="24" r="3" fill="#F59E0B" />
+  </svg>
+);
+
+export const VideoWidgetIcon = () => (
+  <svg className="w-10 h-10" viewBox="0 0 48 48" fill="none">
+    <rect x="6" y="10" width="36" height="28" rx="6" fill="#1E293B" stroke="#0F172A" strokeWidth="2" />
+    {/* Clapper dashes top */}
+    <rect x="10" y="13" width="6" height="4" fill="#EF4444" rx="1" />
+    <rect x="20" y="13" width="6" height="4" fill="#FFFFFF" rx="1" />
+    <rect x="30" y="13" width="6" height="4" fill="#EF4444" rx="1" />
+    {/* Play triangle */}
+    <polygon points="21,21 31,26 21,31" fill="#F43F5E" />
+  </svg>
+);

@@ -123,7 +123,13 @@ export interface CanvasElement {
     | 'custom_form'
     | 'guest_name'
     | 'album'
-    | 'slideshow';
+    | 'slideshow'
+    | 'wishes'
+    | 'music_player'
+    | 'story_timeline'
+    | 'dresscode'
+    | 'family_info'
+    | 'video';
   widgetConfig?: Record<string, any>;
   // Grouping & animations
   groupId?: string;
@@ -174,6 +180,8 @@ export interface WeddingProfileData {
   id?: string;
   isLinked: boolean;
   profileName?: string; // e.g. "Đám cưới Bảo & Vy"
+  groomName?: string;
+  brideName?: string;
   ceremonies: WeddingCeremony[];
   groom: WeddingProfilePerson;
   bride: WeddingProfilePerson;

@@ -902,6 +902,104 @@ export default function StudioRightInspector() {
                   </div>
                 </div>
               )}
+
+              {/* 7. Wishes / Sổ lưu bút */}
+              {selectedElement.widgetType === 'wishes' && (
+                <div className="space-y-2 text-xs">
+                  <div>
+                    <label className="text-[10px] text-stone-400 block mb-1">Tiêu đề sổ lưu bút</label>
+                    <input
+                      type="text"
+                      value={selectedElement.widgetConfig?.title || 'Sổ Lưu Bút & Lời Chúc'}
+                      onChange={(e) =>
+                        updateElement(selectedElement.id, {
+                          widgetConfig: { ...selectedElement.widgetConfig, title: e.target.value },
+                        })
+                      }
+                      onBlur={(e) =>
+                        updateElement(
+                          selectedElement.id,
+                          { widgetConfig: { ...selectedElement.widgetConfig, title: e.target.value } },
+                          true
+                        )
+                      }
+                      className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-2 text-xs outline-none"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* 8. Music Player / Đĩa than */}
+              {selectedElement.widgetType === 'music_player' && (
+                <div className="space-y-2 text-xs">
+                  <div>
+                    <label className="text-[10px] text-stone-400 block mb-1">Tên bài hát</label>
+                    <input
+                      type="text"
+                      value={selectedElement.widgetConfig?.audioTitle || 'Beautiful In White'}
+                      onChange={(e) =>
+                        updateElement(selectedElement.id, {
+                          widgetConfig: { ...selectedElement.widgetConfig, audioTitle: e.target.value },
+                        })
+                      }
+                      onBlur={(e) =>
+                        updateElement(
+                          selectedElement.id,
+                          { widgetConfig: { ...selectedElement.widgetConfig, audioTitle: e.target.value } },
+                          true
+                        )
+                      }
+                      className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-2 text-xs outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-stone-400 block mb-1">Ca sĩ / Thông tin nghệ sĩ</label>
+                    <input
+                      type="text"
+                      value={selectedElement.widgetConfig?.artist || 'Shane Filan • Nhạc nền LoveStory'}
+                      onChange={(e) =>
+                        updateElement(selectedElement.id, {
+                          widgetConfig: { ...selectedElement.widgetConfig, artist: e.target.value },
+                        })
+                      }
+                      onBlur={(e) =>
+                        updateElement(
+                          selectedElement.id,
+                          { widgetConfig: { ...selectedElement.widgetConfig, artist: e.target.value } },
+                          true
+                        )
+                      }
+                      className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-2 text-xs outline-none"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* 9. Video Widget */}
+              {selectedElement.widgetType === 'video' && (
+                <div className="space-y-2 text-xs">
+                  <div>
+                    <label className="text-[10px] text-stone-400 block mb-1">Tiêu đề video kỷ niệm</label>
+                    <input
+                      type="text"
+                      value={selectedElement.widgetConfig?.videoTitle || 'Hành Trình Tình Yêu • Wedding Trailer (4K)'}
+                      onChange={(e) =>
+                        updateElement(selectedElement.id, {
+                          widgetConfig: { ...selectedElement.widgetConfig, videoTitle: e.target.value },
+                        })
+                      }
+                      onBlur={(e) =>
+                        updateElement(
+                          selectedElement.id,
+                          { widgetConfig: { ...selectedElement.widgetConfig, videoTitle: e.target.value } },
+                          true
+                        )
+                      }
+                      className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-2 text-xs outline-none"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
