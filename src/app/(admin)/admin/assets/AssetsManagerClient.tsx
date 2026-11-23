@@ -165,6 +165,7 @@ export default function AssetsManagerClient({
   const [graphics, setGraphics] = useState(initialGraphics);
   const [searchGfx, setSearchGfx] = useState('');
   const [gfxCategoryFilter, setGfxCategoryFilter] = useState<string>('all');
+  const [gfxVisibleLimit, setGfxVisibleLimit] = useState<number>(60);
   const [showAddGfxModal, setShowAddGfxModal] = useState(false);
   const [newGfxName, setNewGfxName] = useState('');
   const [newGfxSrc, setNewGfxSrc] = useState('');
@@ -635,21 +636,38 @@ export default function AssetsManagerClient({
               {[
                 'all',
                 'Yếu tố đám cưới',
-                'Văn hóa Việt',
                 'Nhân vật',
-                'Lễ hội nổi bật',
-                'Hoa & Họa tiết',
+                'Hoa cưới',
+                'Chữ hỷ',
                 'Trái tim',
+                'Thuần Việt',
+                'Trang trí không gian',
+                'Hoa văn',
+                'Hoa lá',
+                'Số và chữ cái',
+                'Kết hợp chữ',
+                'Mặt trời',
                 'Ngôi sao',
+                'Biểu tượng',
+                'Mẹ và bé',
+                'Sinh nhật',
+                'Bản đồ',
+                'Phong bì',
+                'Quà mừng',
+                'Tốt nghiệp',
                 'Khung viền',
+                'Nền',
               ].map((c) => (
                 <button
                   key={c}
-                  onClick={() => setGfxCategoryFilter(c)}
+                  onClick={() => {
+                    setGfxCategoryFilter(c);
+                    setGfxVisibleLimit(60);
+                  }}
                   className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold whitespace-nowrap transition-all ${
                     gfxCategoryFilter === c
-                      ? 'bg-stone-800 text-stone-700 border border-stone-900/30'
-                      : 'text-stone-500 hover:text-white hover:bg-stone-800/40'
+                      ? 'bg-rose-600 text-white shadow-xs'
+                      : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
                   }`}
                 >
                   {c === 'all' ? 'Tất cả' : c}
@@ -669,7 +687,7 @@ export default function AssetsManagerClient({
 
           {/* Graphics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {filteredGraphics.map((item) => (
+            {filteredGraphics.slice(0, gfxVisibleLimit).map((item) => (
               <div
                 key={item.id}
                 className="p-3 rounded-2xl bg-white border border-stone-200/90 hover:border-stone-200/80 transition-all flex flex-col items-center justify-between group relative shadow-2xs"
@@ -691,12 +709,14 @@ export default function AssetsManagerClient({
                   <img
                     src={item.src}
                     alt={item.name}
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
                     className="max-w-full max-h-full object-contain pointer-events-none group-hover:scale-110 transition-transform duration-200"
                   />
                 </div>
 
                 <div className="w-full text-center">
-                  <span className="block text-xs font-semibold text-white truncate" title={item.name}>
+                  <span className="block text-xs font-semibold text-stone-800 truncate" title={item.name}>
                     {item.name}
                   </span>
                   <span className="block text-[9px] text-stone-500 truncate mt-0.5">
@@ -711,6 +731,17 @@ export default function AssetsManagerClient({
               </div>
             ))}
           </div>
+
+          {filteredGraphics.length > gfxVisibleLimit && (
+            <div className="text-center pt-2">
+              <button
+                onClick={() => setGfxVisibleLimit((prev) => prev + 60)}
+                className="px-6 py-2.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 rounded-xl font-semibold text-xs hover:bg-rose-100 transition-colors shadow-xs"
+              >
+                Tải thêm 60 đồ họa ({gfxVisibleLimit} / {filteredGraphics.length.toLocaleString()})
+              </button>
+            </div>
+          )}
         </div>
       )}
 

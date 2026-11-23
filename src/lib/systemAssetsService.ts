@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { STUDIO_FONTS, StudioFont } from '@/lib/studioFonts';
 import { GRAPHICS_CATALOG, GraphicSticker } from '@/data/graphicsCatalog';
 import defaultMusicCatalog from '@/data/weddingMusicCatalog.json';
+import defaultStockCatalog from '@/data/stockGraphicsCatalog.json';
 
 const DATA_DIR = path.join(process.cwd(), 'src', 'data');
 const CUSTOM_FONTS_FILE = path.join(DATA_DIR, 'customFonts.json');
@@ -197,7 +198,7 @@ export async function getCustomGraphics(): Promise<(GraphicSticker & { isCustom?
 
 export async function getAllSystemGraphics(): Promise<(GraphicSticker & { isCustom?: boolean })[]> {
   const custom = await getCustomGraphics();
-  return [...custom, ...GRAPHICS_CATALOG];
+  return [...custom, ...(defaultStockCatalog as GraphicSticker[]), ...GRAPHICS_CATALOG];
 }
 
 export async function addCustomGraphic(graphicData: {

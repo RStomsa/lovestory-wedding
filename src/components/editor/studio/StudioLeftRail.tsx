@@ -26,6 +26,7 @@ import {
   ArrowDownToLine,
   ArrowUpToLine,
   Globe,
+  X,
 } from 'lucide-react';
 import { useStudioStore } from './studioStore';
 import { SidebarTab } from './studioTypes';
@@ -251,8 +252,10 @@ export default function StudioLeftRail() {
     };
   }, []);
 
-  // State for Graphics Category filter (Screenshot 9: "Tất cả", "Yếu tố đám cưới", "Văn hóa Việt", "Nhân vật"...)
+  // State for Graphics Category filter & search
   const [graphicCategory, setGraphicCategory] = useState<string>('Tất cả');
+  const [graphicSearch, setGraphicSearch] = useState<string>('');
+  const [graphicVisibleLimit, setGraphicVisibleLimit] = useState<number>(45);
 
   // Sub-filter for Lễ hội nổi bật (Screenshot 8: "Nổi bật", "Ngôi sao", "Trái tim", "Mùa cưới")
   const [festiveSubTab, setFestiveSubTab] = useState<string>('Nổi bật');
@@ -325,26 +328,61 @@ export default function StudioLeftRail() {
     { id: 'pages', label: 'Trang', icon: <FileText className="w-5 h-5" /> },
   ];
 
-  // Graphic categories
+  // Graphic categories matching full 2,900+ stock library
   const graphicCategories = [
     'Tất cả',
-    'Đồ họa của tôi',
     'Yếu tố đám cưới',
-    'Văn hóa Việt',
     'Nhân vật',
-    'Hoa & Họa tiết',
-    'Lễ hội nổi bật',
+    'Hoa cưới',
+    'Chữ hỷ',
     'Trái tim',
+    'Thuần Việt',
+    'Trang trí không gian',
+    'Hoa văn',
+    'Hoa lá',
+    'Số và chữ cái',
+    'Kết hợp chữ',
+    'Mặt trời',
     'Ngôi sao',
+    'Biểu tượng',
+    'Mẹ và bé',
+    'Sinh nhật',
+    'Bản đồ',
+    'Phong bì',
+    'Quà mừng',
+    'Tốt nghiệp',
     'Khung viền',
+    'Nền',
+    'Đồ họa của tôi',
   ];
 
-  const filteredGraphics =
-    graphicCategory === 'Tất cả'
-      ? graphicsList
-      : graphicCategory === 'Đồ họa của tôi'
-      ? graphicsList.filter((item) => (item as GraphicSticker & { isCustom?: boolean }).isCustom || item.subCategory === 'Đồ họa của tôi' || item.id.startsWith('custom-'))
-      : graphicsList.filter((item) => item.category === graphicCategory);
+  const filteredGraphics = React.useMemo(() => {
+    let list = graphicsList;
+    if (graphicCategory === 'Đồ họa của tôi') {
+      list = list.filter(
+        (item) =>
+          (item as GraphicSticker & { isCustom?: boolean }).isCustom ||
+          item.subCategory === 'Đồ họa của tôi' ||
+          item.id.startsWith('custom-')
+      );
+    } else if (graphicCategory === 'Thuần Việt') {
+      list = list.filter(
+        (item) => item.category === 'Thuần Việt' || item.category === 'Văn hóa Việt'
+      );
+    } else if (graphicCategory !== 'Tất cả') {
+      list = list.filter((item) => item.category === graphicCategory);
+    }
+    if (graphicSearch.trim()) {
+      const q = graphicSearch.toLowerCase().trim();
+      list = list.filter(
+        (item) =>
+          item.name.toLowerCase().includes(q) ||
+          item.category.toLowerCase().includes(q) ||
+          (item.subCategory && item.subCategory.toLowerCase().includes(q))
+      );
+    }
+    return list;
+  }, [graphicsList, graphicCategory, graphicSearch]);
 
   return (
     <div className="flex h-full select-none z-20 relative">
@@ -582,308 +620,259 @@ export default function StudioLeftRail() {
               />
             </div>
 
-            {graphicCategory === 'Tất cả' ? (
-              /* SCREENSHOT 9: Root Category View */
-              <>
-                <div>
-                  <h3 className="text-sm font-bold text-stone-900 dark:text-white">Đồ họa</h3>
-                  <p className="text-[11px] text-stone-500 mt-0.5 leading-relaxed">
-                    Bấm hoặc kéo vào thiệp để thêm
-                  </p>
-                </div>
+            {/* Search Input for Graphics Library (Melipage / M-Invite standard) */}
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Tìm ảnh, nhãn dán, nhân vật, hoa cưới..."
+                value={graphicSearch}
+                onChange={(e) => {
+                  setGraphicSearch(e.target.value);
+                  setGraphicVisibleLimit(45);
+                }}
+                className="w-full pl-8 pr-7 py-1.5 bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200 text-xs rounded-xl border border-transparent focus:border-rose-400 focus:bg-white dark:focus:bg-stone-900 outline-none transition-all placeholder:text-stone-400"
+              />
+              {graphicSearch && (
+                <button
+                  onClick={() => {
+                    setGraphicSearch('');
+                    setGraphicVisibleLimit(45);
+                  }}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
 
-                {/* Filter Pills */}
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-                  {graphicCategories.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setGraphicCategory(cat)}
-                      className={`px-3 py-1 rounded-full text-[11px] whitespace-nowrap transition-all ${
-                        graphicCategory === cat
-                          ? 'bg-blue-600 text-white font-medium shadow-xs'
-                          : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
+            {/* Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+              {graphicCategories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => {
+                    setGraphicCategory(cat);
+                    setGraphicVisibleLimit(45);
+                  }}
+                  className={`px-3 py-1 rounded-full text-[11px] whitespace-nowrap transition-all ${
+                    graphicCategory === cat
+                      ? 'bg-rose-500 text-white font-medium shadow-xs'
+                      : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
 
-                {/* Section 1: Yếu tố đám cưới */}
+            {graphicCategory === 'Tất cả' && !graphicSearch.trim() ? (
+              /* Root Showcase View with Curated Sections */
+              <div className="space-y-4 pt-1">
+                {[
+                  { id: 'nhanvat', name: 'Nhân vật', title: 'Nhân vật & Chibi cưới' },
+                  { id: 'yeutodamcuoi', name: 'Yếu tố đám cưới', title: 'Yếu tố đám cưới' },
+                  { id: 'hoacuoi', name: 'Hoa cưới', title: 'Hoa cưới nghệ thuật' },
+                  { id: 'chuhy', name: 'Chữ hỷ', title: 'Chữ Hỷ Song Hỷ' },
+                  { id: 'traitim', name: 'Trái tim', title: 'Trái tim lãng mạn' },
+                  { id: 'thuanviet', name: 'Thuần Việt', title: 'Thuần Việt & Cổ phục' },
+                  { id: 'trangtrikhonggian', name: 'Trang trí không gian', title: 'Trang trí không gian' },
+                  { id: 'hoavan', name: 'Hoa văn', title: 'Họa tiết hoa văn' },
+                  { id: 'bieutuong', name: 'Biểu tượng', title: 'Biểu tượng & Icon' },
+                  { id: 'mevabe', name: 'Mẹ và bé', title: 'Mẹ và bé' },
+                  { id: 'sinhnhat', name: 'Sinh nhật', title: 'Sinh nhật tiệc mừng' },
+                ].map((sec) => {
+                  const secItems = graphicsList
+                    .filter((i) =>
+                      sec.name === 'Thuần Việt'
+                        ? i.category === 'Thuần Việt' || i.category === 'Văn hóa Việt'
+                        : i.category === sec.name
+                    )
+                    .slice(0, 6);
+
+                  if (secItems.length === 0) return null;
+
+                  return (
+                    <div key={sec.id} className="space-y-2 border-b border-stone-100 dark:border-stone-800 pb-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-bold text-stone-800 dark:text-stone-200">
+                          {sec.title}
+                        </h4>
+                        <button
+                          onClick={() => {
+                            setGraphicCategory(sec.name);
+                            setGraphicVisibleLimit(45);
+                          }}
+                          className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 hover:underline cursor-pointer"
+                        >
+                          Xem tất cả
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        {secItems.map((item) => (
+                          <button
+                            key={item.id}
+                            onClick={() => {
+                              const targetY = getSmartInsertY(item.defaultHeight || 120);
+                              addElement({
+                                type: 'graphic',
+                                x: 190,
+                                y: targetY,
+                                width: item.defaultWidth || 120,
+                                height: item.defaultHeight || 120,
+                                rotation: 0,
+                                opacity: 1,
+                                src: item.src,
+                                objectFit: 'contain',
+                                continuousAnimation: { type: 'floating', duration: 2.0, delay: 0 },
+                              });
+                            }}
+                            className="aspect-square p-2 bg-stone-50 dark:bg-stone-800/60 rounded-2xl border border-stone-200/80 dark:border-stone-700/80 flex items-center justify-center hover:border-rose-400 hover:shadow-md transition-all group shadow-2xs cursor-pointer"
+                            title={item.name}
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={item.src}
+                              alt={item.name}
+                              referrerPolicy="no-referrer"
+                              loading="lazy"
+                              className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Section: Toàn bộ kho đồ họa */}
                 <div className="space-y-2 pt-1">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold text-stone-800 dark:text-stone-200">Yếu tố đám cưới</h4>
-                    <button
-                      onClick={() => setGraphicCategory('Yếu tố đám cưới')}
-                      className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      Xem tất cả
-                    </button>
-                  </div>
+                  <h4 className="text-xs font-bold text-stone-800 dark:text-stone-200">
+                    Toàn bộ kho đồ họa ({graphicsList.length.toLocaleString()} mẫu)
+                  </h4>
                   <div className="grid grid-cols-3 gap-2">
-                    {graphicsList.filter((i) => i.category === 'Yếu tố đám cưới')
-                      .slice(0, 6)
-                      .map((item) => (
-                        <button
-                          key={item.id}
-                          onClick={() => {
-                            const targetY = getSmartInsertY(item.defaultHeight || 100);
-                            addElement({
-                              type: 'graphic',
-                              x: 190,
-                              y: targetY,
-                              width: item.defaultWidth || 100,
-                              height: item.defaultHeight || 100,
-                              rotation: 0,
-                              opacity: 1,
-                              src: item.src,
-                              objectFit: 'contain',
-                              continuousAnimation: { type: 'floating', duration: 2.0, delay: 0 },
-                            });
-                          }}
-                          className="aspect-square p-2 bg-stone-50 dark:bg-stone-800/60 rounded-2xl border border-stone-200/80 dark:border-stone-700/80 flex items-center justify-center hover:border-blue-400 hover:shadow-md transition-all group shadow-2xs"
-                          title={item.name}
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={item.src}
-                            alt={item.name}
-                            className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300"
-                          />
-                        </button>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Section 2: Văn hóa Việt */}
-                <div className="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold text-stone-800 dark:text-stone-200">Văn hóa Việt</h4>
-                    <button
-                      onClick={() => setGraphicCategory('Văn hóa Việt')}
-                      className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      Xem tất cả
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    {graphicsList.filter((i) => i.category === 'Văn hóa Việt')
-                      .slice(0, 6)
-                      .map((item) => (
-                        <button
-                          key={item.id}
-                          onClick={() => {
-                            const targetY = getSmartInsertY(item.defaultHeight || 100);
-                            addElement({
-                              type: 'graphic',
-                              x: 190,
-                              y: targetY,
-                              width: item.defaultWidth || 100,
-                              height: item.defaultHeight || 100,
-                              rotation: 0,
-                              opacity: 1,
-                              src: item.src,
-                              objectFit: 'contain',
-                              continuousAnimation: { type: 'floating', duration: 2.0, delay: 0 },
-                            });
-                          }}
-                          className="aspect-square p-2 bg-stone-50 dark:bg-stone-800/60 rounded-2xl border border-stone-200/80 dark:border-stone-700/80 flex items-center justify-center hover:border-blue-400 hover:shadow-md transition-all group shadow-2xs"
-                          title={item.name}
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={item.src}
-                            alt={item.name}
-                            className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300"
-                          />
-                        </button>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Section 3: Nhân vật */}
-                <div className="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold text-stone-800 dark:text-stone-200">Nhân vật</h4>
-                    <button
-                      onClick={() => setGraphicCategory('Nhân vật')}
-                      className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      Xem tất cả
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    {graphicsList.filter((i) => i.category === 'Nhân vật')
-                      .slice(0, 6)
-                      .map((item) => (
-                        <button
-                          key={item.id}
-                          onClick={() => {
-                            const targetY = getSmartInsertY(item.defaultHeight || 100);
-                            addElement({
-                              type: 'graphic',
-                              x: 190,
-                              y: targetY,
-                              width: item.defaultWidth || 100,
-                              height: item.defaultHeight || 100,
-                              rotation: 0,
-                              opacity: 1,
-                              src: item.src,
-                              objectFit: 'contain',
-                              continuousAnimation: { type: 'floating', duration: 2.0, delay: 0 },
-                            });
-                          }}
-                          className="aspect-square p-2 bg-stone-50 dark:bg-stone-800/60 rounded-2xl border border-stone-200/80 dark:border-stone-700/80 flex items-center justify-center hover:border-blue-400 hover:shadow-md transition-all group shadow-2xs"
-                          title={item.name}
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={item.src}
-                            alt={item.name}
-                            className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300"
-                          />
-                        </button>
-                      ))}
-                  </div>
-                </div>
-              </>
-            ) : graphicCategory === 'Lễ hội nổi bật' ? (
-              /* SCREENSHOT 8: Lễ hội nổi bật Detail View */
-              <>
-                <div className="flex items-center gap-2">
-                  <ChevronLeft
-                    onClick={() => setGraphicCategory('Tất cả')}
-                    className="w-4 h-4 cursor-pointer text-stone-500 hover:text-stone-900 transition-colors"
-                  />
-                  <h3 className="text-sm font-bold text-stone-900 dark:text-white">Lễ hội nổi bật</h3>
-                </div>
-
-                {/* Sub-filter Pills (Screenshot 8: [Nổi bật] [Ngôi sao] [Trái tim] [Mùa cưới]) */}
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-                  {['Nổi bật', 'Ngôi sao', 'Trái tim', 'Mùa cưới'].map((sub) => (
-                    <button
-                      key={sub}
-                      onClick={() => setFestiveSubTab(sub)}
-                      className={`px-3 py-1 rounded-full text-[11px] whitespace-nowrap transition-all ${
-                        festiveSubTab === sub
-                          ? 'bg-stone-900 text-white font-medium shadow-xs'
-                          : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200'
-                      }`}
-                    >
-                      {sub}
-                    </button>
-                  ))}
-                </div>
-
-                {/* 2-Column Card Grid with Names (Screenshot 8) */}
-                <div className="grid grid-cols-2 gap-2.5 pt-1">
-                  {graphicsList.filter((i) => {
-                    if (festiveSubTab === 'Ngôi sao') return i.category === 'Ngôi sao' || i.name.toLowerCase().includes('sao');
-                    if (festiveSubTab === 'Trái tim') return i.category === 'Trái tim' || i.name.toLowerCase().includes('tim');
-                    if (festiveSubTab === 'Mùa cưới') return i.category === 'Yếu tố đám cưới';
-                    return i.category === 'Lễ hội nổi bật';
-                  }).map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        const targetY = getSmartInsertY(item.defaultHeight || 100);
-                        addElement({
-                          type: 'graphic',
-                          x: 190,
-                          y: targetY,
-                          width: item.defaultWidth || 100,
-                          height: item.defaultHeight || 100,
-                          rotation: 0,
-                          opacity: 1,
-                          src: item.src,
-                          objectFit: 'contain',
-                          continuousAnimation: { type: 'floating', duration: 2.0, delay: 0 },
-                        });
-                      }}
-                      className="p-3 bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 flex flex-col items-center hover:border-blue-400 hover:shadow-md transition-all group shadow-2xs"
-                    >
-                      <div className="w-16 h-16 flex items-center justify-center mb-1.5">
+                    {filteredGraphics.slice(0, graphicVisibleLimit).map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          const targetY = getSmartInsertY(item.defaultHeight || 120);
+                          addElement({
+                            type: 'graphic',
+                            x: 190,
+                            y: targetY,
+                            width: item.defaultWidth || 120,
+                            height: item.defaultHeight || 120,
+                            rotation: 0,
+                            opacity: 1,
+                            src: item.src,
+                            objectFit: 'contain',
+                            continuousAnimation: { type: 'floating', duration: 2.0, delay: 0 },
+                          });
+                        }}
+                        className="aspect-square p-2 bg-stone-50 dark:bg-stone-800/60 rounded-2xl border border-stone-200/80 dark:border-stone-700/80 flex items-center justify-center hover:border-rose-400 hover:shadow-md transition-all group shadow-2xs cursor-pointer"
+                        title={item.name}
+                      >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={item.src}
                           alt={item.name}
+                          referrerPolicy="no-referrer"
+                          loading="lazy"
                           className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300"
                         />
-                      </div>
-                      <span className="text-[11px] font-medium text-stone-700 dark:text-stone-300 truncate w-full text-center">
-                        {item.name}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </>
-            ) : (
-              /* Specific Category Detail View */
-              <>
-                <div className="flex items-center gap-2">
-                  <ChevronLeft
-                    onClick={() => setGraphicCategory('Tất cả')}
-                    className="w-4 h-4 cursor-pointer text-stone-500 hover:text-stone-900 transition-colors"
-                  />
-                  <h3 className="text-sm font-bold text-stone-900 dark:text-white">{graphicCategory}</h3>
-                </div>
+                      </button>
+                    ))}
+                  </div>
 
-                {/* Filter Pills */}
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-                  {graphicCategories.map((cat) => (
+                  {filteredGraphics.length > graphicVisibleLimit && (
                     <button
-                      key={cat}
-                      onClick={() => setGraphicCategory(cat)}
-                      className={`px-3 py-1 rounded-full text-[11px] whitespace-nowrap transition-all ${
-                        graphicCategory === cat
-                          ? 'bg-blue-600 text-white font-medium shadow-xs'
-                          : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200'
-                      }`}
+                      onClick={() => setGraphicVisibleLimit((prev) => prev + 45)}
+                      className="w-full py-2 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 rounded-xl font-medium text-xs hover:bg-rose-100 transition-colors mt-2"
                     >
-                      {cat}
+                      Tải thêm 45 mẫu ({graphicVisibleLimit} / {filteredGraphics.length.toLocaleString()})
                     </button>
-                  ))}
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* Specific Category Detail View or Search Results */
+              <div className="space-y-3 pt-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    {graphicCategory !== 'Tất cả' && (
+                      <button
+                        onClick={() => {
+                          setGraphicCategory('Tất cả');
+                          setGraphicVisibleLimit(45);
+                        }}
+                        className="p-1 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg text-stone-500 hover:text-stone-900 transition-colors cursor-pointer"
+                        title="Quay lại Tất cả"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                    )}
+                    <h3 className="text-sm font-bold text-stone-900 dark:text-white">
+                      {graphicSearch ? `Kết quả tìm kiếm: "${graphicSearch}"` : graphicCategory}
+                    </h3>
+                  </div>
+                  <span className="text-[11px] text-stone-400">
+                    {filteredGraphics.length.toLocaleString()} mẫu
+                  </span>
                 </div>
 
-                {/* 3-Column Card Grid */}
                 {filteredGraphics.length === 0 ? (
                   <div className="py-8 text-center text-xs text-stone-400">
-                    Chưa có đồ họa nào trong mục này. Bấm &quot;Tải đồ họa từ máy tính&quot; ở trên để thêm!
+                    {graphicSearch
+                      ? `Không tìm thấy đồ họa nào khớp với "${graphicSearch}".`
+                      : 'Chưa có đồ họa nào trong mục này.'}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-3 gap-2 pt-1">
-                    {filteredGraphics.map((item) => (
+                  <>
+                    <div className="grid grid-cols-3 gap-2">
+                      {filteredGraphics.slice(0, graphicVisibleLimit).map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => {
+                            const targetY = getSmartInsertY(item.defaultHeight || 120);
+                            addElement({
+                              type: 'graphic',
+                              x: 190,
+                              y: targetY,
+                              width: item.defaultWidth || 120,
+                              height: item.defaultHeight || 120,
+                              rotation: 0,
+                              opacity: 1,
+                              src: item.src,
+                              objectFit: 'contain',
+                              continuousAnimation: { type: 'floating', duration: 2.0, delay: 0 },
+                            });
+                          }}
+                          className="aspect-square p-2 bg-stone-50 dark:bg-stone-800/60 rounded-2xl border border-stone-200/80 dark:border-stone-700/80 flex items-center justify-center hover:border-rose-400 hover:shadow-md transition-all group shadow-2xs cursor-pointer"
+                          title={item.name}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={item.src}
+                            alt={item.name}
+                            referrerPolicy="no-referrer"
+                            loading="lazy"
+                            className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                          />
+                        </button>
+                      ))}
+                    </div>
+
+                    {filteredGraphics.length > graphicVisibleLimit && (
                       <button
-                      key={item.id}
-                      onClick={() => {
-                        const targetY = getSmartInsertY(item.defaultHeight || 100);
-                        addElement({
-                          type: 'graphic',
-                          x: 190,
-                          y: targetY,
-                          width: item.defaultWidth || 100,
-                          height: item.defaultHeight || 100,
-                          rotation: 0,
-                          opacity: 1,
-                          src: item.src,
-                          objectFit: 'contain',
-                          continuousAnimation: { type: 'floating', duration: 2.0, delay: 0 },
-                        });
-                      }}
-                      className="aspect-square p-2 bg-stone-50 dark:bg-stone-800/60 rounded-2xl border border-stone-200/80 dark:border-stone-700/80 flex items-center justify-center hover:border-blue-400 hover:shadow-md transition-all group shadow-2xs"
-                      title={item.name}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={item.src}
-                        alt={item.name}
-                        className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300"
-                      />
-                    </button>
-                  ))}
-                </div>
+                        onClick={() => setGraphicVisibleLimit((prev) => prev + 45)}
+                        className="w-full py-2 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 rounded-xl font-medium text-xs hover:bg-rose-100 transition-colors mt-2"
+                      >
+                        Tải thêm {Math.min(45, filteredGraphics.length - graphicVisibleLimit)} mẫu ({graphicVisibleLimit} / {filteredGraphics.length.toLocaleString()})
+                      </button>
+                    )}
+                  </>
                 )}
-              </>
+              </div>
             )}
           </div>
         )}

@@ -5,7 +5,7 @@ export interface GraphicSticker {
   id: string;
   name: string;
   src: string;
-  category: 'Yếu tố đám cưới' | 'Văn hóa Việt' | 'Nhân vật' | 'Hoa & Họa tiết' | 'Lễ hội nổi bật' | 'Trái tim' | 'Ngôi sao' | 'Khung viền';
+  category: string;
   subCategory?: string;
   defaultWidth?: number;
   defaultHeight?: number;
