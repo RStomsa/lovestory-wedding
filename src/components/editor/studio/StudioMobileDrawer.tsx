@@ -1,8 +1,11 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import {
   X,
+  Home,
+  ArrowLeft,
   Image as ImageIcon,
   Music,
   Sparkles,
@@ -90,6 +93,26 @@ export default function StudioMobileDrawer() {
 
         {/* Drawer Content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 text-sm">
+          {/* Nút Về Trang Chủ & Kho Mẫu */}
+          <div className="grid grid-cols-2 gap-2 pb-3 border-b border-stone-200 dark:border-stone-800">
+            <Link
+              href="/"
+              onClick={() => setMobileDrawerOpen(false)}
+              className="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-semibold text-xs border border-rose-200/60 dark:border-rose-900/40 active:scale-95 transition-transform"
+            >
+              <Home className="w-4 h-4 shrink-0" />
+              <span>Về Trang Chủ</span>
+            </Link>
+            <Link
+              href="/templates"
+              onClick={() => setMobileDrawerOpen(false)}
+              className="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-semibold text-xs border border-stone-200 dark:border-stone-700 active:scale-95 transition-transform"
+            >
+              <ArrowLeft className="w-4 h-4 shrink-0" />
+              <span>Kho Mẫu</span>
+            </Link>
+          </div>
+
           {/* Main Tool Categories */}
           <div className="space-y-1">
             {/* 1. Hình ảnh */}

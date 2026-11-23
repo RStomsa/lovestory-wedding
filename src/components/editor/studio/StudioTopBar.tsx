@@ -28,6 +28,7 @@ import {
   Copy,
   Crown,
   Menu,
+  Home,
 } from 'lucide-react';
 import { useStudioStore } from './studioStore';
 import StudioPreviewModal from './StudioPreviewModal';
@@ -311,31 +312,32 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
 
   return (
     <>
-      <header className="h-14 px-4 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between z-30 select-none shadow-xs">
-        {/* Left: Brand & Undo/Redo */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Mobile Hamburger Menu Button (Matches 27BigGroup Screenshot 1 & 5) */}
+      <header className="h-14 px-3 sm:px-4 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between z-30 select-none shadow-xs shrink-0">
+        {/* Left: Home & Brand & Undo/Redo */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
+          {/* Nút Về Trang Chủ - luôn hiển thị trên cả mobile và desktop */}
+          <Link
+            href="/"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-stone-700 dark:text-stone-200 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors text-xs font-semibold border border-stone-200 dark:border-stone-700 active:scale-95 shrink-0"
+            title="Quay về trang chủ LoveStory"
+          >
+            <Home className="w-4 h-4 text-rose-500 shrink-0" />
+            <span className="hidden xs:inline">Trang chủ</span>
+          </Link>
+
+          {/* Mobile Hamburger Menu Button (Mở bảng công cụ) */}
           <button
             onClick={() => setMobileDrawerOpen(true)}
-            className="md:hidden p-2 rounded-xl text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors border border-stone-200 dark:border-stone-700 active:scale-95"
+            className="md:hidden p-2 rounded-xl text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors border border-stone-200 dark:border-stone-700 active:scale-95 shrink-0"
             title="Mở bảng công cụ chỉnh sửa"
           >
             <Menu className="w-4 h-4" />
           </button>
 
-          {/* Mobile Preview Icon Button (Matches 27BigGroup Screenshot 1 & 5) */}
-          <button
-            onClick={() => setShowPreviewModal(true)}
-            className="md:hidden p-2 rounded-xl text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors border border-stone-200 dark:border-stone-700 active:scale-95"
-            title="Xem trước thiệp cưới"
-          >
-            <Eye className="w-4 h-4 text-rose-500" />
-          </button>
-
           {mode === 'admin' ? (
             <Link
               href="/admin"
-              className="hidden sm:flex px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:text-purple-300 transition-colors items-center gap-1.5 text-xs font-semibold"
+              className="hidden sm:flex px-2.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:text-purple-300 transition-colors items-center gap-1.5 text-xs font-semibold shrink-0"
               title="Quay lại Bảng Điều Khiển Admin"
             >
               <ArrowLeft className="w-4 h-4 shrink-0" />
@@ -344,15 +346,20 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
           ) : (
             <Link
               href="/templates"
-              className="hidden sm:flex p-2 rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              className="hidden sm:flex p-2 rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors shrink-0"
               title="Quay lại danh mục mẫu thiệp"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
           )}
 
-          <div className="flex items-center gap-1.5">
-            <span className="font-serif font-bold text-base text-rose-600">💍 LoveStory</span>
+          {/* Brand Logo - click để về trang chủ */}
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 hover:opacity-85 transition-opacity"
+            title="LoveStory - Về trang chủ"
+          >
+            <span className="font-serif font-bold text-base text-rose-600 tracking-tight">💍 LoveStory</span>
             {mode === 'admin' ? (
               <span className="text-[10px] font-sans px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/30 font-bold uppercase tracking-wider">
                 Admin
@@ -362,7 +369,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                 Studio
               </span>
             )}
-          </div>
+          </Link>
 
           {/* Undo / Redo */}
           <div className="hidden sm:flex items-center gap-0.5 pl-3 border-l border-stone-200 dark:border-stone-800">
@@ -490,11 +497,11 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
 
           <button
             onClick={() => setShowPreviewModal(true)}
-            className="px-3.5 py-1.5 rounded-xl border border-stone-300 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-200 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            className="p-2 sm:px-3.5 sm:py-1.5 rounded-xl border border-stone-300 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-200 text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0"
             title="Xem trước trực tiếp thiệp cưới"
           >
-            <Eye className="w-3.5 h-3.5 text-rose-500" />
-            <span>Xem trước</span>
+            <Eye className="w-4 h-4 text-rose-500 shrink-0" />
+            <span className="hidden sm:inline">Xem trước</span>
           </button>
 
           {mode === 'admin' ? (
@@ -504,19 +511,21 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                 setSaveStatus(null);
                 setShowSavePresetModal(true);
               }}
-              className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-purple-600/25 transition-transform active:scale-95 whitespace-nowrap"
+              className="px-3 sm:px-4 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-purple-600/25 transition-transform active:scale-95 whitespace-nowrap shrink-0"
             >
               <FolderPlus className="w-3.5 h-3.5 text-white shrink-0" />
-              <span>Lưu Vào Kho Mẫu Thiệp</span>
+              <span className="hidden sm:inline">Lưu Vào Kho Mẫu Thiệp</span>
+              <span className="sm:hidden">Lưu Mẫu</span>
             </button>
           ) : (
             /* USER: Publish personal wedding card */
             <button
               onClick={handleOpenUserPublish}
-              className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-rose-600/25 transition-transform active:scale-95"
+              className="px-3 sm:px-4 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-rose-600/25 transition-transform active:scale-95 shrink-0"
             >
-              <Rocket className="w-3.5 h-3.5 text-white" />
-              <span>Xuất Bản Thiệp</span>
+              <Rocket className="w-3.5 h-3.5 text-white shrink-0" />
+              <span className="hidden sm:inline">Xuất Bản Thiệp</span>
+              <span className="sm:hidden">Xuất bản</span>
             </button>
           )}
 

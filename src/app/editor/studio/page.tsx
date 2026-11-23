@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function StudioEditorPage() {
   return (
-    <div className="h-screen w-full overflow-hidden">
+    <div className="h-[100dvh] w-full overflow-hidden">
       <StudioEditor mode="user" />
     </div>
   );

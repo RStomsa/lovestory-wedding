@@ -46,6 +46,7 @@ prisma/*.db
 *-out.txt
 admin_rendered.html
 sitemap_urls.txt
+client_secret*.json
 
 # typescript
 *.tsbuildinfo
