@@ -18,6 +18,9 @@ import {
   ArrowDownToLine,
   ArrowUpToLine,
   MoveVertical,
+  Maximize2,
+  Lock,
+  Unlock,
 } from 'lucide-react';
 import { useStudioStore } from './studioStore';
 import { resolveFontFamily } from '@/lib/studioFonts';
@@ -45,6 +48,7 @@ export default function StudioRightInspector() {
   } = useStudioStore();
 
   const selectedElement = elements.find((e) => e.id === selectedId);
+  const [lockRatio, setLockRatio] = useState(false);
 
   // Keep track of committed font for live preview rollbacks
   const committedFontRef = useRef(selectedElement?.fontFamily || 'sans-serif');
@@ -431,6 +435,183 @@ export default function StudioRightInspector() {
               >
                 <ArrowUpToLine className="w-2.5 h-2.5" />
                 <span>-50px</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Kích thước & Vị trí (Dimensions, Resizing & Positioning) */}
+          <div className="p-3 bg-stone-50 dark:bg-stone-850 rounded-2xl border border-stone-200 dark:border-stone-700/80 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-stone-700 dark:text-stone-300 font-semibold text-xs">
+                <Maximize2 className="w-3.5 h-3.5 text-rose-500" />
+                <span>Kích thước &amp; Vị trí</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLockRatio(!lockRatio)}
+                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all flex items-center gap-1 ${
+                  lockRatio
+                    ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/60 dark:border-rose-800'
+                    : 'bg-white text-stone-400 border-stone-200 dark:bg-stone-800 dark:border-stone-700'
+                }`}
+                title="Khóa tỉ lệ khung hình khi kéo dãn"
+              >
+                {lockRatio ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
+                <span>{lockRatio ? 'Khóa tỉ lệ' : 'Tự do'}</span>
+              </button>
+            </div>
+
+            {/* Width & Height inputs */}
+            <div className="grid grid-cols-2 gap-2">
+              {/* Width */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-[10px] text-stone-500 font-medium">
+                  <span>Rộng (W)</span>
+                  <span className="font-mono">{Math.round(selectedElement.width)}px</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newW = Math.max(20, Math.round(selectedElement.width - 20));
+                      const updates: any = { width: newW };
+                      if (lockRatio && selectedElement.width > 0) {
+                        updates.height = Math.max(20, Math.round(selectedElement.height * (newW / selectedElement.width)));
+                      }
+                      updateElement(selectedElement.id, updates, true);
+                    }}
+                    className="w-6 h-7 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 flex items-center justify-center font-bold text-xs hover:bg-stone-100"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    value={Math.round(selectedElement.width)}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      if (!isNaN(val) && val >= 10) {
+                        const updates: any = { width: val };
+                        if (lockRatio && selectedElement.width > 0) {
+                          updates.height = Math.max(20, Math.round(selectedElement.height * (val / selectedElement.width)));
+                        }
+                        updateElement(selectedElement.id, updates, true);
+                      }
+                    }}
+                    className="w-full text-center py-1 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 font-mono text-xs font-semibold focus:outline-none focus:border-rose-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newW = Math.min(canvas.width, Math.round(selectedElement.width + 20));
+                      const updates: any = { width: newW };
+                      if (lockRatio && selectedElement.width > 0) {
+                        updates.height = Math.max(20, Math.round(selectedElement.height * (newW / selectedElement.width)));
+                      }
+                      updateElement(selectedElement.id, updates, true);
+                    }}
+                    className="w-6 h-7 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 flex items-center justify-center font-bold text-xs hover:bg-stone-100"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Height */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-[10px] text-stone-500 font-medium">
+                  <span>Cao (H)</span>
+                  <span className="font-mono">{Math.round(selectedElement.height)}px</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newH = Math.max(20, Math.round(selectedElement.height - 20));
+                      const updates: any = { height: newH };
+                      if (lockRatio && selectedElement.height > 0) {
+                        updates.width = Math.max(20, Math.round(selectedElement.width * (newH / selectedElement.height)));
+                      }
+                      updateElement(selectedElement.id, updates, true);
+                    }}
+                    className="w-6 h-7 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 flex items-center justify-center font-bold text-xs hover:bg-stone-100"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    value={Math.round(selectedElement.height)}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      if (!isNaN(val) && val >= 10) {
+                        const updates: any = { height: val };
+                        if (lockRatio && selectedElement.height > 0) {
+                          updates.width = Math.max(20, Math.round(selectedElement.width * (val / selectedElement.height)));
+                        }
+                        updateElement(selectedElement.id, updates, true);
+                      }
+                    }}
+                    className="w-full text-center py-1 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 font-mono text-xs font-semibold focus:outline-none focus:border-rose-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newH = Math.round(selectedElement.height + 20);
+                      const updates: any = { height: newH };
+                      if (lockRatio && selectedElement.height > 0) {
+                        updates.width = Math.max(20, Math.round(selectedElement.width * (newH / selectedElement.height)));
+                      }
+                      updateElement(selectedElement.id, updates, true);
+                    }}
+                    className="w-6 h-7 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 flex items-center justify-center font-bold text-xs hover:bg-stone-100"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Width Buttons */}
+            <div className="flex items-center gap-1.5 pt-1">
+              {[
+                { label: '500px', w: 500, x: 0 },
+                { label: '420px', w: 420, x: 40 },
+                { label: '300px', w: 300, x: 100 },
+                { label: '200px', w: 200, x: 150 },
+              ].map((btn, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => {
+                    const updates: any = { width: btn.w, x: btn.x };
+                    if (lockRatio && selectedElement.width > 0) {
+                      updates.height = Math.max(20, Math.round(selectedElement.height * (btn.w / selectedElement.width)));
+                    }
+                    updateElement(selectedElement.id, updates, true);
+                  }}
+                  className="flex-1 py-1 px-1 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-[10px] font-semibold text-stone-600 dark:text-stone-300 hover:border-rose-400 hover:text-rose-600 text-center transition-colors"
+                >
+                  {btn.w}px
+                </button>
+              ))}
+            </div>
+
+            {/* Position X, Y and Center */}
+            <div className="flex items-center justify-between pt-1 border-t border-stone-200 dark:border-stone-700/60 gap-2">
+              <div className="flex items-center gap-2 text-[10px] font-mono text-stone-500">
+                <span>X: <strong className="text-stone-700 dark:text-stone-200">{Math.round(selectedElement.x)}</strong></span>
+                <span>Y: <strong className="text-stone-700 dark:text-stone-200">{Math.round(selectedElement.y)}</strong></span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const centeredX = Math.round((canvas.width - selectedElement.width) / 2);
+                  updateElement(selectedElement.id, { x: Math.max(0, centeredX) }, true);
+                }}
+                className="py-1 px-2.5 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-[10px] font-semibold text-stone-700 dark:text-stone-300 hover:border-rose-400 transition-colors flex items-center gap-1"
+                title="Căn giữa phần tử theo chiều ngang"
+              >
+                <AlignCenter className="w-3 h-3 text-rose-500" />
+                <span>Căn giữa trang</span>
               </button>
             </div>
           </div>

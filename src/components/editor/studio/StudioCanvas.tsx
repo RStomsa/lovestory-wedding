@@ -116,6 +116,87 @@ export default function StudioCanvas() {
     touchStartDistRef.current = null;
   };
 
+  // Direct native resize handle gesture handler for bulletproof resizing
+  const handleNativeResize = (
+    e: React.PointerEvent,
+    el: CanvasElement,
+    dir: 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
+  ) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const origX = el.x;
+    const origY = el.y;
+    const origW = el.width;
+    const origH = el.height;
+    const ratio = origW / Math.max(1, origH);
+
+    const node = document.getElementById(`canvas-node-${el.id}`);
+    if (!node) return;
+
+    let currentW = origW;
+    let currentH = origH;
+    let currentX = origX;
+    let currentY = origY;
+
+    const onPointerMove = (moveEvt: PointerEvent) => {
+      const dx = (moveEvt.clientX - startX) / zoom;
+      const dy = (moveEvt.clientY - startY) / zoom;
+
+      let newW = origW;
+      let newH = origH;
+      let newX = origX;
+      let newY = origY;
+
+      if (dir.includes('e')) newW = Math.max(20, origW + dx);
+      if (dir.includes('s')) newH = Math.max(20, origH + dy);
+      if (dir.includes('w')) {
+        newW = Math.max(20, origW - dx);
+        newX = origX + (origW - newW);
+      }
+      if (dir.includes('n')) {
+        newH = Math.max(20, origH - dy);
+        newY = origY + (origH - newH);
+      }
+
+      // If shift key pressed, keep aspect ratio
+      if (moveEvt.shiftKey && (dir === 'nw' || dir === 'ne' || dir === 'se' || dir === 'sw')) {
+        newH = Math.max(20, Math.round(newW / ratio));
+        if (dir.includes('n')) newY = origY + (origH - newH);
+      }
+
+      currentW = Math.round(newW);
+      currentH = Math.round(newH);
+      currentX = Math.round(newX);
+      currentY = Math.round(newY);
+
+      node.style.width = `${currentW}px`;
+      node.style.height = `${currentH}px`;
+      node.style.left = `${currentX}px`;
+      node.style.top = `${currentY}px`;
+    };
+
+    const onPointerUp = () => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      updateElement(
+        el.id,
+        {
+          width: currentW,
+          height: currentH,
+          x: currentX,
+          y: currentY,
+        },
+        true
+      );
+    };
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+  };
+
   // Synchronize moveableTarget ONLY when selectedId or editingTextId changes (NEVER on every elements update!)
   useEffect(() => {
     const handle = requestAnimationFrame(() => {
@@ -937,6 +1018,55 @@ export default function StudioCanvas() {
                 >
                   {renderElementContent(el)}
                 </div>
+
+                {/* Direct Native Resize Handles for Selected Element */}
+                {isSelected && (
+                  <>
+                    {/* 4 Corners */}
+                    <div
+                      onPointerDown={(e) => handleNativeResize(e, el, 'nw')}
+                      className="absolute -top-2 -left-2 w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-md z-30 cursor-nwse-resize hover:scale-125 transition-transform"
+                      title="Kéo để đổi kích thước"
+                    />
+                    <div
+                      onPointerDown={(e) => handleNativeResize(e, el, 'ne')}
+                      className="absolute -top-2 -right-2 w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-md z-30 cursor-nesw-resize hover:scale-125 transition-transform"
+                      title="Kéo để đổi kích thước"
+                    />
+                    <div
+                      onPointerDown={(e) => handleNativeResize(e, el, 'se')}
+                      className="absolute -bottom-2 -right-2 w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-md z-30 cursor-nwse-resize hover:scale-125 transition-transform"
+                      title="Kéo để đổi kích thước"
+                    />
+                    <div
+                      onPointerDown={(e) => handleNativeResize(e, el, 'sw')}
+                      className="absolute -bottom-2 -left-2 w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-md z-30 cursor-nesw-resize hover:scale-125 transition-transform"
+                      title="Kéo để đổi kích thước"
+                    />
+
+                    {/* 4 Edges */}
+                    <div
+                      onPointerDown={(e) => handleNativeResize(e, el, 'n')}
+                      className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-6 h-2 bg-white border border-blue-500 rounded-full shadow-xs z-30 cursor-ns-resize hover:scale-125 transition-transform"
+                      title="Kéo chỉnh chiều cao"
+                    />
+                    <div
+                      onPointerDown={(e) => handleNativeResize(e, el, 's')}
+                      className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-6 h-2 bg-white border border-blue-500 rounded-full shadow-xs z-30 cursor-ns-resize hover:scale-125 transition-transform"
+                      title="Kéo chỉnh chiều cao"
+                    />
+                    <div
+                      onPointerDown={(e) => handleNativeResize(e, el, 'w')}
+                      className="absolute top-1/2 -translate-y-1/2 -left-1.5 w-2 h-6 bg-white border border-blue-500 rounded-full shadow-xs z-30 cursor-ew-resize hover:scale-125 transition-transform"
+                      title="Kéo chỉnh chiều rộng"
+                    />
+                    <div
+                      onPointerDown={(e) => handleNativeResize(e, el, 'e')}
+                      className="absolute top-1/2 -translate-y-1/2 -right-1.5 w-2 h-6 bg-white border border-blue-500 rounded-full shadow-xs z-30 cursor-ew-resize hover:scale-125 transition-transform"
+                      title="Kéo chỉnh chiều rộng"
+                    />
+                  </>
+                )}
               </div>
             );
           })}
@@ -986,8 +1116,7 @@ export default function StudioCanvas() {
                   updateElement(selectedId, { x: Math.round(left), y: Math.round(top) }, true);
                 }
               }}
-              onResizeStart={({ setOrigin, dragStart, target }: any) => {
-                setOrigin(['%', '%']);
+              onResizeStart={({ dragStart, target }: any) => {
                 const left = parseFloat(target.style.left) || 0;
                 const top = parseFloat(target.style.top) || 0;
                 dragStart && dragStart.set([left, top]);
