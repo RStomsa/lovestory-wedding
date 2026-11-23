@@ -54,7 +54,7 @@ export default function TemplatesManagerClient({
   initialCatalogTemplates,
   initialHarvestedTemplates = [],
 }: Props) {
-  // Tabs: Catalog, 188 Harvested templates, M-Invite templates, Core Engines, Typography & Effects
+  // Tabs: Catalog, 188 Harvested templates, VIP Modern templates, Core Engines, Typography & Effects
   const [activeTab, setActiveTab] = useState<'catalog' | 'harvested' | 'minvite' | 'engines' | 'typography-effects'>('catalog');
 
   // State for Catalog Templates
@@ -68,7 +68,7 @@ export default function TemplatesManagerClient({
   const [searchHarvested, setSearchHarvested] = useState('');
   const [harvestedFilter, setHarvestedFilter] = useState<'all' | 'wedding' | 'birthday' | 'event'>('all');
 
-  // State for M-Invite Scraped Templates
+  // State for VIP Modern Templates
   const [searchMinvite, setSearchMinvite] = useState('');
   const [minviteFilter, setMinviteFilter] = useState<string>('all');
 
@@ -193,7 +193,7 @@ export default function TemplatesManagerClient({
     setShowCreateModal(true);
   };
 
-  // Filtering M-Invite Templates (69 templates)
+  // Filtering VIP Modern Templates (69 templates)
   const filteredMinvite = useMemo(() => {
     return (minviteTemplates as any[]).filter((item) => {
       const matchCat =
@@ -213,7 +213,7 @@ export default function TemplatesManagerClient({
     });
   }, [minviteFilter, searchMinvite]);
 
-  // Handle Promote M-Invite Template to Publish Modal
+  // Handle Promote VIP Modern Template to Publish Modal
   const handlePublishMinvite = (item: any) => {
     setFormName(item.title);
     setFormSlug(item.slug);
@@ -222,7 +222,7 @@ export default function TemplatesManagerClient({
     setFormPrice(item.planRequired === 1 ? 200000 : 0);
     setFormBadge(item.planRequired === 1 ? 'VIP' : 'MIỄN PHÍ');
     setFormThumbnail(item.coverImage || item.thumbnail);
-    setFormDescription(item.description || `Mẫu thiệp ${item.title} thu thập từ M-Invite.`);
+    setFormDescription(item.description || `Mẫu thiệp cưới cao cấp ${item.title} - LoveStory VIP.`);
     setShowCreateModal(true);
   };
 
@@ -506,7 +506,7 @@ export default function TemplatesManagerClient({
           }`}
         >
           <Globe className="w-4 h-4 text-blue-500" />
-          <span>Mẫu M-Invite ({minviteTemplates.length})</span>
+          <span>Mẫu Hiện Đại VIP ({minviteTemplates.length})</span>
         </button>
 
         <button
@@ -1090,7 +1090,7 @@ export default function TemplatesManagerClient({
         </div>
       )}
 
-      {/* TAB 3B: M-INVITE SCRAPED TEMPLATES (69 MẪU TỪ M-INVITE.COM) */}
+      {/* TAB 3B: VIP MODERN TEMPLATES (69 MẪU CAO CẤP) */}
       {activeTab === 'minvite' && (
         <div className="space-y-4">
           {/* Filter Bar */}
@@ -1100,7 +1100,7 @@ export default function TemplatesManagerClient({
               <Search className="w-3.5 h-3.5 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Tìm kiếm trong 69 mẫu M-Invite..."
+                placeholder="Tìm kiếm trong 69 mẫu thiệp hiện đại..."
                 value={searchMinvite}
                 onChange={(e) => setSearchMinvite(e.target.value)}
                 className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-stone-800 placeholder:text-stone-400 focus:outline-none focus:border-stone-900"
@@ -1160,16 +1160,6 @@ export default function TemplatesManagerClient({
                       </span>
                     </div>
 
-                    <a
-                      href={item.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute top-2.5 right-2.5 p-1.5 rounded-full bg-white/90 text-stone-600 hover:text-stone-900 shadow-xs transition-colors"
-                      title="Xem mẫu gốc tại m-invite.com"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-
                     {/* Hover Overlay Action Buttons */}
                     <div className="absolute inset-0 bg-stone-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center gap-2 p-3 backdrop-blur-[2px]">
                       <Link
@@ -1199,7 +1189,7 @@ export default function TemplatesManagerClient({
                         {item.title}
                       </h4>
                       <p className="text-[11px] text-stone-500 line-clamp-2 mt-1 leading-relaxed">
-                        {item.description || 'Mẫu thiết kế cào từ m-invite.com'}
+                        {item.description || 'Mẫu thiết kế cao cấp độc quyền LoveStory'}
                       </p>
                     </div>
 

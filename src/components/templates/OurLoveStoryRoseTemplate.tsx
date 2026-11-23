@@ -50,7 +50,7 @@ export default function OurLoveStoryRoseTemplate({
       />
       <FallingPetals type="petals" count={18} />
       <FloatingMusicPlayer
-        audioUrl={data.music.url || 'https://assets.cinelove.me/mp3/5f4c5139-a13a-4ff0-82a2-e3a61240042f.mp3'}
+        audioUrl={data.music.url || '/assets/wedding/mp3/ee11a985-5e0e-4eb0-b6da-28fa39c9946f.mp3'}
         songTitle={data.music.title || 'Until You'}
         artist={data.music.artist || 'LoveStory'}
       />
@@ -62,7 +62,7 @@ export default function OurLoveStoryRoseTemplate({
         <section className="relative w-full min-h-[760px] flex flex-col justify-between overflow-hidden bg-stone-900">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={data.coverImage || 'https://assets.cinelove.me/templates/assets/a2f11727-8717-46db-ada4-ff29271ce53b/0b6a64d0-658b-4bb9-916b-9fa6a26c68bc.jpeg'}
+            src={data.coverImage || 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80'}
             alt="Wedding Cover Rose"
             className="absolute inset-0 w-full h-full object-cover object-top filter brightness-[0.93]"
           />

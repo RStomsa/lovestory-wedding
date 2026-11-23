@@ -914,7 +914,7 @@ function convertMinviteDesignToStudioPreset(minviteMatch: any, rawDesign: any): 
     ? bgMusic.startsWith('http')
       ? bgMusic
       : `https://cdn.biihappy.com/m-invite/${bgMusic}`
-    : 'https://assets.cinelove.me/mp3/5f4c5139-a13a-4ff0-82a2-e3a61240042f.mp3';
+    : '/assets/wedding/mp3/ee11a985-5e0e-4eb0-b6da-28fa39c9946f.mp3';
 
   return {
     id: minviteMatch.id,
@@ -924,7 +924,7 @@ function convertMinviteDesignToStudioPreset(minviteMatch: any, rawDesign: any): 
     tier: minviteMatch.tier || 'VIP 200k',
     thumbnail: coverSrc,
     imagesCount: elements.filter((e) => e.type === 'image').length || 10,
-    description: minviteMatch.description || `Mẫu thiệp ${minviteMatch.title} thu thập từ M-Invite.`,
+    description: minviteMatch.description || `Mẫu thiệp cưới cao cấp ${minviteMatch.title} - LoveStory VIP.`,
     config: {
       width: 500,
       height: canvasHeight,
@@ -971,7 +971,7 @@ export function getStudioTemplate(slugOrId: string): StudioTemplatePreset | null
     return custom;
   }
 
-  // 0. Check M-Invite scraped templates
+  // 0. Check VIP templates
   const minviteMatch = (minviteTemplates as any[]).find(
     (m: any) =>
       m.slug?.toLowerCase() === norm ||
@@ -1169,14 +1169,14 @@ export function getStudioTemplate(slugOrId: string): StudioTemplatePreset | null
       tier: minviteMatch.tier || 'VIP 200k',
       thumbnail: coverSrc,
       imagesCount: 10,
-      description: minviteMatch.description || `Mẫu ${minviteMatch.title} thu thập từ M-Invite.`,
+      description: minviteMatch.description || `Mẫu thiệp cưới cao cấp ${minviteMatch.title} - LoveStory VIP.`,
       config: {
         width: 500,
         height: 2500,
         background: '#FAF7F2',
         title: minviteMatch.title,
         audioTitle: 'Until You (Wedding Theme)',
-        audioUrl: 'https://assets.cinelove.me/mp3/5f4c5139-a13a-4ff0-82a2-e3a61240042f.mp3',
+        audioUrl: '/assets/wedding/mp3/ee11a985-5e0e-4eb0-b6da-28fa39c9946f.mp3',
         envelopeCover: { enabled: true, coverId: 'default' },
         fallingEffect: { enabled: true, type: 'snow' },
       },

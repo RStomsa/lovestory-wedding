@@ -807,7 +807,7 @@ export default function StudioCanvas() {
                   if (editingTextId === el.id) return;
 
                   if (isTouchFriendly) {
-                    // 27BigGroup-style Touch Friendly Mode:
+                    // Mobile Touch Friendly Mode:
                     // DO NOT intercept scroll gestures or drag elements on mobile!
                     // Tapping selects element and opens quick tools
                     e.stopPropagation();

@@ -55,7 +55,7 @@ export default function StudioMobileTextModal() {
         onClick={() => setTextEditModalElementId(null)}
       />
 
-      {/* Modal Dialog (Matches 27BigGroup Screenshot 7 & 12) */}
+      {/* Modal Dialog */}
       <div className="relative w-full max-w-sm bg-white dark:bg-stone-900 rounded-3xl shadow-2xl border border-stone-200 dark:border-stone-800 p-5 z-10 animate-in zoom-in-95 duration-150 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between pb-2 border-b border-stone-100 dark:border-stone-800">

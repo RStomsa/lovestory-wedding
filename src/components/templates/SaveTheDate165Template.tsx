@@ -112,7 +112,7 @@ export default function SaveTheDate165Template({
       />
       <FallingPetals type="sparkles" count={16} />
       <FloatingMusicPlayer
-        audioUrl={data.music.url || 'https://assets.cinelove.me/mp3/5f4c5139-a13a-4ff0-82a2-e3a61240042f.mp3'}
+        audioUrl={data.music.url || '/assets/wedding/mp3/ee11a985-5e0e-4eb0-b6da-28fa39c9946f.mp3'}
         songTitle={data.music.title || 'Until You'}
         artist={data.music.artist || 'LoveStory'}
       />

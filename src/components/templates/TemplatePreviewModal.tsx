@@ -105,7 +105,7 @@ export default function TemplatePreviewModal({
           className="relative w-full max-w-4xl bg-stone-900 border border-stone-800 rounded-3xl shadow-2xl z-10 overflow-hidden flex flex-col max-h-[94vh]"
         >
           {/* ======================================================== */}
-          {/* 1. TOP STICKY BAR (Phỏng theo MeliPage / miuWedding) */}
+          {/* 1. TOP STICKY BAR */}
           {/* ======================================================== */}
           <div className="px-4 py-3 bg-stone-950/90 border-b border-stone-800/80 flex items-center justify-between gap-3 shrink-0 z-20">
             {/* Template Info & Branding */}

@@ -95,7 +95,7 @@ export default function StudioMobilePhotoModal() {
     setPhotoPickerModalElementId(null);
   };
 
-  // Feature: "Tự động thêm tất cả ảnh vào chỗ trống" (Matches 27BigGroup Screenshot 3!)
+  // Feature: "Tự động thêm tất cả ảnh vào chỗ trống"
   const handleAutoFillAllSlots = () => {
     const imageElements = elements.filter((e) => e.type === 'image');
     if (imageElements.length === 0 || uploadedPhotos.length === 0) return;
@@ -127,7 +127,7 @@ export default function StudioMobilePhotoModal() {
         onClick={() => setPhotoPickerModalElementId(null)}
       />
 
-      {/* Bottom Sheet Modal (Matches 27BigGroup Screenshot 3 & 4) */}
+      {/* Bottom Sheet Modal */}
       <div className="relative w-full max-w-md bg-white dark:bg-stone-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-stone-200 dark:border-stone-800 p-5 z-10 animate-in slide-in-from-bottom duration-200 max-h-[85vh] flex flex-col space-y-4">
         {/* Top Handle bar for mobile gesture */}
         <div className="w-10 h-1 bg-stone-300 dark:bg-stone-700 rounded-full mx-auto sm:hidden" />

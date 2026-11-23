@@ -76,7 +76,7 @@ export default function StudioMobileDrawer() {
         onClick={() => setMobileDrawerOpen(false)}
       />
 
-      {/* Slide-out Drawer (Matches 27BigGroup Screenshot 8) */}
+      {/* Slide-out Drawer */}
       <div className="relative w-[320px] max-w-[85vw] h-full bg-white dark:bg-stone-900 shadow-2xl flex flex-col z-10 animate-in slide-in-from-left duration-200">
         {/* Drawer Header */}
         <div className="h-14 px-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
@@ -167,7 +167,7 @@ export default function StudioMobileDrawer() {
             </button>
           </div>
 
-          {/* Section: Ẩn/Hiện Phần Thiệp (Exact match to 27BigGroup Screenshot 10) */}
+          {/* Section: Ẩn/Hiện Phần Thiệp */}
           <div className="pt-3 border-t border-stone-200 dark:border-stone-800">
             <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block mb-2">
               Ẩn / Hiện phần thiệp
@@ -202,7 +202,7 @@ export default function StudioMobileDrawer() {
             </div>
           </div>
 
-          {/* Toggle: Chế độ Desktop (Exact match to 27BigGroup Screenshot 8) */}
+          {/* Toggle: Chế độ Desktop */}
           <div className="pt-3 border-t border-stone-200 dark:border-stone-800 space-y-2">
             <div className="flex items-center justify-between p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/80 border border-stone-200 dark:border-stone-700">
               <div className="flex items-center gap-2.5">

@@ -621,7 +621,7 @@ export default function StudioLeftRail() {
               />
             </div>
 
-            {/* Search Input for Graphics Library (Melipage / M-Invite standard) */}
+            {/* Search Input for Graphics Library */}
             <div className="relative">
               <Search className="w-3.5 h-3.5 text-stone-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
               <input
@@ -1813,14 +1813,14 @@ export default function StudioLeftRail() {
               </div>
             )}
 
-            {/* M-Invite Templates Collection (69 Mẫu từ m-invite.com) */}
+            {/* LoveStory VIP Modern Templates Collection */}
             <div className="space-y-3 pt-3 border-t border-stone-200 dark:border-stone-800">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block">
-                  Mẫu M-Invite ({minviteTemplates.length} Mẫu)
+                  Bộ Sưu Tập Mẫu Hiện Đại ({minviteTemplates.length} Mẫu)
                 </span>
-                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/60 dark:border-blue-800">
-                  m-invite.com
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/60 dark:border-rose-800">
+                  LoveStory VIP
                 </span>
               </div>
 

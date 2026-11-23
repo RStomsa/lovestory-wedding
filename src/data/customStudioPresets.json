@@ -5,7 +5,7 @@
     "name": "Thiệp Cưới Hoa Mộc Đỏ Rượu — Tài & Ngân",
     "category": "wedding",
     "tier": "PREMIUM",
-    "thumbnail": "/assets/uploads/thumbnails/envelope-chamomile.png",
+    "thumbnail": "/assets/uploads/thumbnails/envelope-chamomile-1795443718383.png",
     "imagesCount": 14,
     "description": "Mẫu thiệp cưới scrollytelling hoàng gia sang trọng được thiết kế bởi LoveStory Studio.",
     "config": {
@@ -17,6 +17,10 @@
       "fallingEffect": {
         "enabled": true,
         "type": "petals"
+      },
+      "envelopeCover": {
+        "enabled": true,
+        "coverId": "default"
       }
     },
     "elements": [
@@ -249,7 +253,7 @@
       {
         "id": "elem-element_text_ecaygnzivid",
         "type": "text",
-        "x": 344,
+        "x": 346,
         "y": 364,
         "width": 218.1,
         "height": 27,
@@ -5684,7 +5688,7 @@
       "height": 4500,
       "background": "#FAF7F2",
       "audioTitle": "Until You",
-      "audioUrl": "https://assets.cinelove.me/mp3/5f4c5139-a13a-4ff0-82a2-e3a61240042f.mp3",
+      "audioUrl": "/assets/wedding/mp3/ee11a985-5e0e-4eb0-b6da-28fa39c9946f.mp3",
       "fallingEffect": {
         "enabled": true,
         "type": "hearts"

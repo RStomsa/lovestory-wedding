@@ -66,7 +66,7 @@ interface StudioState {
   previewAnimKey: number;
   triggerPreviewAnim: () => void;
 
-  // 27BigGroup-style Mobile Touch Mode
+  // Mobile Touch Mode
   isMobileView: boolean;
   setIsMobileView: (isMobile: boolean) => void;
   desktopModeOnMobile: boolean;
@@ -437,7 +437,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
     title: 'Thiệp Cưới Kem Chữ Vàng Save The Date (C165)',
     status: 'draft',
     audioTitle: 'Until You',
-    audioUrl: 'https://assets.cinelove.me/mp3/5f4c5139-a13a-4ff0-82a2-e3a61240042f.mp3',
+    audioUrl: '/assets/wedding/mp3/ee11a985-5e0e-4eb0-b6da-28fa39c9946f.mp3',
     envelopeCover: {
       enabled: true,
       coverId: 'default',
@@ -834,7 +834,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
     }));
   },
 
-  // 27BigGroup-style Mobile Touch Mode implementation
+  // Mobile Touch Mode implementation
   isMobileView: false,
   setIsMobileView: (isMobile) => set({ isMobileView: isMobile }),
   desktopModeOnMobile: false,

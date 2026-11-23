@@ -134,16 +134,16 @@ function StudioEditorInner({ mode = 'user' }: StudioEditorProps) {
         )}
       </div>
 
-      {/* 3. 27BigGroup-style Mobile Menu Drawer (Matches Screenshot 8 & 9) */}
+      {/* 3. Mobile Menu Drawer */}
       <StudioMobileDrawer />
 
-      {/* 4. 27BigGroup-style Mobile In-Place Text Edit Modal (Matches Screenshot 7 & 12) */}
+      {/* 4. Mobile In-Place Text Edit Modal */}
       <StudioMobileTextModal />
 
-      {/* 5. 27BigGroup-style Mobile Photo Picker Modal (Matches Screenshot 3 & 4) */}
+      {/* 5. Mobile Photo Picker Modal */}
       <StudioMobilePhotoModal />
 
-      {/* 6. 27BigGroup-style Mobile Onboarding Guide (Matches Screenshot 1, 9, 10, 11, 12, 13) */}
+      {/* 6. Mobile Onboarding Guide */}
       <StudioMobileOnboarding />
 
       {/* 7. Mobile First Bottom Navigation & Contextual Touch Action Strip (Mobile only) */}
