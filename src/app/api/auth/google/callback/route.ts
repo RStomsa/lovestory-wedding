@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { createSession, setSessionCookie } from '@/lib/auth/session';
+import { createSession, SESSION_COOKIE_NAME } from '@/lib/auth/session';
 
 export const dynamic = 'force-dynamic';
 
@@ -115,16 +115,26 @@ export async function GET(request: NextRequest) {
     const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
     const { token, expiresAt } = await createSession(user.id, userAgent, ipAddress);
 
-    // 5. Set session cookie
-    await setSessionCookie(token, expiresAt);
-
-    // 6. Redirect to target
+    // 5. Redirect to target with Set-Cookie header on NextResponse (Next.js 15+ compatible)
     const targetUrl = new URL(state.startsWith('/') ? state : `/${state}`, origin);
-    return NextResponse.redirect(targetUrl.toString());
-  } catch (error) {
+    const response = NextResponse.redirect(targetUrl.toString());
+
+    response.cookies.set(SESSION_COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      expires: expiresAt,
+    });
+
+    return response;
+  } catch (error: any) {
     console.error('Google OAuth callback error:', error);
     const failUrl = new URL('/login', origin);
     failUrl.searchParams.set('error', 'google_callback_exception');
+    if (error?.message) {
+      failUrl.searchParams.set('details', error.message.slice(0, 150));
+    }
     return NextResponse.redirect(failUrl.toString());
   }
 }

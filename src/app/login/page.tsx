@@ -40,6 +40,24 @@ function LoginFormContent() {
   const [customGoogleEmail, setCustomGoogleEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  // Capture URL error parameters (e.g. from Google OAuth callback)
+  useEffect(() => {
+    if (errorParam) {
+      if (errorParam === 'google_callback_exception') {
+        const details = searchParams.get('details');
+        setError(details ? `Đăng nhập Google thất bại: ${decodeURIComponent(details)}` : 'Đăng nhập bằng Google gặp lỗi xử lý. Vui lòng thử lại hoặc đăng nhập bằng Email / Demo bên dưới.');
+      } else if (errorParam === 'google_token_exchange_failed') {
+        setError('Không thể xác thực mã từ Google. Vui lòng kiểm tra lại cấu hình.');
+      } else if (errorParam === 'google_config_missing') {
+        setError('Chưa cấu hình GOOGLE_CLIENT_ID hoặc GOOGLE_CLIENT_SECRET trên server.');
+      } else if (errorParam === 'forbidden') {
+        setError('Tài khoản của bạn không có quyền truy cập trang quản trị.');
+      } else {
+        setError(`Đăng nhập thất bại (${errorParam}).`);
+      }
+    }
+  }, [errorParam, searchParams]);
+
   const isAccessingAdmin = redirectParam === '/admin' || redirectParam?.startsWith('/admin');
   const isForbiddenUser = isAuthenticated && user && user.role !== 'ADMIN' && (isAccessingAdmin || errorParam === 'forbidden');
 
