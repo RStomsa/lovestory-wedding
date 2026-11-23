@@ -15,9 +15,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase().trim() },
+    const cleanEmail = email.toLowerCase().trim();
+    let user = await prisma.user.findUnique({
+      where: { email: cleanEmail },
     });
+
+    // Auto-provision standard admin/demo accounts if database is fresh
+    if (!user) {
+      if (cleanEmail === 'admin@lovestory.me' && password === 'Admin@LoveStory2026') {
+        const bcrypt = (await import('bcryptjs')).default;
+        const passwordHash = await bcrypt.hash('Admin@LoveStory2026', 10);
+        user = await prisma.user.create({
+          data: {
+            email: 'admin@lovestory.me',
+            name: 'Quản Trị Viên',
+            role: 'ADMIN',
+            plan: 'LIFETIME_VIP_200K',
+            passwordHash,
+          },
+        });
+      } else if ((cleanEmail === 'chure@lovestory.me' || cleanEmail === 'codau@lovestory.me') && password === '123456') {
+        const bcrypt = (await import('bcryptjs')).default;
+        const passwordHash = await bcrypt.hash('123456', 10);
+        user = await prisma.user.create({
+          data: {
+            email: cleanEmail,
+            name: cleanEmail === 'chure@lovestory.me' ? 'Anh Tuấn' : 'Thùy Dương',
+            role: 'USER',
+            plan: cleanEmail === 'chure@lovestory.me' ? 'FREE' : 'ANNUAL_50K',
+            passwordHash,
+          },
+        });
+      }
+    }
 
     if (!user || !user.passwordHash) {
       return NextResponse.json(

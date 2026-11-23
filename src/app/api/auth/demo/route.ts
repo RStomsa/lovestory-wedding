@@ -13,15 +13,23 @@ export async function POST(request: NextRequest) {
       email = 'admin@lovestory.me';
     }
 
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: { email },
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: `Tài khoản demo ${email} chưa được khởi tạo trong database` },
-        { status: 404 }
-      );
+      const bcrypt = (await import('bcryptjs')).default;
+      const pwd = role === 'admin' ? 'Admin@LoveStory2026' : '123456';
+      const passwordHash = await bcrypt.hash(pwd, 10);
+      user = await prisma.user.create({
+        data: {
+          email,
+          name: role === 'admin' ? 'Quản Trị Viên' : role === 'codau' ? 'Thùy Dương' : 'Anh Tuấn',
+          role: role === 'admin' ? 'ADMIN' : 'USER',
+          plan: role === 'admin' ? 'LIFETIME_VIP_200K' : role === 'codau' ? 'ANNUAL_50K' : 'FREE',
+          passwordHash,
+        },
+      });
     }
 
     // Create real server session

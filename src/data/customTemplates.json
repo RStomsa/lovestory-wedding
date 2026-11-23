@@ -1,5 +1,35 @@
 [
   {
+    "id": "tpl-tai-ngan-do-ruou-burgundy",
+    "name": "Thiệp Cưới Hoa Mộc Đỏ Rượu — Tài & Ngân",
+    "slug": "thiep-cuoi-tai-ngan-do-ruou-burgundy",
+    "category": "wedding",
+    "tier": "PREMIUM",
+    "price": 30000,
+    "badge": "Mới Hot",
+    "longThumbnail": "/templates/assets/tai-ngan-do-ruou/1794987693199-LVT01888.webp",
+    "baseTemplateId": "thiep-cuoi-tai-ngan-do-ruou-burgundy",
+    "description": "Phong cách Hoa Mộc Đỏ Rượu Burgundy cổ điển, dải ruy băng lụa hoa văn, đếm ngược, lịch cưới, album 6 ảnh lưới và nhạc nền Die With A Smile.",
+    "isCustom": true,
+    "views": 250,
+    "likes": 98
+  },
+  {
+    "id": "tpl-tai-ngan-cam-ranh",
+    "name": "Thiệp Cưới The Anam Cam Ranh - Tài & Ngân",
+    "slug": "thiep-cuoi-tai-ngan-cam-ranh",
+    "category": "wedding",
+    "tier": "PREMIUM",
+    "price": 30000,
+    "badge": "Mới Hot",
+    "longThumbnail": "/templates/assets/tai-ngan-the-anam/1777470891755-TSN_4417_1.webp",
+    "baseTemplateId": "thiep-cuoi-tai-ngan-cam-ranh",
+    "description": "Mẫu thiệp cưới cao cấp phong cách resort biển The Anam Cam Ranh với đầy đủ timeline, dresscode, album 15 ảnh, RSVP và quà mừng cưới.",
+    "isCustom": true,
+    "views": 128,
+    "likes": 56
+  },
+  {
     "id": "thiep-cuoi-minimalism-nau-vintage",
     "name": "Minimalism Nâu Vintage — Wabi-Sabi & Hoa Khô",
     "slug": "thiep-cuoi-minimalism-nau-vintage",
