@@ -5,6 +5,7 @@ import { getStudioTemplate } from '@/lib/harvestedTemplateConverter';
 import { STUDIO_TEMPLATE_PRESETS } from '@/data/studioTemplatePresets';
 import { getCustomStudioPresets } from '@/lib/studioPresetsService';
 import { getAllCatalogTemplates } from '@/lib/templatesService';
+import minviteTemplates from '@/data/minvite_templates.json';
 
 export const dynamic = 'force-dynamic';
 
@@ -77,6 +78,8 @@ export async function GET(req: NextRequest) {
       catalog: catalogList,
       harvestedCount: harvestedList.length,
       harvested: harvestedList,
+      minviteCount: minviteTemplates.length,
+      minvite: minviteTemplates,
     });
   } catch (error) {
     console.error('Studio template API error:', error);

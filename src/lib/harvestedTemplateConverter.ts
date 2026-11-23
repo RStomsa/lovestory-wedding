@@ -4,6 +4,7 @@ import { CanvasElement, CanvasConfig } from '@/components/editor/studio/studioTy
 import { STUDIO_TEMPLATE_PRESETS, StudioTemplatePreset } from '@/data/studioTemplatePresets';
 import { getCustomStudioPreset } from '@/lib/studioPresetsService';
 import { getAllCatalogTemplates } from '@/lib/templatesService';
+import minviteTemplates from '@/data/minvite_templates.json';
 
 export interface HarvestedRawTemplate {
   slug: string;
@@ -671,6 +672,209 @@ export function convertHarvestedToStudioPreset(raw: HarvestedRawTemplate): Studi
  */
 export function getStudioTemplate(slugOrId: string): StudioTemplatePreset | null {
   const norm = slugOrId.toLowerCase().trim();
+
+  // 0. Check M-Invite scraped templates
+  const minviteMatch = (minviteTemplates as any[]).find(
+    (m: any) =>
+      m.slug?.toLowerCase() === norm ||
+      m.id?.toLowerCase() === norm ||
+      norm.includes(m.id?.toLowerCase())
+  );
+  if (minviteMatch) {
+    const coverSrc = minviteMatch.coverImage || minviteMatch.thumbnail || '/assets/wedding/templates/c165/photo_01.webp';
+    const cat = (minviteMatch.category === 'birthday' || minviteMatch.category === 'baby'
+      ? 'birthday'
+      : minviteMatch.category === 'event' || minviteMatch.category === 'opening'
+      ? 'event'
+      : 'wedding') as 'wedding' | 'birthday' | 'event' | 'graduation';
+
+    const elements: CanvasElement[] = [
+      {
+        id: `m-photo-cover-${minviteMatch.id}`,
+        type: 'image',
+        x: 40,
+        y: 260,
+        width: 420,
+        height: 520,
+        rotation: 0,
+        zIndex: 2,
+        opacity: 1,
+        src: coverSrc,
+        borderRadius: 24,
+        objectFit: 'cover',
+        animation: { type: 'fade-in', duration: 1.2, delay: 0 },
+      },
+      {
+        id: `m-text-header-${minviteMatch.id}`,
+        type: 'text',
+        x: 0,
+        y: 40,
+        width: 500,
+        height: 80,
+        rotation: 0,
+        zIndex: 10,
+        opacity: 1,
+        text: cat === 'wedding' ? 'Save The Date' : minviteMatch.title,
+        fontFamily: 'Pinyon Script',
+        fontSize: 80,
+        color: '#8C7355',
+        textAlign: 'center',
+        continuousAnimation: { type: 'floating', duration: 2.2, delay: 0 },
+      },
+      {
+        id: `m-text-names-${minviteMatch.id}`,
+        type: 'text',
+        x: 0,
+        y: 130,
+        width: 500,
+        height: 40,
+        rotation: 0,
+        zIndex: 10,
+        opacity: 1,
+        text: cat === 'wedding' ? 'Quốc Bảo & Thảo Vy' : minviteMatch.title,
+        fontFamily: 'Playfair Display',
+        fontSize: 24,
+        fontWeight: '700',
+        color: '#5C4A3E',
+        textAlign: 'center',
+        letterSpacing: 2,
+      },
+      {
+        id: `m-text-date-${minviteMatch.id}`,
+        type: 'text',
+        x: 0,
+        y: 180,
+        width: 500,
+        height: 36,
+        rotation: 0,
+        zIndex: 10,
+        opacity: 1,
+        text: '28 . 11 . 2026',
+        fontFamily: 'Playfair Display',
+        fontSize: 18,
+        color: '#8C7355',
+        textAlign: 'center',
+        letterSpacing: 6,
+      },
+      {
+        id: `m-widget-countdown-${minviteMatch.id}`,
+        type: 'widget',
+        widgetType: 'countdown',
+        x: 40,
+        y: 810,
+        width: 420,
+        height: 120,
+        rotation: 0,
+        zIndex: 5,
+        opacity: 1,
+      },
+      {
+        id: `m-text-ceremony-${minviteMatch.id}`,
+        type: 'text',
+        x: 40,
+        y: 960,
+        width: 420,
+        height: 50,
+        rotation: 0,
+        zIndex: 5,
+        opacity: 1,
+        text: 'TRÂN TRỌNG KÍNH MỜI',
+        fontFamily: 'Playfair Display',
+        fontSize: 20,
+        fontWeight: '700',
+        color: '#8C7355',
+        textAlign: 'center',
+        letterSpacing: 4,
+      },
+      {
+        id: `m-text-venue-${minviteMatch.id}`,
+        type: 'text',
+        x: 40,
+        y: 1020,
+        width: 420,
+        height: 70,
+        rotation: 0,
+        zIndex: 5,
+        opacity: 1,
+        text: 'Trung Tâm Tiệc Cưới Trống Đồng Palace\n489 Hoàng Quốc Việt, Cầu Giấy, Hà Nội',
+        fontFamily: 'Paris Regular',
+        fontSize: 15,
+        color: '#63554D',
+        textAlign: 'center',
+        lineHeight: 1.5,
+      },
+      {
+        id: `m-widget-map-${minviteMatch.id}`,
+        type: 'widget',
+        widgetType: 'map',
+        x: 40,
+        y: 1110,
+        width: 420,
+        height: 250,
+        rotation: 0,
+        zIndex: 5,
+        opacity: 1,
+      },
+      {
+        id: `m-widget-rsvp-${minviteMatch.id}`,
+        type: 'widget',
+        widgetType: 'rsvp',
+        x: 40,
+        y: 1390,
+        width: 420,
+        height: 340,
+        rotation: 0,
+        zIndex: 5,
+        opacity: 1,
+      },
+      {
+        id: `m-widget-giftbox-${minviteMatch.id}`,
+        type: 'widget',
+        widgetType: 'giftbox',
+        x: 40,
+        y: 1760,
+        width: 420,
+        height: 280,
+        rotation: 0,
+        zIndex: 5,
+        opacity: 1,
+      },
+      {
+        id: `m-widget-wishes-${minviteMatch.id}`,
+        type: 'widget',
+        widgetType: 'wishes',
+        x: 40,
+        y: 2070,
+        width: 420,
+        height: 340,
+        rotation: 0,
+        zIndex: 5,
+        opacity: 1,
+      },
+    ];
+
+    return {
+      id: minviteMatch.id,
+      slug: minviteMatch.slug,
+      name: minviteMatch.title,
+      category: cat,
+      tier: minviteMatch.tier || 'VIP 200k',
+      thumbnail: coverSrc,
+      imagesCount: 10,
+      description: minviteMatch.description || `Mẫu ${minviteMatch.title} thu thập từ M-Invite.`,
+      config: {
+        width: 500,
+        height: 2500,
+        background: '#FAF7F2',
+        title: minviteMatch.title,
+        audioTitle: 'Until You (Wedding Theme)',
+        audioUrl: 'https://assets.cinelove.me/mp3/5f4c5139-a13a-4ff0-82a2-e3a61240042f.mp3',
+        envelopeCover: { enabled: true, coverId: 'default' },
+        fallingEffect: { enabled: true, type: 'snow' },
+      },
+      elements,
+    };
+  }
 
   // 1. Check custom presets created/saved by Admin
   const custom = getCustomStudioPreset(norm);

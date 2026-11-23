@@ -16,6 +16,8 @@ import {
   MessageCircle,
   ArrowUp,
   ArrowDown,
+  ArrowDownToLine,
+  ArrowUpToLine,
   Move,
   RotateCw,
   UploadCloud,
@@ -37,6 +39,7 @@ export default function StudioCanvas() {
     selectedId,
     selectElement,
     addElement,
+    pushElementsBelow,
     updateElement,
     removeElement,
     duplicateElement,
@@ -197,7 +200,18 @@ export default function StudioCanvas() {
         return;
       }
 
-      // 5. Arrow Keys: Nudge position (1px normal, 10px with Shift)
+      // 5. Alt + Arrow Keys: Push down / Pull up elements below
+      if (e.altKey && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+        e.preventDefault();
+        const currentEl = elements.find((el) => el.id === selectedId);
+        if (!currentEl) return;
+        const pushStep = e.shiftKey ? 100 : 50;
+        const amount = e.key === 'ArrowDown' ? pushStep : -pushStep;
+        pushElementsBelow(currentEl.y + currentEl.height - 10, amount, true);
+        return;
+      }
+
+      // 6. Arrow Keys: Nudge position (1px normal, 10px with Shift)
       const step = e.shiftKey ? 10 : 1;
       let deltaX = 0;
       let deltaY = 0;
@@ -1028,6 +1042,26 @@ export default function StudioCanvas() {
                 <Copy className="w-3.5 h-3.5" />
               </button>
               <button
+                onClick={() => {
+                  const pushAmount = selectedEl.height + 24;
+                  pushElementsBelow(selectedEl.y + selectedEl.height - 10, pushAmount, true);
+                }}
+                className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-950/60 text-blue-600 rounded-full transition-colors"
+                title="Đẩy các mục bên dưới xuống (Dãn cách để chèn mục - Alt+Down)"
+              >
+                <ArrowDownToLine className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => {
+                  const pullAmount = -(selectedEl.height + 24);
+                  pushElementsBelow(selectedEl.y + selectedEl.height - 10, pullAmount, true);
+                }}
+                className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 rounded-full transition-colors"
+                title="Kéo các mục bên dưới lên (Thu gọn - Alt+Up)"
+              >
+                <ArrowUpToLine className="w-3.5 h-3.5" />
+              </button>
+              <button
                 onClick={() => removeElement(selectedEl.id)}
                 className="p-1.5 hover:bg-red-50 text-red-500 rounded-full transition-colors"
                 title="Xóa phần tử (Delete)"
@@ -1043,7 +1077,38 @@ export default function StudioCanvas() {
                   <MoreHorizontal className="w-3.5 h-3.5" />
                 </button>
                 {showLayerMenu && (
-                  <div className="absolute top-8 left-0 w-36 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl shadow-2xl p-1 text-xs space-y-0.5 z-50">
+                  <div className="absolute top-8 left-0 w-44 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl shadow-2xl p-1 text-xs space-y-0.5 z-50">
+                    <button
+                      onClick={() => {
+                        pushElementsBelow(selectedEl.y + selectedEl.height - 10, 50, true);
+                        setShowLayerMenu(false);
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2 text-stone-700 dark:text-stone-300"
+                    >
+                      <ArrowDownToLine className="w-3.5 h-3.5 text-blue-500" />
+                      <span>Đẩy xuống +50px</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        pushElementsBelow(selectedEl.y + selectedEl.height - 10, 150, true);
+                        setShowLayerMenu(false);
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2 text-stone-700 dark:text-stone-300"
+                    >
+                      <ArrowDownToLine className="w-3.5 h-3.5 text-blue-500" />
+                      <span>Đẩy xuống +150px</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        pushElementsBelow(selectedEl.y + selectedEl.height - 10, -50, true);
+                        setShowLayerMenu(false);
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2 text-stone-700 dark:text-stone-300"
+                    >
+                      <ArrowUpToLine className="w-3.5 h-3.5 text-stone-500" />
+                      <span>Kéo lên -50px</span>
+                    </button>
+                    <div className="h-px bg-stone-100 dark:bg-stone-800 my-1" />
                     <button
                       onClick={() => {
                         bringToFront(selectedEl.id);

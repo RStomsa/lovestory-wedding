@@ -15,6 +15,9 @@ import {
   Italic,
   Play,
   Sparkles,
+  ArrowDownToLine,
+  ArrowUpToLine,
+  MoveVertical,
 } from 'lucide-react';
 import { useStudioStore } from './studioStore';
 import { resolveFontFamily } from '@/lib/studioFonts';
@@ -36,6 +39,9 @@ export default function StudioRightInspector() {
     setEnvelopeCover,
     setFallingEffect,
     setActiveTab,
+    pushElementsBelow,
+    autoPushDown,
+    setAutoPushDown,
   } = useStudioStore();
 
   const selectedElement = elements.find((e) => e.id === selectedId);
@@ -351,6 +357,80 @@ export default function StudioRightInspector() {
                 title="Thu gọn bảng công cụ"
               >
                 <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Push-Down & Vertical Spacing Control (Chế độ đẩy chèn mục vào giữa) */}
+          <div className="p-3 bg-stone-50 dark:bg-stone-850 rounded-2xl border border-stone-200 dark:border-stone-700/80 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-stone-700 dark:text-stone-300 font-semibold text-xs">
+                <MoveVertical className="w-3.5 h-3.5 text-blue-600" />
+                <span>Khoảng cách &amp; Đẩy vị trí</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAutoPushDown(!autoPushDown)}
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all ${
+                  autoPushDown
+                    ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/60 dark:border-blue-800'
+                    : 'bg-stone-100 text-stone-400 border-stone-200 dark:bg-stone-800 dark:border-stone-700'
+                }`}
+                title="Tự động dãn cách khi chèn mục mới vào giữa"
+              >
+                Tự đẩy: {autoPushDown ? 'BẬT' : 'TẮT'}
+              </button>
+            </div>
+
+            <p className="text-[10px] text-stone-500 leading-tight">
+              Đẩy các mục bên dưới xuống để tạo khoảng trống chèn nội dung vào giữa không bị đè lên nhau.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                const pushAmount = (selectedElement.height || 100) + 24;
+                pushElementsBelow(selectedElement.y + selectedElement.height - 10, pushAmount, true);
+              }}
+              className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-all active:scale-98"
+            >
+              <ArrowDownToLine className="w-3.5 h-3.5" />
+              <span>Đẩy các mục dưới xuống (+{(selectedElement.height || 100) + 24}px)</span>
+            </button>
+
+            <div className="grid grid-cols-4 gap-1.5 pt-0.5">
+              <button
+                type="button"
+                onClick={() => pushElementsBelow(selectedElement.y + selectedElement.height - 10, 50, true)}
+                className="py-1 px-1.5 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-[10px] font-semibold text-stone-700 dark:text-stone-300 hover:border-blue-400 transition-colors"
+                title="Đẩy các mục dưới xuống thêm 50px"
+              >
+                +50px
+              </button>
+              <button
+                type="button"
+                onClick={() => pushElementsBelow(selectedElement.y + selectedElement.height - 10, 100, true)}
+                className="py-1 px-1.5 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-[10px] font-semibold text-stone-700 dark:text-stone-300 hover:border-blue-400 transition-colors"
+                title="Đẩy các mục dưới xuống thêm 100px"
+              >
+                +100px
+              </button>
+              <button
+                type="button"
+                onClick={() => pushElementsBelow(selectedElement.y + selectedElement.height - 10, 200, true)}
+                className="py-1 px-1.5 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-[10px] font-semibold text-stone-700 dark:text-stone-300 hover:border-blue-400 transition-colors"
+                title="Đẩy các mục dưới xuống thêm 200px"
+              >
+                +200px
+              </button>
+              <button
+                type="button"
+                onClick={() => pushElementsBelow(selectedElement.y + selectedElement.height - 10, -50, true)}
+                className="py-1 px-1.5 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-[10px] font-semibold text-stone-500 hover:text-stone-800 hover:border-stone-400 transition-colors flex items-center justify-center gap-0.5"
+                title="Kéo các mục dưới lên bớt 50px"
+              >
+                <ArrowUpToLine className="w-2.5 h-2.5" />
+                <span>-50px</span>
               </button>
             </div>
           </div>

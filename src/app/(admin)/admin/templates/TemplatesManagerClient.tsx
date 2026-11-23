@@ -23,8 +23,10 @@ import {
   Wand2,
   Music,
   Code2,
+  Globe,
 } from 'lucide-react';
 import { CatalogTemplate } from '@/data/templatesCatalog';
+import minviteTemplates from '@/data/minvite_templates.json';
 
 interface DbTemplateData {
   id: string;
@@ -52,8 +54,8 @@ export default function TemplatesManagerClient({
   initialCatalogTemplates,
   initialHarvestedTemplates = [],
 }: Props) {
-  // Tabs: Catalog, 188 Harvested templates, Core Engines, Typography & Effects
-  const [activeTab, setActiveTab] = useState<'catalog' | 'harvested' | 'engines' | 'typography-effects'>('catalog');
+  // Tabs: Catalog, 188 Harvested templates, M-Invite templates, Core Engines, Typography & Effects
+  const [activeTab, setActiveTab] = useState<'catalog' | 'harvested' | 'minvite' | 'engines' | 'typography-effects'>('catalog');
 
   // State for Catalog Templates
   const [catalogTemplates, setCatalogTemplates] = useState<CatalogTemplate[]>(initialCatalogTemplates);
@@ -65,6 +67,10 @@ export default function TemplatesManagerClient({
   const [harvestedTemplates] = useState<any[]>(initialHarvestedTemplates);
   const [searchHarvested, setSearchHarvested] = useState('');
   const [harvestedFilter, setHarvestedFilter] = useState<'all' | 'wedding' | 'birthday' | 'event'>('all');
+
+  // State for M-Invite Scraped Templates
+  const [searchMinvite, setSearchMinvite] = useState('');
+  const [minviteFilter, setMinviteFilter] = useState<string>('all');
 
   // State for DB Engine Templates
   const [dbTemplates, setDbTemplates] = useState<DbTemplateData[]>(initialDbTemplates);
@@ -184,6 +190,39 @@ export default function TemplatesManagerClient({
     setFormDescription(
       `Mẫu thiết kế cao cấp "${cleanTitle}" gồm ${item.imagesCount || 10} hình ảnh thời trang cùng hiệu ứng tương tác trực tiếp.`
     );
+    setShowCreateModal(true);
+  };
+
+  // Filtering M-Invite Templates (69 templates)
+  const filteredMinvite = useMemo(() => {
+    return (minviteTemplates as any[]).filter((item) => {
+      const matchCat =
+        minviteFilter === 'all'
+          ? true
+          : minviteFilter === 'wedding'
+          ? item.category === 'wedding'
+          : minviteFilter === 'birthday'
+          ? item.category === 'birthday' || item.category === 'baby'
+          : item.category === 'opening' || item.category === 'event';
+      const matchSearch =
+        !searchMinvite.trim() ||
+        item.title.toLowerCase().includes(searchMinvite.toLowerCase()) ||
+        item.description?.toLowerCase().includes(searchMinvite.toLowerCase()) ||
+        item.slug?.toLowerCase().includes(searchMinvite.toLowerCase());
+      return matchCat && matchSearch;
+    });
+  }, [minviteFilter, searchMinvite]);
+
+  // Handle Promote M-Invite Template to Publish Modal
+  const handlePublishMinvite = (item: any) => {
+    setFormName(item.title);
+    setFormSlug(item.slug);
+    setFormCategory(item.category === 'wedding' ? 'wedding' : item.category === 'birthday' ? 'birthday' : 'event');
+    setFormTier(item.planRequired === 1 ? 'PREMIUM' : 'FREE');
+    setFormPrice(item.planRequired === 1 ? 200000 : 0);
+    setFormBadge(item.planRequired === 1 ? 'VIP' : 'MIỄN PHÍ');
+    setFormThumbnail(item.coverImage || item.thumbnail);
+    setFormDescription(item.description || `Mẫu thiệp ${item.title} thu thập từ M-Invite.`);
     setShowCreateModal(true);
   };
 
@@ -455,6 +494,19 @@ export default function TemplatesManagerClient({
         >
           <Sparkles className="w-4 h-4 text-amber-400" />
           <span>Thư Viện 188 Mẫu Thực Tế ({harvestedTemplates.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('minvite')}
+          className={`pb-3 px-4 text-xs font-bold transition-all flex items-center gap-2 border-b-2 whitespace-nowrap ${
+            activeTab === 'minvite'
+              ? 'border-stone-900 text-stone-900 font-semibold'
+              : 'border-transparent text-stone-500 hover:text-stone-200'
+          }`}
+        >
+          <Globe className="w-4 h-4 text-blue-500" />
+          <span>Mẫu M-Invite ({minviteTemplates.length})</span>
         </button>
 
         <button
@@ -1024,6 +1076,139 @@ export default function TemplatesManagerClient({
                       <button
                         type="button"
                         onClick={() => handlePromoteHarvested(item)}
+                        className="text-stone-900 hover:underline font-medium text-[11px]"
+                      >
+                        + Mở bán
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3B: M-INVITE SCRAPED TEMPLATES (69 MẪU TỪ M-INVITE.COM) */}
+      {activeTab === 'minvite' && (
+        <div className="space-y-4">
+          {/* Filter Bar */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 rounded-2xl bg-white border border-stone-200/90 shadow-2xs">
+            {/* Search */}
+            <div className="relative w-full sm:w-80">
+              <Search className="w-3.5 h-3.5 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Tìm kiếm trong 69 mẫu M-Invite..."
+                value={searchMinvite}
+                onChange={(e) => setSearchMinvite(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-stone-800 placeholder:text-stone-400 focus:outline-none focus:border-stone-900"
+              />
+            </div>
+
+            {/* Category Pills */}
+            <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+              {[
+                { id: 'all', label: `Tất cả (${minviteTemplates.length})` },
+                { id: 'wedding', label: 'Thiệp cưới (60)' },
+                { id: 'birthday', label: 'Sinh nhật & Thôi nôi (6)' },
+                { id: 'event', label: 'Sự kiện & Khai trương (3)' },
+              ].map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setMinviteFilter(cat.id)}
+                  className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                    minviteFilter === cat.id
+                      ? 'bg-stone-900 text-white shadow-xs'
+                      : 'bg-stone-100 text-stone-500 hover:text-stone-900'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {filteredMinvite.map((item: any, idx: number) => {
+              const thumbUrl = item.coverImage || item.thumbnail;
+              return (
+                <div
+                  key={item.id || idx}
+                  className="rounded-2xl border border-stone-200/90 bg-white shadow-2xs overflow-hidden flex flex-col group hover:shadow-md hover:border-blue-400 transition-all duration-300"
+                >
+                  {/* Thumbnail */}
+                  <div className="relative aspect-[9/16] bg-stone-100 overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={thumbUrl}
+                      alt={item.title}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+
+                    {/* Category & Plan Badges */}
+                    <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 items-start">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/90 text-stone-800 shadow-xs backdrop-blur-xs">
+                        {item.categoryLabel}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-black/75 text-white backdrop-blur-xs">
+                        {item.tier}
+                      </span>
+                    </div>
+
+                    <a
+                      href={item.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute top-2.5 right-2.5 p-1.5 rounded-full bg-white/90 text-stone-600 hover:text-stone-900 shadow-xs transition-colors"
+                      title="Xem mẫu gốc tại m-invite.com"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+
+                    {/* Hover Overlay Action Buttons */}
+                    <div className="absolute inset-0 bg-stone-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center gap-2 p-3 backdrop-blur-[2px]">
+                      <Link
+                        href={`/editor/studio?template=${encodeURIComponent(item.slug)}`}
+                        target="_blank"
+                        className="w-full py-2 px-3 rounded-xl bg-white text-stone-900 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-md hover:bg-stone-100 transition-colors"
+                      >
+                        <Wand2 className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Mở trong Studio</span>
+                      </Link>
+
+                      <button
+                        type="button"
+                        onClick={() => handlePublishMinvite(item)}
+                        className="w-full py-2 px-3 rounded-xl bg-stone-900 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-md hover:bg-black transition-colors"
+                      >
+                        <Plus className="w-3.5 h-3.5 text-amber-400" />
+                        <span>+ Phát Hành Vào Kho</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Card Details */}
+                  <div className="p-3.5 flex flex-col flex-1 justify-between bg-white border-t border-stone-100">
+                    <div>
+                      <h4 className="font-bold text-xs text-stone-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                        {item.title}
+                      </h4>
+                      <p className="text-[11px] text-stone-500 line-clamp-2 mt-1 leading-relaxed">
+                        {item.description || 'Mẫu thiết kế cào từ m-invite.com'}
+                      </p>
+                    </div>
+
+                    <div className="pt-2.5 mt-2 border-t border-stone-100 flex items-center justify-between text-[11px]">
+                      <span className="font-mono text-stone-400 text-[10px]">
+                        ID: {item.id.slice(-6)}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handlePublishMinvite(item)}
                         className="text-stone-900 hover:underline font-medium text-[11px]"
                       >
                         + Mở bán

@@ -27,6 +27,12 @@ interface StudioState {
   setFallingEffect: (effect: { enabled: boolean; type: 'snow' | 'hearts' | 'petals' | 'stars' | 'confetti' | 'butterfly' | 'heart-snow' }) => void;
   setEnvelopeCover: (cover: { enabled: boolean; coverId: string; rememberOpened?: boolean; autoOpen?: boolean }) => void;
   
+  // Push-Down & Spacing Engine
+  autoPushDown: boolean;
+  setAutoPushDown: (enabled: boolean) => void;
+  pushElementsBelow: (referenceY: number, amount: number, recordHistory?: boolean) => void;
+  addElementWithPush: (el: Omit<CanvasElement, 'id' | 'zIndex'>, options?: { push?: boolean; gap?: number }) => void;
+
   selectElement: (id: string | null) => void;
   addElement: (el: Omit<CanvasElement, 'id' | 'zIndex'>) => void;
   updateElement: (id: string, updates: Partial<CanvasElement>, recordHistory?: boolean) => void;
@@ -614,6 +620,98 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       activeMobileSheet: id ? state.activeMobileSheet : null,
       isInspectorOpen: id ? true : state.isInspectorOpen,
     })),
+
+  // Push-Down & Spacing Engine state
+  autoPushDown: true,
+  setAutoPushDown: (enabled) => set({ autoPushDown: enabled }),
+
+  pushElementsBelow: (referenceY, amount, recordHistory = true) => {
+    const { elements, canvas, past } = get();
+    if (amount === 0) return;
+
+    let maxBottom = 0;
+    let shiftedCount = 0;
+    const nextElements = elements.map((e) => {
+      if (e.y >= referenceY) {
+        shiftedCount++;
+        const nextY = Math.max(0, Math.round(e.y + amount));
+        const bottom = nextY + (e.height || 0);
+        if (bottom > maxBottom) maxBottom = bottom;
+        return { ...e, y: nextY };
+      }
+      const bottom = e.y + (e.height || 0);
+      if (bottom > maxBottom) maxBottom = bottom;
+      return e;
+    });
+
+    if (shiftedCount === 0) return;
+
+    const requiredHeight = Math.max(canvas.height, maxBottom + 200);
+
+    set({
+      past: recordHistory ? [...past, elements] : past,
+      future: recordHistory ? [] : get().future,
+      elements: nextElements,
+      canvas: { ...canvas, height: requiredHeight },
+      hasUnsavedChanges: true,
+    });
+  },
+
+  addElementWithPush: (el, options) => {
+    const { elements, canvas, past, autoPushDown } = get();
+    const shouldPush = options?.push !== undefined ? options.push : autoPushDown;
+    const gap = options?.gap ?? 24;
+    const maxZ = elements.reduce((max, e) => Math.max(max, e.zIndex), 0);
+    const newId = `el-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
+
+    const newElement: CanvasElement = {
+      ...el,
+      id: newId,
+      zIndex: maxZ + 1,
+    };
+
+    let nextElements = [...elements];
+    let nextCanvas = { ...canvas };
+
+    if (shouldPush) {
+      const pushAmount = el.height + gap;
+      // Push elements whose top is at or below this insertion point
+      const thresholdY = el.y - 10;
+      let maxBottom = el.y + el.height;
+
+      nextElements = nextElements.map((e) => {
+        if (e.y >= thresholdY) {
+          const nextY = Math.max(0, Math.round(e.y + pushAmount));
+          const bottom = nextY + (e.height || 0);
+          if (bottom > maxBottom) maxBottom = bottom;
+          return { ...e, y: nextY };
+        }
+        const bottom = e.y + (e.height || 0);
+        if (bottom > maxBottom) maxBottom = bottom;
+        return e;
+      });
+
+      nextElements.push(newElement);
+
+      const requiredHeight = Math.max(canvas.height, maxBottom + 200);
+      nextCanvas.height = requiredHeight;
+    } else {
+      nextElements.push(newElement);
+      const bottom = el.y + el.height;
+      if (bottom + 200 > nextCanvas.height) {
+        nextCanvas.height = bottom + 200;
+      }
+    }
+
+    set({
+      past: [...past, elements],
+      future: [],
+      elements: nextElements,
+      canvas: nextCanvas,
+      selectedId: newId,
+      hasUnsavedChanges: true,
+    });
+  },
 
   addElement: (el) => {
     const { elements, past } = get();

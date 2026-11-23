@@ -23,6 +23,9 @@ import {
   Search,
   Check,
   Loader2,
+  ArrowDownToLine,
+  ArrowUpToLine,
+  Globe,
 } from 'lucide-react';
 import { useStudioStore } from './studioStore';
 import { SidebarTab } from './studioTypes';
@@ -30,6 +33,7 @@ import { STUDIO_TEMPLATE_PRESETS } from '@/data/studioTemplatePresets';
 import { GRAPHICS_CATALOG, GraphicSticker } from '@/data/graphicsCatalog';
 import weddingMusicCatalog from '@/data/weddingMusicCatalog.json';
 import harvestedTemplates from '@/data/harvested_templates/index.json';
+import minviteTemplates from '@/data/minvite_templates.json';
 import { resolveFontFamily } from '@/lib/studioFonts';
 import { WEDDING_TEXT_TEMPLATES } from '@/data/weddingTextTemplates';
 import {
@@ -69,6 +73,10 @@ export default function StudioLeftRail() {
     activeTab,
     setActiveTab,
     addElement,
+    addElementWithPush,
+    autoPushDown,
+    setAutoPushDown,
+    pushElementsBelow,
     setCanvasBackground,
     setFallingEffect,
     setEnvelopeCover,
@@ -1126,7 +1134,7 @@ export default function StudioLeftRail() {
                       type="button"
                       onClick={() => {
                         const targetY = getSmartInsertY(item.defaultHeight || 60);
-                        addElement({
+                        addElementWithPush({
                           type: 'text',
                           x: Math.max(20, Math.round((canvas.width - (item.defaultWidth || 400)) / 2)),
                           y: targetY,
@@ -1179,7 +1187,7 @@ export default function StudioLeftRail() {
               <button
                 type="button"
                 onClick={() =>
-                  addElement({
+                  addElementWithPush({
                     type: 'text',
                     x: 50,
                     y: getSmartInsertY(60),
@@ -1204,7 +1212,7 @@ export default function StudioLeftRail() {
               <button
                 type="button"
                 onClick={() =>
-                  addElement({
+                  addElementWithPush({
                     type: 'text',
                     x: 50,
                     y: getSmartInsertY(80),
@@ -1473,11 +1481,35 @@ export default function StudioLeftRail() {
         ========================================================================= */}
         {activeTab === 'widget' && (
           <div className="space-y-4">
-            <div>
-              <h3 className="text-sm font-bold text-stone-900 dark:text-white">Tiện ích</h3>
-              <p className="text-[11px] text-stone-500 mt-0.5 leading-relaxed">
-                Bấm hoặc kéo vào thiệp để thêm. Gói Miễn phí thêm mỗi tiện ích 1 lần.
-              </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-stone-900 dark:text-white">Tiện ích</h3>
+                <p className="text-[11px] text-stone-500 mt-0.5 leading-relaxed">
+                  Bấm để chèn tiện ích vào vị trí đang xem hoặc dưới mục đang chọn.
+                </p>
+              </div>
+            </div>
+
+            {/* Chế độ đẩy dãn cách khi chèn */}
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-stone-50 dark:bg-stone-800/80 border border-stone-200 dark:border-stone-700">
+              <div className="flex items-center gap-1.5">
+                <ArrowDownToLine className={`w-3.5 h-3.5 ${autoPushDown ? 'text-blue-500' : 'text-stone-400'}`} />
+                <span className="text-[11px] font-semibold text-stone-700 dark:text-stone-300">
+                  Tự động đẩy dãn cách:
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAutoPushDown(!autoPushDown)}
+                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border ${
+                  autoPushDown
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                    : 'bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-600'
+                }`}
+                title="Khi bật: Thêm mục vào giữa sẽ tự động đẩy mọi nội dung bên dưới xuống, không bị đè nhau"
+              >
+                {autoPushDown ? 'ĐANG BẬT' : 'ĐANG TẮT'}
+              </button>
             </div>
 
             {/* Nhóm 1: Thông tin sự kiện */}
@@ -1500,7 +1532,7 @@ export default function StudioLeftRail() {
                     key={idx}
                     onClick={() => {
                       const targetY = getSmartInsertY(w.height);
-                      addElement({
+                      addElementWithPush({
                         type: 'widget',
                         widgetType: w.type as any,
                         x: 40,
@@ -1539,7 +1571,7 @@ export default function StudioLeftRail() {
                     key={idx}
                     onClick={() => {
                       const targetY = getSmartInsertY(w.height);
-                      addElement({
+                      addElementWithPush({
                         type: 'widget',
                         widgetType: w.type as any,
                         x: 40,
@@ -1579,7 +1611,7 @@ export default function StudioLeftRail() {
                     key={idx}
                     onClick={() => {
                       const targetY = getSmartInsertY(w.height);
-                      addElement({
+                      addElementWithPush({
                         type: 'widget',
                         widgetType: w.type as any,
                         x: 40,
@@ -1781,6 +1813,84 @@ export default function StudioLeftRail() {
                 </div>
               </div>
             )}
+
+            {/* M-Invite Templates Collection (69 Mẫu từ m-invite.com) */}
+            <div className="space-y-3 pt-3 border-t border-stone-200 dark:border-stone-800">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block">
+                  Mẫu M-Invite ({minviteTemplates.length} Mẫu)
+                </span>
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/60 dark:border-blue-800">
+                  m-invite.com
+                </span>
+              </div>
+
+              <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+                {minviteTemplates
+                  .filter((m: any) => {
+                    const matchCat =
+                      templateFilter === 'all'
+                        ? true
+                        : templateFilter === 'wedding'
+                        ? m.category === 'wedding'
+                        : templateFilter === 'birthday'
+                        ? m.category === 'birthday' || m.category === 'baby'
+                        : m.category === 'opening' || m.category === 'event';
+                    const matchSearch = templateSearch
+                      ? m.title.toLowerCase().includes(templateSearch.toLowerCase()) ||
+                        m.description.toLowerCase().includes(templateSearch.toLowerCase())
+                      : true;
+                    return matchCat && matchSearch;
+                  })
+                  .slice(0, 30)
+                  .map((m: any) => (
+                    <div
+                      key={m.id || m.slug}
+                      className="p-2.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/80 hover:border-blue-400 transition-all flex items-center justify-between gap-2"
+                    >
+                      <div className="w-12 h-16 rounded-lg bg-stone-200 overflow-hidden flex-shrink-0 relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={m.coverImage || m.thumbnail}
+                          alt={m.title}
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      <div className="overflow-hidden flex-1 min-w-0">
+                        <h5 className="font-semibold text-xs text-stone-800 dark:text-stone-200 truncate">
+                          {m.title}
+                        </h5>
+                        <p className="text-[10px] text-stone-500 line-clamp-1 mt-0.5">
+                          {m.description || m.categoryLabel}
+                        </p>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300">
+                            {m.categoryLabel}
+                          </span>
+                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-600 uppercase">
+                            {m.tier}
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        disabled={loadingTemplateSlug === m.slug}
+                        onClick={() => handleApplyTemplate(m.slug, null, m.title)}
+                        className="px-2.5 py-1.5 rounded-lg bg-stone-900 hover:bg-black text-white text-[10px] font-semibold transition-all flex-shrink-0 flex items-center gap-1 disabled:opacity-50"
+                      >
+                        {loadingTemplateSlug === m.slug ? (
+                          <Loader2 className="w-3 h-3 animate-spin text-rose-400" />
+                        ) : (
+                          <Check className="w-3 h-3" />
+                        )}
+                        <span>Áp dụng</span>
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            </div>
 
             {/* Harvested LoveStory Templates Collection (188 templates) */}
             <div className="space-y-3 pt-3 border-t border-stone-200 dark:border-stone-800">
