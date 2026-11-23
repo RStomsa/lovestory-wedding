@@ -163,6 +163,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
             audioTitle: canvas.audioTitle,
             audioUrl: canvas.audioUrl,
             fallingEffect: canvas.fallingEffect,
+            envelopeCover: canvas.envelopeCover,
           },
         }),
       });
@@ -173,6 +174,9 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
       }
 
       markSaved();
+      if (data.preset?.thumbnail) {
+        setTplThumbnail(data.preset.thumbnail);
+      }
       setSaveStatus({
         type: 'success',
         message: data.message || `Đã lưu mẫu "${tplName}" vào kho mẫu thiệp thành công!`,
@@ -717,14 +721,25 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                       <span>{isCapturingThumb ? 'Đang chụp...' : 'Chụp Canvas làm ảnh'}</span>
                     </button>
                   </div>
-                  <input
-                    type="text"
-                    required
-                    value={tplThumbnail}
-                    onChange={(e) => setTplThumbnail(e.target.value)}
-                    className="w-full bg-stone-800 border border-stone-700 rounded-xl p-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-purple-500 font-mono truncate"
-                    placeholder="https://..."
-                  />
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      required
+                      value={tplThumbnail.startsWith('data:image/') ? '[Ảnh chụp từ Canvas - Sẽ lưu vào public/assets/uploads/thumbnails/]' : tplThumbnail}
+                      onChange={(e) => setTplThumbnail(e.target.value)}
+                      className="w-full bg-stone-800 border border-stone-700 rounded-xl p-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-purple-500 font-mono truncate"
+                      placeholder="https://... hoặc chụp Canvas"
+                    />
+                    {tplThumbnail && (
+                      <div className="w-9 h-9 rounded-lg border border-stone-700 overflow-hidden shrink-0 bg-stone-950 flex items-center justify-center shadow-xs">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={tplThumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-stone-400 block">
+                    📁 Vị trí lưu: <code className="text-purple-300">public/assets/uploads/thumbnails/</code>
+                  </span>
                 </div>
               </div>
 

@@ -29,9 +29,12 @@ function writeCustomTemplates(list: CatalogTemplate[]) {
  */
 export function getAllCatalogTemplates(): CatalogTemplate[] {
   const custom = readCustomTemplates();
-  const customIds = new Set(custom.map((c) => c.id));
-  // Filter out any built-in template that has an updated custom version with the same ID
-  const remainingBuiltIn = CATALOG_TEMPLATES.filter((t) => !customIds.has(t.id));
+  const customIds = new Set(custom.map((c) => c.id.toLowerCase()));
+  const customSlugs = new Set(custom.map((c) => (c.slug || c.id).toLowerCase()));
+  // Filter out any built-in template that has an updated custom version with the same ID or slug
+  const remainingBuiltIn = CATALOG_TEMPLATES.filter(
+    (t) => !customIds.has(t.id.toLowerCase()) && !customSlugs.has(t.slug.toLowerCase()) && !customIds.has(t.slug.toLowerCase())
+  );
   return [...custom, ...remainingBuiltIn];
 }
 

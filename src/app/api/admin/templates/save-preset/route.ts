@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 import { getCurrentUser } from '@/lib/auth/session';
 import prisma from '@/lib/prisma';
 import { saveCustomStudioPreset } from '@/lib/studioPresetsService';
@@ -6,6 +8,26 @@ import { addCustomTemplate } from '@/lib/templatesService';
 import { StudioTemplatePreset } from '@/data/studioTemplatePresets';
 
 export const dynamic = 'force-dynamic';
+
+function persistThumbnailToDisk(thumb: string, slug: string): string {
+  if (!thumb || !thumb.startsWith('data:image/')) return thumb;
+  try {
+    const matches = thumb.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
+    if (!matches) return thumb;
+    const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+    const buffer = Buffer.from(matches[2], 'base64');
+    const uploadDir = path.join(process.cwd(), 'public', 'assets', 'uploads', 'thumbnails');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    const filename = `${slug.replace(/[^a-z0-9-]/gi, '-')}-${Date.now()}.${ext}`;
+    fs.writeFileSync(path.join(uploadDir, filename), buffer);
+    return `/assets/uploads/thumbnails/${filename}`;
+  } catch (err) {
+    console.error('Failed to persist thumbnail to disk:', err);
+    return thumb;
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -54,9 +76,10 @@ export async function POST(request: NextRequest) {
     // Comply with project pricing: FREE = 0, BASIC = 50000, PREMIUM (VIP) = 30000 single
     const safePrice = safeTier === 'FREE' ? 0 : Number(price) || (safeTier === 'BASIC' ? 50000 : 30000);
     const safeBadge = badge?.trim() || (safeTier === 'PREMIUM' ? 'VIP' : safeTier === 'BASIC' ? '50k' : 'Miễn Phí');
-    const safeThumbnail =
+    const rawThumbnail =
       thumbnail?.trim() ||
       'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80';
+    const safeThumbnail = persistThumbnailToDisk(rawThumbnail, cleanSlug);
     const safeDesc = description?.trim() || 'Mẫu thiệp cao cấp được thiết kế bởi LoveStory Studio.';
 
     const safeElements = Array.isArray(elements) ? elements : [];

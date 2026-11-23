@@ -942,6 +942,35 @@ function convertMinviteDesignToStudioPreset(minviteMatch: any, rawDesign: any): 
 export function getStudioTemplate(slugOrId: string): StudioTemplatePreset | null {
   const norm = slugOrId.toLowerCase().trim();
 
+  // 1. TOP PRIORITY: Check custom presets created or edited by Admin
+  let custom = getCustomStudioPreset(norm);
+  if (!custom) {
+    const target = HARVESTED_SLUG_MAP[norm];
+    if (target) {
+      custom = getCustomStudioPreset(target);
+    }
+    if (!custom) {
+      for (const [alias, mapped] of Object.entries(HARVESTED_SLUG_MAP)) {
+        if (mapped.toLowerCase() === norm) {
+          custom = getCustomStudioPreset(alias);
+          if (custom) break;
+        }
+      }
+    }
+  }
+  if (!custom) {
+    try {
+      const catalogList = getAllCatalogTemplates();
+      const catItem = catalogList.find((c) => c.id.toLowerCase() === norm || c.slug.toLowerCase() === norm);
+      if (catItem) {
+        custom = getCustomStudioPreset(catItem.slug) || getCustomStudioPreset(catItem.id);
+      }
+    } catch {}
+  }
+  if (custom && custom.elements && custom.elements.length > 0) {
+    return custom;
+  }
+
   // 0. Check M-Invite scraped templates
   const minviteMatch = (minviteTemplates as any[]).find(
     (m: any) =>
@@ -1153,12 +1182,6 @@ export function getStudioTemplate(slugOrId: string): StudioTemplatePreset | null
       },
       elements,
     };
-  }
-
-  // 1. Check custom presets created/saved by Admin
-  const custom = getCustomStudioPreset(norm);
-  if (custom && custom.elements && custom.elements.length > 5) {
-    return custom;
   }
 
   // 2. Check Catalog templates first (retaining catalog item ID, slug, name, thumbnail)
