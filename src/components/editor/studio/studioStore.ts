@@ -25,6 +25,7 @@ interface StudioState {
   setCanvasBackground: (bg: string) => void;
   setCanvasTitle: (title: string) => void;
   setFallingEffect: (effect: { enabled: boolean; type: 'snow' | 'hearts' | 'petals' | 'stars' | 'confetti' | 'butterfly' | 'heart-snow' }) => void;
+  setEnvelopeCover: (cover: { enabled: boolean; coverId: string; rememberOpened?: boolean; autoOpen?: boolean }) => void;
   
   selectElement: (id: string | null) => void;
   addElement: (el: Omit<CanvasElement, 'id' | 'zIndex'>) => void;
@@ -431,6 +432,12 @@ export const useStudioStore = create<StudioState>((set, get) => ({
     status: 'draft',
     audioTitle: 'Until You',
     audioUrl: 'https://assets.cinelove.me/mp3/5f4c5139-a13a-4ff0-82a2-e3a61240042f.mp3',
+    envelopeCover: {
+      enabled: true,
+      coverId: 'default',
+      rememberOpened: false,
+      autoOpen: false,
+    },
   },
   elements: DEFAULT_ELEMENTS,
   selectedId: null,
@@ -592,6 +599,12 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   setFallingEffect: (effect) =>
     set((state) => ({
       canvas: { ...state.canvas, fallingEffect: effect },
+      hasUnsavedChanges: true,
+    })),
+
+  setEnvelopeCover: (cover) =>
+    set((state) => ({
+      canvas: { ...state.canvas, envelopeCover: cover },
       hasUnsavedChanges: true,
     })),
 

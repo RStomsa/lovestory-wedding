@@ -121,9 +121,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const loginWithGoogle = async (): Promise<boolean> => {
-    await loginDemoUser('chure');
-    return true;
+  const loginWithGoogle = async (data?: { email?: string; name?: string; avatar?: string; credential?: string }): Promise<{ success: boolean; error?: string; user?: User }> => {
+    try {
+      setIsLoading(true);
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data || {
+          email: 'vinhtaithan@gmail.com',
+          name: 'Vĩnh Tài (Google)',
+        }),
+      });
+
+      const resData = await res.json();
+      if (res.ok && resData.success) {
+        await refreshUser();
+        closeAuthModal();
+        return { success: true, user: resData.user };
+      }
+      return { success: false, error: resData.error || 'Đăng nhập Google thất bại' };
+    } catch (err) {
+      console.error('Google login error:', err);
+      return { success: false, error: 'Lỗi kết nối máy chủ' };
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const loginDemoUser = async (role: 'chure' | 'codau' | 'admin' = 'chure'): Promise<{ success: boolean; error?: string }> => {

@@ -50,7 +50,7 @@ export interface AuthContextType {
   closeUpgradeModal: () => void;
   login: (credentials: LoginCredentials) => Promise<{ success: boolean; error?: string; user?: User }>;
   register: (credentials: RegisterCredentials) => Promise<{ success: boolean; error?: string }>;
-  loginWithGoogle: () => Promise<boolean>;
+  loginWithGoogle: (data?: { email?: string; name?: string; avatar?: string; credential?: string }) => Promise<{ success: boolean; error?: string; user?: User }>;
   loginDemoUser: (role?: 'chure' | 'codau' | 'admin') => Promise<{ success: boolean; error?: string } | void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;

@@ -52,6 +52,17 @@ import {
   VideoWidgetIcon,
 } from './StudioWidgetIcons';
 
+export const ENVELOPE_COVER_PRESETS = [
+  { id: 'default', name: 'Mặc định', desc: 'Bìa đỏ truyền thống, dấu sáp vàng hoàng gia', bg: '#8B1E2F', flapColor: '#751927', sealColor: '#D4AF37' },
+  { id: 'pink_clouds', name: 'Mây hồng', desc: 'Sương hoa pastel mộng mơ phong cách Hàn Quốc', bg: '#FAD2E1', flapColor: '#F7CAD0', sealColor: '#E07A5F' },
+  { id: 'green_envelope', name: 'Phong bì xanh', desc: 'Xanh rêu Vintage Botanical mộc mạc', bg: '#2D4A3E', flapColor: '#243D33', sealColor: '#D4AF37' },
+  { id: 'white_envelope', name: 'Phong bì trắng', desc: 'Trắng sứ ngọc trai & nơ sáp thanh lịch', bg: '#F8F9FA', flapColor: '#E9ECEF', sealColor: '#8C7355' },
+  { id: 'rose_garden', name: 'Vườn hoa hồng', desc: 'Vòng hoa hồng đỏ rượu vang sang trọng', bg: '#590D22', flapColor: '#470A1B', sealColor: '#FFB703' },
+  { id: 'red_garden', name: 'Vườn hoa đỏ', desc: 'Sắc đỏ thắm rực rỡ hạnh phúc lứa đôi', bg: '#9B1D20', flapColor: '#7F181B', sealColor: '#E63946' },
+  { id: 'pastel_garden', name: 'Vườn hoa pastel', desc: 'Hoa dại mùa xuân nhã nhặn', bg: '#FDE2E4', flapColor: '#F7CAD0', sealColor: '#B5838D' },
+  { id: 'blue_garden', name: 'Vườn hoa lam', desc: 'Cẩm tú cầu xanh lam đại dương quý phái', bg: '#1D3557', flapColor: '#162942', sealColor: '#457B9D' },
+];
+
 export default function StudioLeftRail() {
   const {
     canvas,
@@ -60,6 +71,7 @@ export default function StudioLeftRail() {
     addElement,
     setCanvasBackground,
     setFallingEffect,
+    setEnvelopeCover,
     elements,
     selectedId,
     updateElement,
@@ -70,6 +82,7 @@ export default function StudioLeftRail() {
 
   // Collapsible sub-panel drawer state
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [isEnvelopeModalOpen, setIsEnvelopeModalOpen] = useState(false);
 
   // Background sub-tabs: Màu nền | Hình nền
   const [bgSubTab, setBgSubTab] = useState<'color' | 'image'>('color');
@@ -1825,7 +1838,7 @@ export default function StudioLeftRail() {
         )}
 
         {/* =========================================================================
-            EFFECTS / HIỆU ỨNG RƠI (EXACT MATCH TO SCREENSHOT 5)
+            EFFECTS / MỞ THIỆP BÌA & HIỆU ỨNG RƠI (EXACT MATCH TO SCREENSHOT 4 & 5)
         ========================================================================= */}
         {activeTab === 'effect' && (
           <div className="space-y-4">
@@ -1834,38 +1847,98 @@ export default function StudioLeftRail() {
                 onClick={() => setActiveTab('template')}
                 className="w-4 h-4 cursor-pointer text-stone-500 hover:text-stone-900 transition-colors"
               />
-              <h3 className="text-sm font-bold text-stone-900 dark:text-white">Hiệu ứng rơi</h3>
+              <h3 className="text-sm font-bold text-stone-900 dark:text-white">Mở thiệp bìa &amp; Hiệu ứng</h3>
             </div>
 
-            {/* Toggle: Hiện trên thiệp (Screenshot 5) */}
-            <div className="p-3 bg-stone-50 dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 flex items-center justify-between">
-              <span className="text-xs font-semibold text-stone-800 dark:text-stone-200">
-                Hiện trên thiệp
-              </span>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={canvas.fallingEffect?.enabled ?? true}
-                  onChange={(e) =>
-                    setFallingEffect({
-                      enabled: e.target.checked,
-                      type: canvas.fallingEffect?.type || 'snow',
-                    })
-                  }
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-stone-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              </label>
+            {/* Mở thiệp bìa (Envelope opening cover) Section - Screenshot 4 */}
+            <div className="p-3 bg-stone-50 dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] text-rose-500 font-bold uppercase tracking-wider block">Mở màn phong bì</span>
+                  <h4 className="text-xs font-bold text-stone-900 dark:text-white">Mở thiệp bìa</h4>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={canvas.envelopeCover?.enabled ?? true}
+                    onChange={(e) =>
+                      setEnvelopeCover({
+                        enabled: e.target.checked,
+                        coverId: canvas.envelopeCover?.coverId || 'default',
+                        rememberOpened: canvas.envelopeCover?.rememberOpened ?? false,
+                        autoOpen: canvas.envelopeCover?.autoOpen ?? false,
+                      })
+                    }
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-stone-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-600"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center gap-2.5 p-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700">
+                <div
+                  className="w-8 h-10 rounded shadow-xs border border-stone-300 flex items-center justify-center shrink-0 relative overflow-hidden"
+                  style={{
+                    backgroundColor:
+                      ENVELOPE_COVER_PRESETS.find((c) => c.id === (canvas.envelopeCover?.coverId || 'default'))?.bg || '#8B1E2F',
+                  }}
+                >
+                  <div
+                    className="w-3 h-3 rounded-full border border-white/60 shadow-xs"
+                    style={{
+                      backgroundColor:
+                        ENVELOPE_COVER_PRESETS.find((c) => c.id === (canvas.envelopeCover?.coverId || 'default'))?.sealColor || '#D4AF37',
+                    }}
+                  />
+                </div>
+                <div className="overflow-hidden flex-1">
+                  <span className="text-[10px] text-stone-400 block">Bìa phong bì đang dùng:</span>
+                  <span className="text-xs font-semibold text-stone-800 dark:text-stone-100 truncate block">
+                    {ENVELOPE_COVER_PRESETS.find((c) => c.id === (canvas.envelopeCover?.coverId || 'default'))?.name || 'Mặc định'}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsEnvelopeModalOpen(true)}
+                className="w-full py-2 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-95"
+              >
+                <span>Tùy chỉnh &amp; Xem bìa mở thiệp</span>
+              </button>
             </div>
 
-            {/* Subheader: Kiểu hiệu ứng */}
-            <div className="space-y-2">
-              <span className="text-xs font-bold text-stone-800 dark:text-stone-200 block">
-                Kiểu hiệu ứng
-              </span>
+            {/* Hiệu ứng rơi trên thiệp (Screenshot 5) */}
+            <div className="space-y-3 pt-2 border-t border-stone-200 dark:border-stone-800">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] text-blue-500 font-bold uppercase tracking-wider block">Hoạt cảnh rơi</span>
+                  <h4 className="text-xs font-bold text-stone-900 dark:text-white">Hiệu ứng rơi</h4>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={canvas.fallingEffect?.enabled ?? true}
+                    onChange={(e) =>
+                      setFallingEffect({
+                        enabled: e.target.checked,
+                        type: canvas.fallingEffect?.type || 'snow',
+                      })
+                    }
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-stone-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
 
-              {/* 7 Effect cards in 3-column grid (Screenshot 5) */}
-              <div className="grid grid-cols-3 gap-2">
+              {/* Subheader: Kiểu hiệu ứng */}
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-stone-800 dark:text-stone-200 block">
+                  Kiểu hiệu ứng
+                </span>
+
+                {/* 7 Effect cards in 3-column grid (Screenshot 5) */}
+                <div className="grid grid-cols-3 gap-2">
                 {[
                   {
                     id: 'snow',
@@ -1985,6 +2058,7 @@ export default function StudioLeftRail() {
               </div>
             </div>
           </div>
+          </div>
         )}
         </div>
       ) : (
@@ -1996,6 +2070,161 @@ export default function StudioLeftRail() {
         >
           <ChevronRight className="w-3.5 h-3.5" />
         </button>
+      )}
+
+      {/* MỞ THIỆP BÌA MODAL (EXACT MATCH TO SCREENSHOT 4) */}
+      {isEnvelopeModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="w-full max-w-2xl bg-white dark:bg-stone-900 rounded-3xl shadow-2xl border border-stone-200 dark:border-stone-800 p-6 relative animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-stone-200 dark:border-stone-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-full bg-rose-500/10 text-rose-600 flex items-center justify-center font-bold text-sm">
+                  👁
+                </div>
+                <h3 className="font-bold text-base text-stone-900 dark:text-white">
+                  Mở thiệp bìa
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEnvelopeModalOpen(false)}
+                className="w-7 h-7 rounded-full text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center justify-center transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto py-4 space-y-6 pr-1">
+              {/* Section 1: Chọn bìa có sẵn */}
+              <div className="space-y-3">
+                <span className="text-xs font-bold text-stone-700 dark:text-stone-300 flex items-center gap-1.5">
+                  <span>≡</span> Chọn bìa có sẵn
+                </span>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {ENVELOPE_COVER_PRESETS.map((cover) => {
+                    const isSelected = (canvas.envelopeCover?.coverId || 'default') === cover.id;
+                    return (
+                      <button
+                        key={cover.id}
+                        type="button"
+                        onClick={() =>
+                          setEnvelopeCover({
+                            enabled: true,
+                            coverId: cover.id,
+                            rememberOpened: canvas.envelopeCover?.rememberOpened ?? false,
+                            autoOpen: canvas.envelopeCover?.autoOpen ?? false,
+                          })
+                        }
+                        className={`group relative p-2 rounded-2xl border text-center transition-all flex flex-col items-center cursor-pointer ${
+                          isSelected
+                            ? 'border-rose-500 bg-rose-50/50 dark:bg-rose-950/30 ring-2 ring-rose-500 shadow-md'
+                            : 'border-stone-200 dark:border-stone-700 hover:border-rose-300 bg-stone-50/50 dark:bg-stone-800/60'
+                        }`}
+                      >
+                        {/* Cover preview mini envelope */}
+                        <div
+                          className="w-full aspect-[9/16] rounded-xl shadow-inner mb-2 relative overflow-hidden flex flex-col items-center justify-center border border-black/10 group-hover:scale-105 transition-transform"
+                          style={{ backgroundColor: cover.bg }}
+                        >
+                          {/* Flap shape */}
+                          <div
+                            className="absolute top-0 inset-x-0 h-1/3 [clip-path:polygon(0_0,100%_0,50%_100%)] opacity-90 shadow-sm"
+                            style={{ backgroundColor: cover.flapColor }}
+                          />
+                          {/* Wax seal */}
+                          <div
+                            className="w-6 h-6 rounded-full border border-white/50 shadow-md z-10 flex items-center justify-center text-[8px] font-bold text-white/90"
+                            style={{ backgroundColor: cover.sealColor }}
+                          >
+                            LS
+                          </div>
+                        </div>
+
+                        <span className="text-xs font-semibold text-stone-800 dark:text-stone-200 truncate w-full">
+                          {cover.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Section 2: Cài đặt */}
+              <div className="pt-4 border-t border-stone-200 dark:border-stone-800 space-y-3">
+                <span className="text-xs font-bold text-stone-700 dark:text-stone-300 flex items-center gap-1.5">
+                  <span>⚙</span> Cài đặt
+                </span>
+
+                <div className="space-y-2.5">
+                  <label className="flex items-center gap-2.5 text-xs text-stone-700 dark:text-stone-300 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={canvas.envelopeCover?.enabled ?? true}
+                      onChange={(e) =>
+                        setEnvelopeCover({
+                          enabled: e.target.checked,
+                          coverId: canvas.envelopeCover?.coverId || 'default',
+                          rememberOpened: canvas.envelopeCover?.rememberOpened ?? false,
+                          autoOpen: canvas.envelopeCover?.autoOpen ?? false,
+                        })
+                      }
+                      className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-stone-300 dark:border-stone-600"
+                    />
+                    <span className="font-medium">Bật màn hình mở thiệp</span>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 text-xs text-stone-700 dark:text-stone-300 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={canvas.envelopeCover?.rememberOpened ?? false}
+                      onChange={(e) =>
+                        setEnvelopeCover({
+                          enabled: canvas.envelopeCover?.enabled ?? true,
+                          coverId: canvas.envelopeCover?.coverId || 'default',
+                          rememberOpened: e.target.checked,
+                          autoOpen: canvas.envelopeCover?.autoOpen ?? false,
+                        })
+                      }
+                      className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-stone-300 dark:border-stone-600"
+                    />
+                    <span>Nhớ đã mở (tắt để reload lần nào cũng hiện bìa)</span>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 text-xs text-stone-700 dark:text-stone-300 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={canvas.envelopeCover?.autoOpen ?? false}
+                      onChange={(e) =>
+                        setEnvelopeCover({
+                          enabled: canvas.envelopeCover?.enabled ?? true,
+                          coverId: canvas.envelopeCover?.coverId || 'default',
+                          rememberOpened: canvas.envelopeCover?.rememberOpened ?? false,
+                          autoOpen: e.target.checked,
+                        })
+                      }
+                      className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-stone-300 dark:border-stone-600"
+                    />
+                    <span>Tự động mở thiệp</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pt-4 border-t border-stone-200 dark:border-stone-800 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsEnvelopeModalOpen(false)}
+                className="px-6 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                Xong
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

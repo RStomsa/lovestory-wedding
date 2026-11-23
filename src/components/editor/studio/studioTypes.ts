@@ -151,6 +151,14 @@ export interface FallingEffectConfig {
   type: FallingEffectType;
 }
 
+export interface EnvelopeCoverConfig {
+  enabled: boolean;
+  coverId: string; // 'default' | 'pink_clouds' | 'green_envelope' | 'white_envelope' | 'rose_garden' | 'red_garden' | 'pastel_garden' | 'blue_garden'
+  coverName?: string;
+  rememberOpened?: boolean;
+  autoOpen?: boolean;
+}
+
 export interface WeddingCeremony {
   id: string;
   name: string; // 'Lễ ăn hỏi' | 'Lễ vu quy' | 'Lễ thành hôn' | 'Tiệc cưới nhà gái' | 'Tiệc cưới nhà trai' | 'Tiệc cưới' | 'Lễ khác'
@@ -198,6 +206,7 @@ export interface CanvasConfig {
   audioUrl?: string;
   audioIcon?: string;
   fallingEffect?: FallingEffectConfig;
+  envelopeCover?: EnvelopeCoverConfig;
   weddingProfile?: WeddingProfileData;
 }
 

@@ -16,6 +16,7 @@ import { useStudioStore } from './studioStore';
 import { CanvasElement } from './studioTypes';
 import StudioFallingOverlay from './StudioFallingOverlay';
 import StudioWidgetRenderer from './StudioWidgetRenderer';
+import EnvelopeOpeningEffect from '@/components/common/EnvelopeOpeningEffect';
 import { resolveFontFamily } from '@/lib/studioFonts';
 
 interface StudioPreviewModalProps {
@@ -410,6 +411,23 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
               className="relative w-full h-full rounded-[40px] overflow-y-auto overflow-x-hidden no-scrollbar shadow-inner"
               style={{ backgroundColor: canvas.background }}
             >
+              {/* Envelope Opening Cover Overlay inside phone */}
+              {canvas.envelopeCover?.enabled !== false && (
+                <EnvelopeOpeningEffect
+                  key={`env-${replayKey}`}
+                  coverId={canvas.envelopeCover?.coverId || 'default'}
+                  autoOpen={canvas.envelopeCover?.autoOpen ?? false}
+                  groomName={canvas.weddingProfile?.groom?.shortName || canvas.weddingProfile?.groom?.fullName || 'Chú Rể'}
+                  brideName={canvas.weddingProfile?.bride?.shortName || canvas.weddingProfile?.bride?.fullName || 'Cô Dâu'}
+                  weddingDate={canvas.weddingProfile?.ceremonies?.find((c) => c.isMain)?.date || '2026-11-28'}
+                  onOpen={() => {
+                    if (!isPlayingMusic && audioRef.current) {
+                      audioRef.current.play().then(() => setIsPlayingMusic(true)).catch(() => {});
+                    }
+                  }}
+                />
+              )}
+
               {/* Floating Music Button inside phone */}
               <button
                 onClick={toggleMusic}

@@ -33,6 +33,9 @@ export default function StudioRightInspector() {
     toggleInspector,
     weddingProfile,
     setProfileModalOpen,
+    setEnvelopeCover,
+    setFallingEffect,
+    setActiveTab,
   } = useStudioStore();
 
   const selectedElement = elements.find((e) => e.id === selectedId);
@@ -199,18 +202,56 @@ export default function StudioRightInspector() {
                 {openSections.display ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
               </button>
               {openSections.display && (
-                <div className="p-3 bg-stone-50/60 dark:bg-stone-800/40 space-y-2 border-t border-stone-200 dark:border-stone-700">
-                  <label className="flex items-center justify-between">
-                    <span>Mở màn phong bì</span>
-                    <input type="checkbox" defaultChecked className="rounded text-rose-500" />
+                <div className="p-3 bg-stone-50/60 dark:bg-stone-800/40 space-y-3 border-t border-stone-200 dark:border-stone-700">
+                  <div className="space-y-1.5">
+                    <label className="flex items-center justify-between cursor-pointer">
+                      <span className="font-medium">Mở màn phong bì</span>
+                      <input
+                        type="checkbox"
+                        checked={canvas.envelopeCover?.enabled ?? true}
+                        onChange={(e) =>
+                          setEnvelopeCover({
+                            enabled: e.target.checked,
+                            coverId: canvas.envelopeCover?.coverId || 'default',
+                            rememberOpened: canvas.envelopeCover?.rememberOpened ?? false,
+                            autoOpen: canvas.envelopeCover?.autoOpen ?? false,
+                          })
+                        }
+                        className="rounded text-rose-500 focus:ring-rose-500"
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('effect')}
+                      className="w-full py-1 px-2 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-[11px] text-rose-600 dark:text-rose-400 font-semibold hover:bg-rose-100 transition-colors flex items-center justify-between"
+                    >
+                      <span>Mẫu bìa: {canvas.envelopeCover?.coverId || 'Mặc định'}</span>
+                      <span className="underline">Đổi mẫu ➔</span>
+                    </button>
+                  </div>
+
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <span className="font-medium">Hiệu ứng hoa rơi</span>
+                    <input
+                      type="checkbox"
+                      checked={canvas.fallingEffect?.enabled ?? true}
+                      onChange={(e) =>
+                        setFallingEffect({
+                          enabled: e.target.checked,
+                          type: canvas.fallingEffect?.type || 'snow',
+                        })
+                      }
+                      className="rounded text-rose-500 focus:ring-rose-500"
+                    />
                   </label>
-                  <label className="flex items-center justify-between">
-                    <span>Hiệu ứng hoa rơi</span>
-                    <input type="checkbox" defaultChecked className="rounded text-rose-500" />
-                  </label>
-                  <label className="flex items-center justify-between">
-                    <span>Trình phát nhạc nền</span>
-                    <input type="checkbox" defaultChecked className="rounded text-rose-500" />
+
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <span className="font-medium">Trình phát nhạc nền</span>
+                    <input
+                      type="checkbox"
+                      defaultChecked
+                      className="rounded text-rose-500 focus:ring-rose-500"
+                    />
                   </label>
                 </div>
               )}
