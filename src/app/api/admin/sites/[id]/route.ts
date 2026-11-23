@@ -16,11 +16,35 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const { status, viewCount, maxViews, activeExpiresAt, backupExpiresAt } = body;
+    const { status, viewCount, maxViews, activeExpiresAt, backupExpiresAt, title, slug } = body;
+
+    let cleanSlug: string | undefined = undefined;
+    if (slug) {
+      cleanSlug = slug
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9-]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+      if (cleanSlug) {
+        // Check uniqueness if slug is changing
+        const duplicate = await prisma.site.findUnique({
+          where: { slug: cleanSlug },
+        });
+        if (duplicate && duplicate.id !== id) {
+          return NextResponse.json(
+            { error: `Đường dẫn "/${cleanSlug}" đã có thiệp khác sử dụng!` },
+            { status: 409 }
+          );
+        }
+      }
+    }
 
     const updatedSite = await prisma.site.update({
       where: { id },
       data: {
+        ...(title ? { title: title.trim() } : {}),
+        ...(cleanSlug ? { slug: cleanSlug } : {}),
         ...(status ? { status } : {}),
         ...(typeof viewCount === 'number' ? { viewCount } : {}),
         ...(typeof maxViews === 'number' ? { maxViews } : {}),
@@ -32,8 +56,10 @@ export async function PATCH(
           : {}),
       },
       include: {
-        owner: { select: { name: true, email: true, plan: true } },
-        template: { select: { name: true, tier: true } },
+        owner: { select: { id: true, name: true, email: true, plan: true } },
+        template: { select: { id: true, name: true, tier: true } },
+        rsvps: { select: { id: true } },
+        wishes: { select: { id: true } },
       },
     });
 

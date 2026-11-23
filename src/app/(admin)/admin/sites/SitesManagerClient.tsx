@@ -15,6 +15,8 @@ import {
   X,
   Clock,
   Sparkles,
+  Pencil,
+  Save,
 } from 'lucide-react';
 
 interface SiteData {
@@ -49,6 +51,59 @@ export default function SitesManagerClient({ initialSites }: { initialSites: Sit
   const [planFilter, setPlanFilter] = useState('all');
   const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [isSweeping, setIsSweeping] = useState(false);
+
+  // Edit Site Modal (Admin)
+  const [editingSite, setEditingSite] = useState<SiteData | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editSlug, setEditSlug] = useState('');
+  const [editStatus, setEditStatus] = useState('ACTIVE');
+  const [editMaxViews, setEditMaxViews] = useState(300);
+  const [editViewCount, setEditViewCount] = useState(0);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  const handleStartEdit = (site: SiteData) => {
+    setEditingSite(site);
+    setEditTitle(site.title);
+    setEditSlug(site.slug);
+    setEditStatus(site.status);
+    setEditMaxViews(site.maxViews);
+    setEditViewCount(site.viewCount);
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSite) return;
+    setIsSavingEdit(true);
+
+    try {
+      const res = await fetch(`/api/admin/sites/${editingSite.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: editTitle.trim(),
+          slug: editSlug.trim(),
+          status: editStatus,
+          maxViews: Number(editMaxViews),
+          viewCount: Number(editViewCount),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Cập nhật thất bại');
+
+      setSites((prev) =>
+        prev.map((s) => (s.id === editingSite.id ? { ...s, ...data.site } : s))
+      );
+      setToast({ text: `✓ Đã cập nhật thành công thiệp "/${data.site.slug}"!`, type: 'success' });
+      setEditingSite(null);
+      setTimeout(() => setToast(null), 3500);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Lỗi cập nhật';
+      alert(msg);
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
 
   // Filtered Sites
   const filteredSites = useMemo(() => {
@@ -362,6 +417,15 @@ export default function SitesManagerClient({ initialSites }: { initialSites: Sit
                             </button>
                           )}
 
+                          <button
+                            type="button"
+                            onClick={() => handleStartEdit(site)}
+                            className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 hover:text-white transition-colors"
+                            title="Chỉnh sửa Tên thiệp & Đường dẫn Slug"
+                          >
+                            <Pencil className="w-3.5 h-3.5 text-blue-400" />
+                          </button>
+
                           <Link
                             href={`/${site.slug}`}
                             target="_blank"
@@ -389,6 +453,115 @@ export default function SitesManagerClient({ initialSites }: { initialSites: Sit
           </div>
         )}
       </div>
+
+      {/* Modal Chỉnh sửa Tên & Đường dẫn Slug dành cho Admin */}
+      {editingSite && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in">
+          <div className="relative w-full max-w-lg bg-stone-900 border border-stone-800 rounded-3xl shadow-2xl p-6 space-y-5 text-stone-200">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-800">
+              <div>
+                <span className="text-[11px] uppercase tracking-wider text-rose-400 font-bold block">
+                  Quản Trị Thiệp Cưới
+                </span>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Pencil className="w-4 h-4 text-rose-400" />
+                  <span>Sửa Đường Dẫn &amp; Thông Tin Thiệp</span>
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingSite(null)}
+                className="p-2 rounded-xl text-stone-400 hover:text-white hover:bg-stone-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="space-y-4 text-xs">
+              <div className="space-y-1.5">
+                <label className="font-semibold text-stone-300 block">Tên Thiệp Cưới</label>
+                <input
+                  type="text"
+                  required
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="w-full bg-stone-800 border border-stone-700 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-rose-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="font-semibold text-stone-300 block">Đường Dẫn Công Khai (Slug)</label>
+                <div className="flex items-center rounded-xl bg-stone-800 border border-stone-700 overflow-hidden focus-within:ring-1 focus-within:ring-rose-500">
+                  <span className="px-3 py-2.5 bg-stone-950 text-stone-500 font-mono text-xs border-r border-stone-700 shrink-0">
+                    /
+                  </span>
+                  <input
+                    type="text"
+                    required
+                    value={editSlug}
+                    onChange={(e) =>
+                      setEditSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))
+                    }
+                    className="w-full bg-transparent px-3 py-2 text-xs text-white font-mono outline-none"
+                  />
+                </div>
+                <span className="text-[10px] text-stone-400">
+                  Liên kết: /{editSlug} (Chỉ gồm chữ cái thường, số và dấu gạch nối)
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-stone-300 block">Trạng Thái</label>
+                  <select
+                    value={editStatus}
+                    onChange={(e) => setEditStatus(e.target.value)}
+                    className="w-full bg-stone-800 border border-stone-700 rounded-xl px-3 py-2 text-xs text-white outline-none"
+                  >
+                    <option value="ACTIVE">Hoạt động (ACTIVE)</option>
+                    <option value="EXPIRED_BACKUP">Backup (+30 ngày)</option>
+                    <option value="ARCHIVED">Lưu kho (ARCHIVED)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-stone-300 block">Giới Hạn Lượt Xem</label>
+                  <input
+                    type="number"
+                    value={editMaxViews}
+                    onChange={(e) => setEditMaxViews(Number(e.target.value))}
+                    className="w-full bg-stone-800 border border-stone-700 rounded-xl px-3 py-2 text-xs text-white outline-none"
+                  />
+                  <span className="text-[10px] text-stone-500 block">-1 = Không giới hạn (VIP)</span>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 text-[11px] text-stone-400 space-y-1">
+                <div>Chủ sở hữu: <span className="font-semibold text-stone-200">{editingSite.owner.name} ({editingSite.owner.email})</span></div>
+                <div>Gói cước: <span className="font-bold text-amber-400">{editingSite.owner.plan}</span></div>
+              </div>
+
+              <div className="pt-3 flex items-center justify-end gap-2 border-t border-stone-800">
+                <button
+                  type="button"
+                  onClick={() => setEditingSite(null)}
+                  className="px-4 py-2 rounded-xl border border-stone-700 text-stone-300 hover:bg-stone-800 font-medium text-xs"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingEdit}
+                  className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md shadow-rose-600/25 flex items-center gap-1.5 active:scale-95 disabled:opacity-50"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>{isSavingEdit ? 'Đang lưu...' : 'Lưu Thay Đổi'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

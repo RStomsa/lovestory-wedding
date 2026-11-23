@@ -940,13 +940,19 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                   </div>
 
                   {/* Slug đường dẫn */}
-                  <div className="space-y-1.5">
-                    <label className="font-semibold text-stone-300 block">
-                      Đường Dẫn Công Khai (Slug)
-                    </label>
-                    <div className="flex items-center rounded-xl bg-stone-800 border border-stone-700 overflow-hidden focus-within:ring-1 focus-within:ring-rose-500">
-                      <span className="px-3 py-2.5 bg-stone-950 text-stone-500 font-mono text-xs border-r border-stone-700 shrink-0">
-                        lovestory.me/
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="font-semibold text-stone-300 block">
+                        Đường Dẫn Công Khai (Slug)
+                      </label>
+                      <span className="text-[10px] text-stone-400 font-mono">
+                        {typeof window !== 'undefined' ? window.location.host : 'lovestory.vn'}/{userSiteSlug || '...'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center rounded-xl bg-stone-800 border border-stone-700 overflow-hidden focus-within:ring-1 focus-within:ring-rose-500 transition-all">
+                      <span className="px-3 py-2.5 bg-stone-950 text-stone-400 font-mono text-xs border-r border-stone-700 shrink-0">
+                        {typeof window !== 'undefined' ? `${window.location.host}/` : 'lovestory.vn/'}
                       </span>
                       <input
                         type="text"
@@ -961,8 +967,35 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                         placeholder="bao-va-vy-2026"
                       />
                     </div>
-                    <span className="text-[10px] text-stone-500">
-                      Chỉ dùng chữ cái thường, số và dấu gạch nối (-).
+
+                    {/* Gợi ý nhanh đường dẫn đẹp từ Hồ sơ cưới hoặc Tên thiệp */}
+                    <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                      <span className="text-[10px] text-stone-400">Gợi ý nhanh:</span>
+                      {(() => {
+                        const groomRaw = weddingProfile?.groom?.shortName || weddingProfile?.groom?.fullName || 'bao';
+                        const brideRaw = weddingProfile?.bride?.shortName || weddingProfile?.bride?.fullName || 'vy';
+                        const groomS = groomRaw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '');
+                        const brideS = brideRaw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '');
+                        const chips = [
+                          `${groomS}-${brideS}-wedding`,
+                          `${groomS}-${brideS}-2026`,
+                          `thiep-cuoi-${groomS}-${brideS}`,
+                        ];
+                        return chips.map((chip) => (
+                          <button
+                            key={chip}
+                            type="button"
+                            onClick={() => setUserSiteSlug(chip)}
+                            className="px-2 py-0.5 rounded-full bg-stone-800 hover:bg-rose-950/60 text-stone-300 hover:text-rose-300 border border-stone-700 hover:border-rose-700/50 text-[10px] font-mono transition-colors active:scale-95"
+                          >
+                            +{chip}
+                          </button>
+                        ));
+                      })()}
+                    </div>
+
+                    <span className="text-[10px] text-stone-500 block">
+                      💡 Khách mời sẽ truy cập vào liên kết này trên trình duyệt hoặc quét mã QR. Chỉ gồm chữ cái thường không dấu, số và dấu gạch nối (-).
                     </span>
                   </div>
 
