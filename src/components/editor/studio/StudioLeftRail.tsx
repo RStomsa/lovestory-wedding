@@ -2057,286 +2057,124 @@ export default function StudioLeftRail() {
               </div>
             </div>
 
-            {/* Market Templates Section (26 Mẫu Thị Trường) */}
-            {marketTemplates.length > 0 && (
-              <div className="space-y-3 pt-3 border-t border-stone-200 dark:border-stone-800">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block">
-                    Kho Mẫu Thị Trường ({marketTemplates.length})
-                  </span>
-                  <span className="text-[10px] text-rose-600 font-medium">LoveStory Market</span>
-                </div>
+            {/* Custom Created Templates Section */}
+            {(() => {
+              const spotlightSlugs = new Set(['thiep-cuoi-165', 'our-love-begins', 'our-love-story-rose', 'envelope-chamomile']);
+              const customCreated = marketTemplates.filter(
+                (m: any) => !spotlightSlugs.has(m.slug) && !spotlightSlugs.has(m.id)
+              );
 
-                <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
-                  {marketTemplates
-                    .filter((m: any) => {
-                      const matchCat =
-                        templateFilter === 'all'
-                          ? true
-                          : templateFilter === 'wedding'
-                          ? m.category === 'wedding' || m.slug?.includes('cuoi')
-                          : templateFilter === 'birthday'
-                          ? m.category === 'birthday' || m.slug?.includes('sinh-nhat')
-                          : m.category === 'event' || m.slug?.includes('su-kien');
-                      const matchSearch = templateSearch
-                        ? (m.name || '').toLowerCase().includes(templateSearch.toLowerCase()) ||
-                          (m.slug || '').toLowerCase().includes(templateSearch.toLowerCase())
-                        : true;
-                      return matchCat && matchSearch;
-                    })
-                    .map((m: any, mIdx: number) => {
-                      const isCurrent = currentTemplateSlug === m.slug || currentTemplateSlug === m.id;
-                      const templateCode = m.code || `Mẫu ${String(mIdx + 1).padStart(2, '0')}`;
-                      const templateSubtitle = m.subtitle || m.name.replace(/^Mẫu\s*\d+\s*[-—:]\s*/i, '');
-                      return (
-                        <div
-                          key={m.id || m.slug}
-                          className={`p-2.5 rounded-xl border ${
-                            isCurrent
-                              ? 'border-purple-600 dark:border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/25'
-                              : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/80'
-                          } hover:border-rose-400 transition-all flex items-center justify-between gap-2`}
-                        >
-                          <div className="w-12 h-16 rounded-lg bg-stone-200 overflow-hidden flex-shrink-0 relative">
-                            {m.thumbnail ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
-                                src={resolveStudioAssetUrl(m.thumbnail) || '/assets/wedding/samples/sample_01.jpg'}
-                                alt={m.name}
-                                referrerPolicy="no-referrer"
-                                loading="lazy"
-                                onError={(e) => {
-                                  const target = e.currentTarget;
-                                  if (target.dataset.hasError === 'true') return;
-                                  target.dataset.hasError = 'true';
-                                  target.src = '/assets/wedding/samples/sample_01.jpg';
-                                }}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-[10px] text-stone-400">
-                                Ảnh
-                              </div>
-                            )}
-                          </div>
+              if (customCreated.length === 0) return null;
 
-                          <div className="overflow-hidden flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-serif font-black text-xs text-rose-600 dark:text-rose-400 shrink-0">
-                                {templateCode}
-                              </span>
-                              <h5 className="font-semibold text-xs text-stone-800 dark:text-stone-200 truncate">
-                                {templateSubtitle}
-                              </h5>
-                              {isCurrent && (
-                                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-purple-600 text-white shrink-0">
-                                  Đang mở
-                                </span>
+              return (
+                <div className="space-y-3 pt-3 border-t border-stone-200 dark:border-stone-800">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block">
+                      Mẫu Thiệp Do Bạn Tạo ({customCreated.length})
+                    </span>
+                    <span className="text-[10px] text-rose-600 font-medium">LoveStory Studio</span>
+                  </div>
+
+                  <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                    {customCreated
+                      .filter((m: any) => {
+                        const matchCat =
+                          templateFilter === 'all'
+                            ? true
+                            : templateFilter === 'wedding'
+                            ? m.category === 'wedding' || m.slug?.includes('cuoi')
+                            : templateFilter === 'birthday'
+                            ? m.category === 'birthday' || m.slug?.includes('sinh-nhat')
+                            : m.category === 'event' || m.slug?.includes('su-kien');
+                        const matchSearch = templateSearch
+                          ? (m.name || '').toLowerCase().includes(templateSearch.toLowerCase()) ||
+                            (m.slug || '').toLowerCase().includes(templateSearch.toLowerCase())
+                          : true;
+                        return matchCat && matchSearch;
+                      })
+                      .map((m: any, mIdx: number) => {
+                        const isCurrent = currentTemplateSlug === m.slug || currentTemplateSlug === m.id;
+                        const templateCode = m.code || `Mẫu ${String(mIdx + 5).padStart(2, '0')}`;
+                        const templateSubtitle = m.subtitle || m.name.replace(/^Mẫu\s*\d+\s*[-—:]\s*/i, '');
+                        return (
+                          <div
+                            key={m.id || m.slug}
+                            className={`p-2.5 rounded-xl border ${
+                              isCurrent
+                                ? 'border-purple-600 dark:border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/25'
+                                : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/80'
+                            } hover:border-rose-400 transition-all flex items-center justify-between gap-2`}
+                          >
+                            <div className="w-12 h-16 rounded-lg bg-stone-200 overflow-hidden flex-shrink-0 relative">
+                              {m.thumbnail ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={resolveStudioAssetUrl(m.thumbnail) || '/assets/wedding/samples/sample_01.jpg'}
+                                  alt={m.name}
+                                  referrerPolicy="no-referrer"
+                                  loading="lazy"
+                                  onError={(e) => {
+                                    const target = e.currentTarget;
+                                    if (target.dataset.hasError === 'true') return;
+                                    target.dataset.hasError = 'true';
+                                    target.src = '/assets/wedding/samples/sample_01.jpg';
+                                  }}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-[10px] text-stone-400">
+                                  Ảnh
+                                </div>
                               )}
                             </div>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-600 uppercase">
-                                {m.badge || m.tier || 'VIP'}
-                              </span>
-                              <span className="text-[10px] font-medium text-stone-500">
-                                {m.price ? `${m.price.toLocaleString('vi-VN')} đ` : '50.000 đ'}
-                              </span>
+
+                            <div className="overflow-hidden flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-serif font-black text-xs text-rose-600 dark:text-rose-400 shrink-0">
+                                  {templateCode}
+                                </span>
+                                <h5 className="font-semibold text-xs text-stone-800 dark:text-stone-200 truncate">
+                                  {templateSubtitle}
+                                </h5>
+                                {isCurrent && (
+                                  <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-purple-600 text-white shrink-0">
+                                    Đang mở
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1.5 mt-0.5">
+                                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-600 uppercase">
+                                  {m.badge || m.tier || 'VIP'}
+                                </span>
+                                <span className="text-[10px] font-medium text-stone-500">
+                                  {m.price ? `${m.price.toLocaleString('vi-VN')} đ` : '50.000 đ'}
+                                </span>
+                              </div>
                             </div>
-                          </div>
 
-                          <button
-                            disabled={loadingTemplateSlug === m.slug}
-                            onClick={() => handleApplyTemplate(m.slug || m.id, null, m.name)}
-                            className={`px-2.5 py-1.5 rounded-lg text-white text-[10px] font-semibold transition-all flex-shrink-0 flex items-center gap-1 disabled:opacity-50 ${
-                              isCurrent
-                                ? 'bg-purple-600 hover:bg-purple-700'
-                                : 'bg-stone-900 hover:bg-black'
-                            }`}
-                          >
-                            {loadingTemplateSlug === m.slug ? (
-                              <Loader2 className="w-3 h-3 animate-spin text-rose-400" />
-                            ) : (
-                              <Check className="w-3 h-3" />
-                            )}
-                            <span>{isCurrent ? '✓ Đang mở' : 'Áp dụng'}</span>
-                          </button>
-                        </div>
-                      );
-                    })}
+                            <button
+                              disabled={loadingTemplateSlug === m.slug}
+                              onClick={() => handleApplyTemplate(m.slug || m.id, null, m.name)}
+                              className={`px-2.5 py-1.5 rounded-lg text-white text-[10px] font-semibold transition-all flex-shrink-0 flex items-center gap-1 disabled:opacity-50 ${
+                                isCurrent
+                                  ? 'bg-purple-600 hover:bg-purple-700'
+                                  : 'bg-stone-900 hover:bg-black'
+                              }`}
+                            >
+                              {loadingTemplateSlug === m.slug ? (
+                                <Loader2 className="w-3 h-3 animate-spin text-rose-400" />
+                              ) : (
+                                <Check className="w-3 h-3" />
+                              )}
+                              <span>{isCurrent ? '✓ Đang mở' : 'Áp dụng'}</span>
+                            </button>
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
-              </div>
-            )}
-
-            {/* LoveStory VIP Modern Templates Collection */}
-            <div className="space-y-3 pt-3 border-t border-stone-200 dark:border-stone-800">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block">
-                  Bộ Sưu Tập Mẫu Hiện Đại ({minviteTemplates.length} Mẫu)
-                </span>
-                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/60 dark:border-rose-800">
-                  LoveStory VIP
-                </span>
-              </div>
-
-              <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-                {minviteTemplates
-                  .filter((m: any) => {
-                    const matchCat =
-                      templateFilter === 'all'
-                        ? true
-                        : templateFilter === 'wedding'
-                        ? m.category === 'wedding'
-                        : templateFilter === 'birthday'
-                        ? m.category === 'birthday' || m.category === 'baby'
-                        : m.category === 'opening' || m.category === 'event';
-                    const matchSearch = templateSearch
-                      ? m.title.toLowerCase().includes(templateSearch.toLowerCase()) ||
-                        m.description.toLowerCase().includes(templateSearch.toLowerCase())
-                      : true;
-                    return matchCat && matchSearch;
-                  })
-                  .slice(0, 30)
-                  .map((m: any) => {
-                    const isCurrent = currentTemplateSlug === m.slug || currentTemplateSlug === m.id;
-                    return (
-                      <div
-                        key={m.id || m.slug}
-                        className={`p-2.5 rounded-xl border ${
-                          isCurrent
-                            ? 'border-purple-600 dark:border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/25'
-                            : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/80'
-                        } hover:border-blue-400 transition-all flex items-center justify-between gap-2`}
-                      >
-                        <div className="w-12 h-16 rounded-lg bg-stone-200 overflow-hidden flex-shrink-0 relative">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={resolveStudioAssetUrl(m.coverImage || m.thumbnail) || '/assets/wedding/samples/sample_01.jpg'}
-                            alt={m.title}
-                            referrerPolicy="no-referrer"
-                            loading="lazy"
-                            onError={(e) => {
-                              const target = e.currentTarget;
-                              if (target.dataset.hasError === 'true') return;
-                              target.dataset.hasError = 'true';
-                              target.src = '/assets/wedding/samples/sample_01.jpg';
-                            }}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-
-                        <div className="overflow-hidden flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <h5 className="font-semibold text-xs text-stone-800 dark:text-stone-200 truncate">
-                              {m.title}
-                            </h5>
-                            {isCurrent && (
-                              <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-purple-600 text-white shrink-0">
-                                Đang mở
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-[10px] text-stone-500 line-clamp-1 mt-0.5">
-                            {m.description || m.categoryLabel}
-                          </p>
-                          <div className="flex items-center gap-1.5 mt-1">
-                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300">
-                              {m.categoryLabel}
-                            </span>
-                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-600 uppercase">
-                              {m.tier}
-                            </span>
-                          </div>
-                        </div>
-
-                        <button
-                          disabled={loadingTemplateSlug === m.slug}
-                          onClick={() => handleApplyTemplate(m.slug, null, m.title)}
-                          className={`px-2.5 py-1.5 rounded-lg text-white text-[10px] font-semibold transition-all flex-shrink-0 flex items-center gap-1 disabled:opacity-50 ${
-                            isCurrent
-                              ? 'bg-purple-600 hover:bg-purple-700'
-                              : 'bg-stone-900 hover:bg-black'
-                          }`}
-                        >
-                          {loadingTemplateSlug === m.slug ? (
-                            <Loader2 className="w-3 h-3 animate-spin text-rose-400" />
-                          ) : (
-                            <Check className="w-3 h-3" />
-                          )}
-                          <span>{isCurrent ? '✓ Đang mở' : 'Áp dụng'}</span>
-                        </button>
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-
-            {/* Harvested LoveStory Templates Collection (188 templates) */}
-            <div className="space-y-3 pt-3 border-t border-stone-200 dark:border-stone-800">
-              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block">
-                Toàn Bộ Thư Viện ({harvestedTemplates.length} Mẫu)
-              </span>
-
-              <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-                {harvestedTemplates
-                  .filter((t: any) => {
-                    const matchCat =
-                      templateFilter === 'all'
-                        ? true
-                        : templateFilter === 'wedding'
-                        ? t.slug.includes('cuoi')
-                        : templateFilter === 'birthday'
-                        ? t.slug.includes('sinh-nhat')
-                        : !t.slug.includes('cuoi') && !t.slug.includes('sinh-nhat');
-                    const matchSearch = templateSearch
-                      ? t.title.toLowerCase().includes(templateSearch.toLowerCase()) ||
-                        t.slug.toLowerCase().includes(templateSearch.toLowerCase())
-                      : true;
-                    return matchCat && matchSearch;
-                  })
-                  .slice(0, 30)
-                  .map((t: any, idx: number) => (
-                    <div
-                      key={t.slug || idx}
-                      className={`p-2.5 rounded-xl border ${
-                        currentTemplateSlug === t.slug
-                          ? 'border-purple-600 dark:border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/25'
-                          : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/80'
-                      } hover:border-rose-400 transition-all flex items-center justify-between`}
-                    >
-                      <div className="overflow-hidden mr-2">
-                        <div className="flex items-center gap-1.5">
-                          <h5 className="font-semibold text-xs text-stone-800 dark:text-stone-200 truncate">
-                            {t.title ? t.title.split('-')[0].trim() : t.slug}
-                          </h5>
-                          {currentTemplateSlug === t.slug && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-purple-600 text-white shrink-0">
-                              Đang mở
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[10px] text-stone-400 font-mono">
-                          Mã: {t.slug} • {t.imagesCount || 10} ảnh
-                        </p>
-                      </div>
-
-                      <button
-                        disabled={loadingTemplateSlug === t.slug}
-                        onClick={() => handleApplyTemplate(t.slug, null, t.title ? t.title.split('-')[0].trim() : t.slug)}
-                        className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-colors flex-shrink-0 flex items-center gap-1 disabled:opacity-50 ${
-                          currentTemplateSlug === t.slug
-                            ? 'bg-purple-600 text-white hover:bg-purple-700'
-                            : 'bg-stone-200 dark:bg-stone-700 hover:bg-stone-900 hover:text-white text-stone-700 dark:text-stone-300'
-                        }`}
-                      >
-                        {loadingTemplateSlug === t.slug ? (
-                          <Loader2 className="w-3 h-3 animate-spin text-rose-500" />
-                        ) : null}
-                        <span>{currentTemplateSlug === t.slug ? '✓ Đang mở' : 'Nạp mẫu'}</span>
-                      </button>
-                    </div>
-                  ))}
-              </div>
-            </div>
+              );
+            })()}
           </div>
         )}
 

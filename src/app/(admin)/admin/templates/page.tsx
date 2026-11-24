@@ -2,7 +2,7 @@ import React from 'react';
 import fs from 'fs';
 import path from 'path';
 import prisma from '@/lib/prisma';
-import { getAllCatalogTemplates } from '@/lib/templatesService';
+import { getAllCatalogTemplates, getTrashedTemplates } from '@/lib/templatesService';
 import TemplatesManagerClient from './TemplatesManagerClient';
 
 export const dynamic = 'force-dynamic';
@@ -21,6 +21,7 @@ export default async function AdminTemplatesPage() {
   });
 
   const catalogTemplates = getAllCatalogTemplates();
+  const trashedTemplates = getTrashedTemplates();
 
   // Load harvested templates summary index (streamlined preview data to keep RSC payload ultra-light)
   let harvestedTemplates: any[] = [];
@@ -47,6 +48,7 @@ export default async function AdminTemplatesPage() {
       <TemplatesManagerClient
         initialDbTemplates={JSON.parse(JSON.stringify(dbTemplates))}
         initialCatalogTemplates={catalogTemplates}
+        initialTrashedTemplates={trashedTemplates}
         initialHarvestedTemplates={harvestedTemplates}
       />
     </div>

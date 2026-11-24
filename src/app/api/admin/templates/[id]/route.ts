@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/session';
 import prisma from '@/lib/prisma';
-import { deleteCustomTemplate, updateCatalogTemplate } from '@/lib/templatesService';
+import { moveToTrash, updateCatalogTemplate } from '@/lib/templatesService';
 
 export async function PATCH(
   request: NextRequest,
@@ -69,16 +69,15 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const deleted = deleteCustomTemplate(id);
+    const result = moveToTrash(id);
 
     return NextResponse.json({
-      success: true,
-      message: deleted ? 'Đã xóa mẫu thiệp thành công' : 'Mẫu thiệp mặc định không thể xóa khỏi hệ thống',
-      deleted,
-    });
+      success: result.success,
+      message: result.message,
+      template: result.template,
+    }, { status: result.success ? 200 : 400 });
   } catch (error) {
     console.error('Delete template error:', error);
-    return NextResponse.json({ error: 'Lỗi khi xóa template' }, { status: 500 });
+    return NextResponse.json({ error: 'Lỗi khi bỏ template vào thùng rác' }, { status: 500 });
   }
 }
-

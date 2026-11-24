@@ -46,16 +46,18 @@ interface DbTemplateData {
 interface Props {
   initialDbTemplates: DbTemplateData[];
   initialCatalogTemplates: CatalogTemplate[];
+  initialTrashedTemplates?: CatalogTemplate[];
   initialHarvestedTemplates?: any[];
 }
 
 export default function TemplatesManagerClient({
   initialDbTemplates,
   initialCatalogTemplates,
+  initialTrashedTemplates = [],
   initialHarvestedTemplates = [],
 }: Props) {
-  // Tabs: Catalog, 188 Harvested templates, VIP Modern templates, Core Engines, Typography & Effects
-  const [activeTab, setActiveTab] = useState<'catalog' | 'harvested' | 'minvite' | 'engines' | 'typography-effects'>('catalog');
+  // Tabs: Catalog, Trash, 188 Harvested templates, VIP Modern templates, Core Engines, Typography & Effects
+  const [activeTab, setActiveTab] = useState<'catalog' | 'trash' | 'harvested' | 'minvite' | 'engines' | 'typography-effects'>('catalog');
 
   // State for Catalog Templates
   const [catalogTemplates, setCatalogTemplates] = useState<CatalogTemplate[]>(initialCatalogTemplates);
@@ -63,6 +65,10 @@ export default function TemplatesManagerClient({
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [tierFilter, setTierFilter] = useState<string>('all');
   const [publishFilter, setPublishFilter] = useState<'all' | 'published' | 'draft'>('all');
+
+  // State for Trashed Templates
+  const [trashedTemplates, setTrashedTemplates] = useState<CatalogTemplate[]>(initialTrashedTemplates);
+  const [searchTrashed, setSearchTrashed] = useState('');
 
   // State for Harvested Templates
   const [harvestedTemplates] = useState<any[]>(initialHarvestedTemplates);
@@ -137,7 +143,9 @@ export default function TemplatesManagerClient({
   const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   // Form State for New Template
+  const [formCode, setFormCode] = useState('');
   const [formName, setFormName] = useState('');
+  const [formSubtitle, setFormSubtitle] = useState('');
   const [formSlug, setFormSlug] = useState('');
   const [formCategory, setFormCategory] = useState<'wedding' | 'birthday' | 'graduation' | 'event' | 'anniversary'>('wedding');
   const [formTier, setFormTier] = useState<'FREE' | 'BASIC' | 'PREMIUM'>('PREMIUM');
@@ -148,6 +156,7 @@ export default function TemplatesManagerClient({
     'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80'
   );
   const [formDescription, setFormDescription] = useState('Mẫu thiệp scrollytelling điện ảnh sang trọng và hiện đại.');
+  const [formIsPublished, setFormIsPublished] = useState(true);
 
   // Quick Preset Sample Images
   const SAMPLE_PRESETS = [
@@ -168,6 +177,21 @@ export default function TemplatesManagerClient({
       url: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=800&q=80',
     },
   ];
+
+  // Filtering Trashed Templates
+  const filteredTrashed = useMemo(() => {
+    return trashedTemplates.filter((item) => {
+      if (!searchTrashed.trim()) return true;
+      const s = searchTrashed.toLowerCase();
+      return (
+        item.name.toLowerCase().includes(s) ||
+        (item.code && item.code.toLowerCase().includes(s)) ||
+        (item.subtitle && item.subtitle.toLowerCase().includes(s)) ||
+        (item.description && item.description.toLowerCase().includes(s)) ||
+        item.id.toLowerCase().includes(s)
+      );
+    });
+  }, [trashedTemplates, searchTrashed]);
 
   // Filtering Catalog
   const filteredCatalog = useMemo(() => {
@@ -301,27 +325,134 @@ export default function TemplatesManagerClient({
     }
   };
 
-  // Handle Delete Custom Template
-  const handleDeleteCustomTemplate = async (id: string, name: string) => {
-    if (!confirm(`Bạn có chắc chắn muốn xóa mẫu "${name}" khỏi kho mẫu công khai?`)) return;
+  // Handle Move Template to Trash (Bỏ mẫu vào thùng rác)
+  const handleMoveToTrash = async (tpl: CatalogTemplate) => {
+    if (
+      !confirm(
+        'Bạn có chắc chắn muốn bỏ "' + tpl.name + '" vào thùng rác?\n\nMẫu sẽ tạm thời ẩn khỏi danh mục hoạt động. Bạn có thể vào tab "Thùng rác" để Khôi phục hoặc Xóa vĩnh viễn bất kỳ lúc nào.'
+      )
+    ) {
+      return;
+    }
 
     setMessage(null);
     try {
-      const res = await fetch(`/api/admin/templates/${id}`, {
+      const res = await fetch('/api/admin/templates/' + encodeURIComponent(tpl.id), {
         method: 'DELETE',
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Không thể xóa mẫu này');
+        throw new Error(data.error || data.message || 'Không thể bỏ vào thùng rác');
       }
 
-      setCatalogTemplates((prev) => prev.filter((t) => t.id !== id));
-      setMessage({ text: `Đã xóa mẫu "${name}" thành công!`, type: 'success' });
+      setCatalogTemplates((prev) => prev.filter((t) => t.id !== tpl.id && t.slug !== tpl.slug));
+      const trashedItem = data.template || { ...tpl, trashedAt: new Date().toISOString() };
+      setTrashedTemplates((prev) => [trashedItem, ...prev.filter((t) => t.id !== tpl.id)]);
+      setMessage({ text: '🗑️ Đã chuyển "' + tpl.name + '" vào thùng rác thành công!', type: 'success' });
       setTimeout(() => setMessage(null), 3500);
-    } catch (err: unknown) {
+    } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Đã có lỗi xảy ra';
       setMessage({ text: errorMsg, type: 'error' });
     }
+  };
+
+  // Handle Restore Template from Trash
+  const handleRestoreFromTrash = async (tpl: CatalogTemplate) => {
+    setMessage(null);
+    try {
+      const res = await fetch('/api/admin/templates/trash', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'restore', id: tpl.id }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || data.message || 'Không thể khôi phục mẫu này');
+      }
+
+      setTrashedTemplates((prev) => prev.filter((t) => t.id !== tpl.id && t.slug !== tpl.slug));
+      const restoredItem = data.template || { ...tpl, trashedAt: undefined, isCustom: true };
+      setCatalogTemplates((prev) => [restoredItem, ...prev.filter((t) => t.id !== tpl.id)]);
+      setMessage({ text: '🎉 Đã khôi phục "' + tpl.name + '" về kho mẫu hoạt động!', type: 'success' });
+      setTimeout(() => setMessage(null), 3500);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Đã có lỗi xảy ra';
+      setMessage({ text: errorMsg, type: 'error' });
+    }
+  };
+
+  // Handle Permanently Delete from Trash
+  const handlePermanentDelete = async (tpl: CatalogTemplate) => {
+    if (
+      !confirm(
+        '⚠️ CẢNH BÁO:\nMẫu "' + tpl.name + '" sẽ bị XÓA VĨNH VIỄN khỏi hệ thống LoveStory và KHÔNG THỂ hoàn tác!\n\nBạn có chắc chắn muốn xóa vĩnh viễn?'
+      )
+    ) {
+      return;
+    }
+
+    setMessage(null);
+    try {
+      const res = await fetch('/api/admin/templates/trash?id=' + encodeURIComponent(tpl.id), {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || data.message || 'Lỗi khi xóa vĩnh viễn');
+      }
+
+      setTrashedTemplates((prev) => prev.filter((t) => t.id !== tpl.id && t.slug !== tpl.slug));
+      setMessage({ text: 'Đã xóa vĩnh viễn mẫu "' + tpl.name + '".', type: 'success' });
+      setTimeout(() => setMessage(null), 3500);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Đã có lỗi xảy ra';
+      setMessage({ text: errorMsg, type: 'error' });
+    }
+  };
+
+  // Handle Empty All Trash
+  const handleEmptyTrash = async () => {
+    if (
+      !confirm(
+        '⚠️ CẢNH BÁO NGUY HIỂM:\nToàn bộ ' + trashedTemplates.length + ' mẫu trong thùng rác sẽ bị XÓA VĨNH VIỄN!\n\nThao tác này KHÔNG THỂ hoàn tác. Bạn có chắc chắn?'
+      )
+    ) {
+      return;
+    }
+
+    setMessage(null);
+    try {
+      const res = await fetch('/api/admin/templates/trash?all=true', {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || data.message || 'Lỗi khi dọn sạch thùng rác');
+      }
+
+      setTrashedTemplates([]);
+      setMessage({ text: 'Đã dọn sạch toàn bộ mẫu trong thùng rác!', type: 'success' });
+      setTimeout(() => setMessage(null), 3500);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Đã có lỗi xảy ra';
+      setMessage({ text: errorMsg, type: 'error' });
+    }
+  };
+
+  // Open Create Modal with clean preset
+  const handleOpenCreateModal = () => {
+    const nextNum = catalogTemplates.length + 1;
+    const formattedCode = 'Mẫu ' + String(nextNum).padStart(2, '0');
+    setFormCode(formattedCode);
+    setFormName(formattedCode + ' — Phong Cách Mới');
+    setFormSubtitle('Thiết kế cao cấp độc quyền LoveStory');
+    setFormSlug('');
+    setFormPrice(30000);
+    setFormBadge('Mới');
+    setFormThumbnail('/assets/wedding/samples/sample_01.jpg');
+    setFormDescription('Mẫu thiệp cưới scrollytelling điện ảnh sang trọng được thiết kế bởi LoveStory.');
+    setFormIsPublished(true);
+    setShowCreateModal(true);
   };
 
   // Handle Quick Toggle Publish/Draft Status
@@ -825,16 +956,14 @@ export default function TemplatesManagerClient({
                             {templateSubtitle}
                           </h3>
                         </div>
-                        {isCustom && (
-                          <button
-                            type="button"
-                            title="Xóa mẫu tự tạo"
-                            onClick={() => handleDeleteCustomTemplate(tpl.id, tpl.name)}
-                            className="text-stone-400 hover:text-rose-600 p-1 rounded-md transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          title="Bỏ mẫu vào thùng rác"
+                          onClick={() => handleMoveToTrash(tpl)}
+                          className="text-stone-400 hover:text-rose-600 hover:bg-rose-50 p-1.5 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
 
                       <p className="text-[11px] text-stone-500 line-clamp-2 leading-relaxed">

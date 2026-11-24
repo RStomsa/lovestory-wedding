@@ -30,6 +30,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const {
       name,
+      code,
+      subtitle,
       slug,
       category,
       tier,
@@ -39,6 +41,7 @@ export async function POST(request: NextRequest) {
       baseTemplateId,
       description,
       studioPresetData,
+      isPublished,
     } = body;
 
     if (!name || !longThumbnail) {
@@ -62,7 +65,9 @@ export async function POST(request: NextRequest) {
     // Add to custom templates catalog
     const newTemplate = addCustomTemplate({
       id,
+      code: code?.trim() || undefined,
       name: name.trim(),
+      subtitle: subtitle?.trim() || undefined,
       slug: generatedSlug,
       category: category || 'wedding',
       tier: tier || 'PREMIUM',
@@ -72,6 +77,7 @@ export async function POST(request: NextRequest) {
       baseTemplateId: baseTemplateId || generatedSlug,
       description: description?.trim() || 'Mẫu thiệp scrollytelling điện ảnh sang trọng và hiện đại.',
       studioPresetData: studioPresetData || undefined,
+      isPublished: isPublished !== undefined ? Boolean(isPublished) : true,
       isCustom: true,
     });
 
