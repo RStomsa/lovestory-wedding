@@ -133,7 +133,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
     try {
       const { domToPng } = await import('modern-screenshot');
       const dataUrl = await domToPng(node, {
-        scale: 1.2,
+        scale: 1.5,
         filter: (el) => {
           if (el instanceof HTMLElement) {
             if (
@@ -151,7 +151,38 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
           return true;
         },
       });
-      setTplThumbnail(dataUrl);
+
+      // Crop exclusively to Screen 1 (0 to 850px) so thumbnail shows only the gorgeous cover (Trang bìa & Save The Date)
+      const croppedScreen1Url = await new Promise<string>((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          try {
+            const offscreen = document.createElement('canvas');
+            const baseW = canvas.width || 500;
+            const scaleRatio = img.width / baseW;
+            const SCREEN_1_HEIGHT = 850;
+            const cropH = Math.min(img.height, Math.round(SCREEN_1_HEIGHT * scaleRatio));
+
+            offscreen.width = img.width;
+            offscreen.height = cropH;
+            const ctx = offscreen.getContext('2d');
+            if (!ctx) {
+              resolve(dataUrl);
+              return;
+            }
+            ctx.drawImage(img, 0, 0, img.width, cropH, 0, 0, img.width, cropH);
+            resolve(offscreen.toDataURL('image/png', 0.95));
+          } catch (e) {
+            console.warn('Crop screen 1 error:', e);
+            resolve(dataUrl);
+          }
+        };
+        img.onerror = () => resolve(dataUrl);
+        img.src = dataUrl;
+      });
+
+      setTplThumbnail(croppedScreen1Url);
     } catch (err) {
       console.error('Thumbnail capture error:', err);
       alert('Không thể chụp tự động, vui lòng dùng link ảnh mẫu bên dưới.');
@@ -784,22 +815,25 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                       className="text-[11px] text-purple-600 hover:text-purple-800 flex items-center gap-1 font-semibold"
                     >
                       <Camera className="w-3.5 h-3.5" />
-                      <span>{isCapturingThumb ? 'Đang chụp...' : 'Chụp Canvas làm ảnh'}</span>
+                      <span>{isCapturingThumb ? 'Đang chụp Màn 1...' : '📸 Chụp Màn 1 (Trang bìa) làm Thumbnail'}</span>
                     </button>
                   </div>
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
                       required
-                      value={tplThumbnail.startsWith('data:image/') ? '[Ảnh chụp từ Canvas - Sẽ lưu vào public/assets/uploads/thumbnails/]' : tplThumbnail}
+                      value={tplThumbnail.startsWith('data:image/') ? '[Ảnh chụp Màn 1 từ Canvas - Sẽ lưu vào public/assets/uploads/thumbnails/]' : tplThumbnail}
                       onChange={(e) => setTplThumbnail(e.target.value)}
                       className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 font-mono truncate transition-colors"
-                      placeholder="https://... hoặc chụp Canvas"
+                      placeholder="https://... hoặc bấm nút chụp Màn 1"
                     />
                     {tplThumbnail && (
-                      <div className="w-9 h-9 rounded-lg border border-stone-200 overflow-hidden shrink-0 bg-white flex items-center justify-center shadow-2xs">
+                      <div className="w-12 h-18 rounded-xl border-2 border-purple-200 overflow-hidden shrink-0 bg-stone-50 flex flex-col items-center justify-center shadow-xs relative group">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={tplThumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
+                        <span className="absolute bottom-0 inset-x-0 bg-stone-900/80 text-[8px] text-white font-medium text-center py-0.5 leading-none">
+                          Màn 1
+                        </span>
                       </div>
                     )}
                   </div>
