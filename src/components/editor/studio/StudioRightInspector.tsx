@@ -25,6 +25,9 @@ import {
   Wand2,
   X,
   Check,
+  UploadCloud,
+  Image as ImageIcon,
+  Link as LinkIcon,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useStudioStore } from './studioStore';
@@ -111,6 +114,89 @@ export default function StudioRightInspector() {
     } finally {
       setIsSavingGfx(false);
     }
+  };
+
+  // Stock Wedding Photos & Direct Upload State
+  const photoFileInputRef = useRef<HTMLInputElement>(null);
+  const [showStockPickerModal, setShowStockPickerModal] = useState(false);
+  const [stockCategoryFilter, setStockCategoryFilter] = useState('all');
+  const [customUrlInput, setCustomUrlInput] = useState('');
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+
+  const WEDDING_STOCK_PHOTOS = [
+    { id: 'sample-01', title: 'Lễ đường & Váy cưới', src: '/assets/wedding/samples/sample_01.jpg', tag: 'vay-cuoi' },
+    { id: 'sample-02', title: 'Cô dâu lãng mạn', src: '/assets/wedding/samples/sample_02.jpg', tag: 'co-dau' },
+    { id: 'sample-03', title: 'Cặp đôi tay trong tay', src: '/assets/wedding/samples/sample_03.jpg', tag: 'cap-doi' },
+    { id: 'sample-04', title: 'Nụ cười hạnh phúc', src: '/assets/wedding/samples/sample_04.jpg', tag: 'cap-doi' },
+    { id: 'sample-05', title: 'Bó hoa cưới Pastel', src: '/assets/wedding/samples/sample_05.jpg', tag: 'hoa-cuoi' },
+    { id: 'sample-06', title: 'Cổng hoa lãng mạn', src: '/assets/wedding/samples/sample_06.jpg', tag: 'le-duong' },
+    { id: 'sample-07', title: 'Khoảnh khắc trao nhẫn', src: '/assets/wedding/samples/sample_07.jpg', tag: 'nhan-cuoi' },
+    { id: 'sample-08', title: 'Cặp đôi hoàng hôn', src: '/assets/wedding/samples/sample_08.jpg', tag: 'cap-doi' },
+    { id: 'sample-09', title: 'Chân dung cô dâu kiêu sa', src: '/assets/wedding/samples/sample_09.jpg', tag: 'co-dau' },
+    { id: 'sample-10', title: 'Chú rể & Cô dâu thanh lịch', src: '/assets/wedding/samples/sample_10.jpg', tag: 'cap-doi' },
+    { id: 'sample-11', title: 'Tiệc cưới ngoài trời', src: '/assets/wedding/samples/sample_11.jpg', tag: 'le-duong' },
+    { id: 'sample-12', title: 'Lãng mạn vườn hoa', src: '/assets/wedding/samples/sample_12.jpg', tag: 'ngoai-canh' },
+    { id: 'sample-13', title: 'Ánh hoàng hôn ngọt ngào', src: '/assets/wedding/samples/sample_13.jpg', tag: 'cap-doi' },
+    { id: 'sample-14', title: 'Ánh mắt yêu thương', src: '/assets/wedding/samples/sample_14.jpg', tag: 'cap-doi' },
+    { id: 'sample-15', title: 'Bước đi bên nhau', src: '/assets/wedding/samples/sample_15.jpg', tag: 'cap-doi' },
+    { id: 'sample-16', title: 'Nụ hôn ngày cưới', src: '/assets/wedding/samples/sample_16.jpg', tag: 'cap-doi' },
+    { id: 'sample-18', title: 'Lễ đường hoàng gia', src: '/assets/wedding/samples/sample_18.jpg', tag: 'le-duong' },
+    { id: 'sample-20', title: 'Bình minh tình yêu', src: '/assets/wedding/samples/sample_20.jpg', tag: 'ngoai-canh' },
+  ];
+
+  const handleDirectPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedElement) return;
+
+    setIsUploadingPhoto(true);
+
+    // 1. Read as local DataURL for instant 0ms preview
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      updateElement(selectedElement.id, { src: dataUrl }, true);
+      setGfxToast({ text: 'Đã tải và thay đổi ảnh thành công!', type: 'success' });
+      setTimeout(() => setGfxToast(null), 3000);
+    };
+    reader.readAsDataURL(file);
+
+    // 2. Also try uploading to server assets
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('quality', 'high');
+      const res = await fetch('/api/admin/assets/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok && data.success && data.url) {
+        updateElement(selectedElement.id, { src: data.url }, true);
+      }
+    } catch {
+      // Local DataURL is already in place
+    } finally {
+      setIsUploadingPhoto(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleSelectStockPhoto = (photoUrl: string) => {
+    if (!selectedElement) return;
+    updateElement(selectedElement.id, { src: photoUrl }, true);
+    setShowStockPickerModal(false);
+    setGfxToast({ text: 'Đã chọn ảnh cưới mẫu thành công!', type: 'success' });
+    setTimeout(() => setGfxToast(null), 3000);
+  };
+
+  const handleApplyCustomUrl = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedElement || !customUrlInput.trim()) return;
+    updateElement(selectedElement.id, { src: customUrlInput.trim() }, true);
+    setCustomUrlInput('');
+    setShowStockPickerModal(false);
+    setGfxToast({ text: 'Đã cập nhật ảnh từ đường dẫn URL!', type: 'success' });
+    setTimeout(() => setGfxToast(null), 3000);
   };
 
   const selectedElement = elements.find((e) => e.id === selectedId);
@@ -720,21 +806,49 @@ export default function StudioRightInspector() {
                 />
               </div>
 
-              {/* Action Buttons: Thay đổi ảnh, Tách nền AI, Làm nét AI, Lưu vào kho */}
+              {/* Action Buttons: Tải ảnh từ máy/ĐT, Kho ảnh mẫu, Tách nền AI, Làm nét AI, Lưu vào kho */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2">
+                {/* Hidden file input for Phone / PC direct photo upload */}
+                <input
+                  type="file"
+                  ref={photoFileInputRef}
+                  accept="image/*"
+                  onChange={handleDirectPhotoUpload}
+                  className="hidden"
+                />
+
+                {/* Primary Upload & Stock Buttons */}
+                <div className="grid grid-cols-2 gap-2">
                   <button
-                    onClick={() => {
-                      const newUrl = prompt('Nhập URL hình ảnh/đồ họa mới:', selectedElement.src);
-                      if (newUrl) updateElement(selectedElement.id, { src: newUrl }, true);
-                    }}
-                    className="flex-1 py-1.5 rounded-xl bg-stone-900 text-white hover:bg-black text-[11px] font-medium transition-all shadow-xs flex items-center justify-center gap-1.5"
+                    type="button"
+                    onClick={() => photoFileInputRef.current?.click()}
+                    disabled={isUploadingPhoto}
+                    className="py-2 px-2.5 rounded-xl bg-stone-900 text-white hover:bg-stone-800 text-[11px] font-semibold transition-all shadow-xs flex items-center justify-center gap-1.5 active:scale-95"
+                    title="Tải ảnh trực tiếp từ thư viện ảnh điện thoại hoặc máy tính"
                   >
-                    <RefreshCw className="w-3 h-3" />
-                    <span>Thay đổi ảnh</span>
+                    {isUploadingPhoto ? (
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <UploadCloud className="w-3.5 h-3.5 text-rose-400" />
+                    )}
+                    <span>{isUploadingPhoto ? 'Đang tải...' : 'Tải ảnh máy / ĐT'}</span>
                   </button>
 
                   <button
+                    type="button"
+                    onClick={() => setShowStockPickerModal(true)}
+                    className="py-2 px-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[11px] font-semibold transition-all shadow-xs flex items-center justify-center gap-1.5 active:scale-95"
+                    title="Chọn từ 18+ bức ảnh cưới mẫu chất lượng cao có sẵn"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5 text-rose-500" />
+                    <span>Kho ảnh mẫu</span>
+                  </button>
+                </div>
+
+                {/* AI Tools & Cutout */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
                     onClick={() => {
                       updateElement(
                         selectedElement.id,
@@ -746,7 +860,7 @@ export default function StudioRightInspector() {
                       );
                       alert(selectedElement.isCutout ? 'Đã tắt tách nền' : '✨ Đã áp dụng hiệu ứng tách nền AI (AI Cutout) cho ảnh!');
                     }}
-                    className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold transition-all shadow-xs flex items-center gap-1 ${
+                    className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-semibold transition-all shadow-xs flex items-center justify-center gap-1 ${
                       selectedElement.isCutout
                         ? 'bg-rose-500 text-white'
                         : 'bg-gradient-to-r from-violet-600 to-rose-500 text-white hover:opacity-90'
@@ -756,9 +870,7 @@ export default function StudioRightInspector() {
                     <Wand2 className="w-3 h-3" />
                     <span>{selectedElement.isCutout ? 'Đã tách nền' : '✨ Tách nền AI'}</span>
                   </button>
-                </div>
 
-                <div className="flex items-center gap-2">
                   {/* AI HD Sharpness Boost */}
                   <button
                     type="button"
@@ -778,12 +890,15 @@ export default function StudioRightInspector() {
                         true
                       );
                     }}
-                    className="flex-1 py-1.5 px-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 hover:bg-stone-100 text-[11px] font-medium text-stone-700 dark:text-stone-300 transition-all flex items-center justify-center gap-1"
+                    className="flex-1 py-1.5 px-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white hover:bg-stone-50 text-[11px] font-medium text-stone-700 dark:text-stone-300 transition-all flex items-center justify-center gap-1"
                     title="AI tăng cường độ nét, tương phản & độ sâu chi tiết"
                   >
                     <Sparkles className="w-3 h-3 text-amber-500" />
                     <span>Làm nét AI</span>
                   </button>
+                </div>
+
+                <div className="flex items-center gap-2">
 
                   {/* ADMIN: Save Graphic to Master Warehouse */}
                   {isAdmin && (
@@ -2043,6 +2158,156 @@ export default function StudioRightInspector() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* STOCK WEDDING PHOTOS & DIRECT UPLOAD MODAL */}
+      {/* ======================================================== */}
+      {showStockPickerModal && (
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-2xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-stone-900">
+            {/* Modal Header */}
+            <div className="p-5 border-b border-stone-100 flex items-start justify-between bg-stone-50/70">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
+                  <ImageIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-stone-900 font-serif">
+                    Kho Ảnh Cưới Đẹp &amp; Tải Ảnh Lên
+                  </h3>
+                  <p className="text-xs text-stone-500">
+                    Chọn từ 18+ bức ảnh cưới mẫu sắc nét hoặc tải ảnh kỷ niệm của hai bạn từ máy tính / điện thoại.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowStockPickerModal(false)}
+                className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Upload Action & Category Filter Bar */}
+            <div className="px-5 py-3 border-b border-stone-100 flex flex-wrap items-center justify-between gap-2 bg-white">
+              <button
+                type="button"
+                onClick={() => {
+                  photoFileInputRef.current?.click();
+                  setShowStockPickerModal(false);
+                }}
+                className="py-2 px-3.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-colors"
+              >
+                <UploadCloud className="w-4 h-4 text-rose-400" />
+                <span>Tải ảnh từ máy / điện thoại</span>
+              </button>
+
+              {/* Filter Chips */}
+              <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none text-xs">
+                {[
+                  { id: 'all', label: 'Tất cả (18)' },
+                  { id: 'cap-doi', label: 'Cặp đôi' },
+                  { id: 'co-dau', label: 'Cô dâu' },
+                  { id: 'hoa-cuoi', label: 'Hoa cưới' },
+                  { id: 'le-duong', label: 'Lễ đường' },
+                  { id: 'ngoai-canh', label: 'Ngoại cảnh' },
+                  { id: 'url', label: '🔗 Nhập link URL' },
+                ].map((chip) => (
+                  <button
+                    key={chip.id}
+                    type="button"
+                    onClick={() => setStockCategoryFilter(chip.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap ${
+                      stockCategoryFilter === chip.id
+                        ? 'bg-rose-600 text-white shadow-xs'
+                        : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                    }`}
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-5 overflow-y-auto flex-1 min-h-[300px]">
+              {stockCategoryFilter === 'url' ? (
+                /* Custom URL Tab */
+                <form onSubmit={handleApplyCustomUrl} className="space-y-4 max-w-lg mx-auto py-6">
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-semibold text-stone-700">
+                      Dán đường dẫn hình ảnh (URL)
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="url"
+                        required
+                        placeholder="https://example.com/anh-cuoi.jpg"
+                        value={customUrlInput}
+                        onChange={(e) => setCustomUrlInput(e.target.value)}
+                        className="flex-1 px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 font-mono"
+                      />
+                      <button
+                        type="submit"
+                        className="px-4 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold transition-colors"
+                      >
+                        Áp dụng ngay
+                      </button>
+                    </div>
+                    <span className="text-[11px] text-stone-400 block">
+                      Hỗ trợ định dạng: JPG, PNG, WEBP, GIF, SVG.
+                    </span>
+                  </div>
+                </form>
+              ) : (
+                /* Stock Photos Grid */
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {WEDDING_STOCK_PHOTOS.filter(
+                    (p) => stockCategoryFilter === 'all' || p.tag === stockCategoryFilter
+                  ).map((photo) => (
+                    <div
+                      key={photo.id}
+                      onClick={() => handleSelectStockPhoto(photo.src)}
+                      className="group relative aspect-[3/4] rounded-2xl overflow-hidden border border-stone-200 bg-stone-100 cursor-pointer shadow-xs hover:shadow-md transition-all hover:border-rose-400"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={photo.src}
+                        alt={photo.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2.5">
+                        <span className="text-[11px] font-semibold text-white truncate drop-shadow-sm">
+                          {photo.title}
+                        </span>
+                        <span className="text-[10px] text-rose-300 flex items-center gap-1 font-medium mt-0.5">
+                          <Check className="w-3 h-3" />
+                          <span>Bấm để dùng ảnh này</span>
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-stone-100 bg-stone-50/50 flex items-center justify-between text-xs text-stone-500">
+              <span>
+                💡 Tải ảnh từ điện thoại sẽ tự động căn chỉnh và hiển thị mượt mà trên thiệp cưới.
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowStockPickerModal(false)}
+                className="px-4 py-2 rounded-xl bg-white border border-stone-200 hover:bg-stone-100 text-stone-700 font-semibold transition-colors"
+              >
+                Đóng
+              </button>
+            </div>
           </div>
         </div>
       )}

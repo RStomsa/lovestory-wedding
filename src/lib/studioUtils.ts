@@ -15,7 +15,23 @@ export function resolveStudioAssetUrl(src?: string | null): string {
   const trimmed = src.trim();
   if (!trimmed) return '';
 
-  // 1. Check if it's an M-Invite stock asset (SVG/PNG/WebP)
+  // 1. Resolve broken / offline assets.lovestory.vn assets to local high-res wedding sample photos
+  if (trimmed.includes('assets.lovestory.vn')) {
+    if (trimmed.includes('.mp3')) {
+      return '/assets/wedding/audio/wedding-melody-01.mp3';
+    }
+    // Deterministically hash the URL so the same template element consistently gets the same photo
+    let hash = 0;
+    for (let i = 0; i < trimmed.length; i++) {
+      hash = (hash << 5) - hash + trimmed.charCodeAt(i);
+      hash |= 0;
+    }
+    const sampleIndex = (Math.abs(hash) % 18) + 1;
+    const sampleNum = String(sampleIndex).padStart(2, '0');
+    return `/assets/wedding/samples/sample_${sampleNum}.jpg`;
+  }
+
+  // 2. Check if it's an M-Invite stock asset (SVG/PNG/WebP)
   if (trimmed.includes('cdn.biihappy.com/m-invite/stock/') || trimmed.includes('/stock/') || trimmed.startsWith('stock/')) {
     const parts = trimmed.split(/(?:\/|^)stock(?:\/|%2F)/);
     if (parts.length > 1) {

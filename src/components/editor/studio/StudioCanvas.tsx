@@ -630,6 +630,10 @@ export default function StudioCanvas() {
                     return;
                   }
                 }
+                // Fallback to local wedding sample if image fails
+                if (!target.src.includes('/assets/wedding/samples/')) {
+                  target.src = '/assets/wedding/samples/sample_01.jpg';
+                }
               }}
               style={{
                 width: '100%',
