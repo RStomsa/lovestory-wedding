@@ -27,6 +27,7 @@ import {
   Wand2,
   Edit3,
   Check,
+  Smartphone,
 } from 'lucide-react';
 
 // Dynamically import react-moveable to ensure SSR safe
@@ -67,6 +68,21 @@ export default function StudioCanvas() {
   const [moveableTarget, setMoveableTarget] = useState<HTMLElement | null>(null);
   const [showLayerMenu, setShowLayerMenu] = useState(false);
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
+  const [showScreenGuides, setShowScreenGuides] = useState(true);
+
+  // Helper to center selected element inside a specific screen fold
+  const centerInScreenFold = (foldIndex: number) => {
+    if (!selectedId) {
+      alert('Vui lòng click chọn 1 đối tượng (ảnh, chữ hoặc họa tiết) trên thiệp trước khi canh giữa.');
+      return;
+    }
+    const el = elements.find((e) => e.id === selectedId);
+    if (!el) return;
+    const FOLD_H = 850;
+    const targetX = Math.round((canvas.width - el.width) / 2);
+    const targetY = Math.round(foldIndex * FOLD_H + (FOLD_H - el.height) / 2);
+    updateElement(selectedId, { x: targetX, y: targetY }, true);
+  };
 
   const touchStartDistRef = useRef<number | null>(null);
   const initialZoomRef = useRef<number>(1);
@@ -773,6 +789,88 @@ export default function StudioCanvas() {
             />
           )}
 
+          {/* Mobile Screen Fold Guides (850px per viewport fold) */}
+          {showScreenGuides && (
+            <div data-export-ignore="true" className="absolute inset-0 pointer-events-none z-20">
+              {Array.from({ length: Math.ceil(canvas.height / 850) }).map((_, i) => {
+                const foldTop = i * 850;
+                const foldBottom = Math.min(canvas.height, (i + 1) * 850);
+                const foldLabels = [
+                  'Màn 1: Trang bìa & Save The Date',
+                  'Màn 2: Gia đình & Tiệc cưới',
+                  'Màn 3: Album ảnh cưới',
+                  'Màn 4: Lịch cưới & Đếm ngược',
+                  'Màn 5: Lời chúc & RSVP',
+                  'Màn 6: Bản đồ & Cảm ơn',
+                  'Màn 7: Thông tin phụ',
+                  'Màn 8: Cuối thiệp',
+                ];
+                const label = foldLabels[i] || `Màn ${i + 1}: Khu vực thiệp`;
+
+                return (
+                  <div key={`screen-fold-${i}`}>
+                    {/* Top Divider Line (from screen 2 onwards) */}
+                    {i > 0 && (
+                      <div
+                        className="absolute left-0 right-0 border-b-2 border-dashed border-rose-400/70 flex items-center justify-between px-3"
+                        style={{ top: `${foldTop}px` }}
+                      >
+                        {/* Left Badge */}
+                        <div className="bg-stone-900/90 text-white text-[10px] font-mono font-medium px-2.5 py-1 rounded-md shadow-md flex items-center gap-1.5 -translate-y-1/2">
+                          <span>📱 {label}</span>
+                          <span className="text-stone-400">({foldTop}px - {foldBottom}px)</span>
+                        </div>
+
+                        {/* Right Align to Fold Center Button */}
+                        <button
+                          type="button"
+                          onClick={() => centerInScreenFold(i)}
+                          className="pointer-events-auto bg-white/95 hover:bg-rose-50 text-stone-700 hover:text-rose-600 border border-stone-200 text-[10px] font-semibold px-2.5 py-1 rounded-md shadow-md flex items-center gap-1 -translate-y-1/2 active:scale-95 transition-all"
+                          title={`Canh giữa phần tử đang chọn vào ${label}`}
+                        >
+                          <span>🎯 Canh giữa Màn {i + 1}</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Screen 1 top label & center button */}
+                    {i === 0 && (
+                      <div
+                        className="absolute left-0 right-0 flex items-center justify-between px-3"
+                        style={{ top: '8px' }}
+                      >
+                        <div className="bg-stone-900/90 text-white text-[10px] font-mono font-medium px-2.5 py-1 rounded-md shadow-md flex items-center gap-1.5">
+                          <span>📱 {label}</span>
+                          <span className="text-stone-400">(0px - {foldBottom}px)</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => centerInScreenFold(0)}
+                          className="pointer-events-auto bg-white/95 hover:bg-rose-50 text-stone-700 hover:text-rose-600 border border-stone-200 text-[10px] font-semibold px-2.5 py-1 rounded-md shadow-md flex items-center gap-1 active:scale-95 transition-all"
+                          title="Canh giữa phần tử đang chọn vào Màn 1"
+                        >
+                          <span>🎯 Canh giữa Màn 1</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Screen 1 Phone Notch / Safe Area Indicator */}
+                    {i === 0 && (
+                      <div
+                        className="absolute left-0 right-0 border-b border-dotted border-amber-400/50 flex items-center justify-center pointer-events-none"
+                        style={{ top: '44px' }}
+                      >
+                        <span className="bg-amber-100/90 text-amber-800 text-[9px] font-medium px-2 py-0.5 rounded-full shadow-xs -translate-y-1/2">
+                          ⚡ Vùng tai thỏ / Dynamic Island điện thoại (44px)
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           {/* Elements on Canvas */}
           {elements.map((el) => {
             if (hiddenElementIds.includes(el.id)) return null;
@@ -1423,8 +1521,20 @@ export default function StudioCanvas() {
         </div>
       </div>
 
-      {/* FLOATING ZOOM CONTROLLER (Screenshot 1, 2, 3) */}
-      <div className="fixed right-3 md:right-84 bottom-20 md:bottom-28 z-30 flex flex-col items-center bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-full shadow-lg p-1.5 text-stone-600 dark:text-stone-300">
+      {/* FLOATING ZOOM & SCREEN GUIDES CONTROLLER */}
+      <div className="fixed right-3 md:right-84 bottom-20 md:bottom-28 z-30 flex flex-col items-center bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-full shadow-lg p-1.5 text-stone-600 dark:text-stone-300 gap-1">
+        <button
+          onClick={() => setShowScreenGuides(!showScreenGuides)}
+          className={`p-1.5 rounded-full transition-all ${
+            showScreenGuides
+              ? 'bg-rose-500 text-white shadow-xs'
+              : 'hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500'
+          }`}
+          title={showScreenGuides ? 'Ẩn khung phân trang màn hình (850px)' : 'Hiện khung phân trang màn hình (850px)'}
+        >
+          <Smartphone className="w-4 h-4" />
+        </button>
+        <div className="w-3.5 h-[1px] bg-stone-200 dark:bg-stone-700 my-0.5" />
         <button
           onClick={() => setZoom(Math.min(2.0, zoom + 0.1))}
           className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full"

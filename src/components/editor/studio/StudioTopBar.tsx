@@ -122,14 +122,43 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
     const node = document.getElementById('studio-main-canvas');
     if (!node) return;
     setIsCapturingThumb(true);
+
+    // Save previous selection and deselect so handles & toolbars are completely hidden from the thumbnail
+    const prevSelectedId = selectedId;
+    if (prevSelectedId) {
+      selectElement(null);
+      await new Promise((r) => setTimeout(r, 150));
+    }
+
     try {
       const { domToPng } = await import('modern-screenshot');
-      const dataUrl = await domToPng(node, { scale: 1.2 });
+      const dataUrl = await domToPng(node, {
+        scale: 1.2,
+        filter: (el) => {
+          if (el instanceof HTMLElement) {
+            if (
+              el.getAttribute('data-export-ignore') === 'true' ||
+              el.classList?.contains('moveable-control-box') ||
+              el.classList?.contains('moveable-line') ||
+              el.classList?.contains('moveable-control') ||
+              el.classList?.contains('moveable-guideline') ||
+              el.getAttribute('data-moveable') ||
+              el.classList?.contains('selection-toolbar')
+            ) {
+              return false;
+            }
+          }
+          return true;
+        },
+      });
       setTplThumbnail(dataUrl);
     } catch (err) {
       console.error('Thumbnail capture error:', err);
       alert('Không thể chụp tự động, vui lòng dùng link ảnh mẫu bên dưới.');
     } finally {
+      if (prevSelectedId) {
+        selectElement(prevSelectedId);
+      }
       setIsCapturingThumb(false);
     }
   };
@@ -205,7 +234,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
     if (prevSelectedId) {
       selectElement(null);
       // Wait for React to flush DOM state
-      await new Promise((r) => setTimeout(r, 120));
+      await new Promise((r) => setTimeout(r, 150));
     }
 
     try {
@@ -217,6 +246,9 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
             if (
               el.getAttribute('data-export-ignore') === 'true' ||
               el.classList?.contains('moveable-control-box') ||
+              el.classList?.contains('moveable-line') ||
+              el.classList?.contains('moveable-control') ||
+              el.classList?.contains('moveable-guideline') ||
               el.getAttribute('data-moveable') ||
               el.classList?.contains('selection-toolbar')
             ) {

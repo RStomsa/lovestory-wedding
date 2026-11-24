@@ -11,6 +11,9 @@ import {
   RotateCcw,
   Sparkles,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Layers,
 } from 'lucide-react';
 import { useStudioStore } from './studioStore';
 import { CanvasElement } from './studioTypes';
@@ -18,6 +21,7 @@ import StudioFallingOverlay from './StudioFallingOverlay';
 import StudioWidgetRenderer from './StudioWidgetRenderer';
 import EnvelopeOpeningEffect from '@/components/common/EnvelopeOpeningEffect';
 import { resolveFontFamily } from '@/lib/studioFonts';
+import { resolveStudioAssetUrl } from '@/lib/studioUtils';
 
 interface StudioPreviewModalProps {
   isOpen: boolean;
@@ -28,9 +32,43 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
   const { canvas, elements } = useStudioStore();
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
   const [viewMode, setViewMode] = useState<'phone' | 'fullscreen'>('phone');
+  const [scrollMode, setScrollMode] = useState<'snap' | 'continuous'>('snap');
+  const [currentSection, setCurrentSection] = useState(0);
   const [replayKey, setReplayKey] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Exact Pixel Scaling:
+  // Base canvas is 500px wide. Phone viewport inner screen is 360px wide.
+  const INNER_SCREEN_WIDTH = 360;
+  const FOLD_HEIGHT_CANVAS = 850;
+  const phoneScale = INNER_SCREEN_WIDTH / (canvas.width || 500); // 0.72
+  const sectionFoldHeight = FOLD_HEIGHT_CANVAS * phoneScale; // ~612px
+  const totalSections = Math.max(1, Math.ceil((canvas.height || 5200) / FOLD_HEIGHT_CANVAS));
+
+  // Handle scroll section tracking
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const scrollTop = e.currentTarget.scrollTop;
+    const activeIdx = Math.min(
+      totalSections - 1,
+      Math.max(0, Math.round(scrollTop / (viewMode === 'phone' ? sectionFoldHeight : FOLD_HEIGHT_CANVAS)))
+    );
+    if (activeIdx !== currentSection) {
+      setCurrentSection(activeIdx);
+    }
+  };
+
+  const scrollToSection = (idx: number) => {
+    const targetIdx = Math.max(0, Math.min(totalSections - 1, idx));
+    if (scrollContainerRef.current) {
+      const stepH = viewMode === 'phone' ? sectionFoldHeight : FOLD_HEIGHT_CANVAS;
+      scrollContainerRef.current.scrollTo({
+        top: targetIdx * stepH,
+        behavior: 'smooth',
+      });
+    }
+    setCurrentSection(targetIdx);
+  };
 
   // Sync state to localStorage for new tab preview
   useEffect(() => {
@@ -227,9 +265,12 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={el.src}
-                alt={el.alt || 'Wedding asset'}
+                src={resolveStudioAssetUrl(el.src)}
+                alt={el.alt || 'Ảnh cưới LoveStory'}
                 referrerPolicy="no-referrer"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/assets/wedding/samples/sample_01.jpg';
+                }}
                 style={{
                   width: '100%',
                   height: '100%',
@@ -323,26 +364,71 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
     );
   };
 
-  // Canvas scaling: base canvas is 500px wide. Phone viewport is 390px wide.
-  const phoneScale = 390 / 500; // 0.78
-
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col items-center justify-between p-2 sm:p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col items-center justify-between p-2 sm:p-4 animate-in fade-in duration-200">
       {/* Top Header Controls Bar */}
-      <div className="w-full max-w-4xl bg-stone-900/90 text-white rounded-2xl px-4 py-2.5 flex items-center justify-between border border-stone-800 shadow-xl backdrop-blur-md mb-2">
+      <div className="w-full max-w-4xl bg-stone-900/95 text-white rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 border border-stone-800 shadow-xl backdrop-blur-md mb-2">
         <div className="flex items-center gap-3 overflow-hidden">
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
           <div className="truncate">
             <span className="text-xs sm:text-sm font-bold tracking-tight block truncate">
               Xem trước trải nghiệm khách mời (Live Guest View)
             </span>
-            <span className="text-[10px] text-rose-400 font-medium flex items-center gap-1">
-              <span>🎵 Lưu ý: Nhạc nền, hình ảnh và font chữ đều có thể thay đổi tùy thích</span>
+            <span className="text-[10px] text-stone-400 font-medium flex items-center gap-1.5">
+              <span>Đang ở: <strong className="text-rose-400">Màn {currentSection + 1} / {totalSections}</strong></span>
+              <span>•</span>
+              <span className="text-stone-400">Tự động canh chuẩn tỷ lệ điện thoại 1:1</span>
             </span>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Scroll Mode Toggle: Vuốt từng trang (Snap) vs Cuộn mượt */}
+          <div className="flex bg-stone-800 rounded-xl p-0.5 border border-stone-700">
+            <button
+              onClick={() => setScrollMode('snap')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
+                scrollMode === 'snap' ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-xs' : 'text-stone-400 hover:text-white'
+              }`}
+              title="Vuốt ngón tay là tự động trượt sang trang/mục tiếp theo mượt mà"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Vuốt từng trang (Snap)</span>
+            </button>
+            <button
+              onClick={() => setScrollMode('continuous')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
+                scrollMode === 'continuous' ? 'bg-stone-700 text-white shadow-xs' : 'text-stone-400 hover:text-white'
+              }`}
+              title="Cuộn mượt mà liên tục từ trên xuống dưới"
+            >
+              <span>Cuộn mượt</span>
+            </button>
+          </div>
+
+          {/* Section Stepper (Next/Prev buttons) */}
+          <div className="flex items-center bg-stone-800 rounded-xl p-0.5 border border-stone-700">
+            <button
+              onClick={() => scrollToSection(currentSection - 1)}
+              disabled={currentSection <= 0}
+              className="p-1.5 hover:bg-stone-700 text-stone-300 hover:text-white rounded-lg disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+              title="Màn trước"
+            >
+              <ChevronUp className="w-3.5 h-3.5" />
+            </button>
+            <span className="px-2 text-[11px] font-mono text-stone-300 font-semibold">
+              {currentSection + 1}/{totalSections}
+            </span>
+            <button
+              onClick={() => scrollToSection(currentSection + 1)}
+              disabled={currentSection >= totalSections - 1}
+              className="p-1.5 hover:bg-stone-700 text-stone-300 hover:text-white rounded-lg disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+              title="Màn tiếp theo"
+            >
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
           {/* Replay Entrance Animations */}
           <button
             onClick={handleReplayAnimations}
@@ -350,7 +436,7 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
             title="Phát lại toàn bộ hiệu ứng xuất hiện"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Phát lại hiệu ứng</span>
+            <span className="hidden sm:inline">Phát lại</span>
           </button>
 
           {/* Device Toggle */}
@@ -396,10 +482,10 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
       </div>
 
       {/* Main Preview Container */}
-      <div className="flex-1 w-full flex items-center justify-center overflow-hidden">
+      <div className="flex-1 w-full flex items-center justify-center overflow-hidden relative">
         {viewMode === 'phone' ? (
-          /* Realistic iPhone 15 Pro Titanium Mockup Frame */
-          <div className="relative w-[390px] h-[780px] max-h-[88vh] bg-stone-900 rounded-[50px] p-3 shadow-2xl border-[6px] border-stone-700 ring-1 ring-white/10 flex flex-col items-center">
+          /* Realistic iPhone 15 Pro Titanium Mockup Frame (Standard 360px inner screen) */
+          <div className="relative w-[384px] h-[780px] max-h-[86vh] bg-stone-900 rounded-[50px] p-3 shadow-2xl border-[5px] border-stone-700 ring-1 ring-white/10 flex flex-col items-center">
             {/* Dynamic Island Notch */}
             <div className="absolute top-4 z-40 w-28 h-6 bg-black rounded-full flex items-center justify-between px-2.5">
               <div className="w-2.5 h-2.5 rounded-full bg-stone-800/80" />
@@ -409,8 +495,14 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
             {/* Inner Phone Screen */}
             <div
               ref={scrollContainerRef}
-              className="relative w-full h-full rounded-[40px] overflow-y-auto overflow-x-hidden no-scrollbar shadow-inner"
-              style={{ backgroundColor: canvas.background }}
+              onScroll={handleScroll}
+              className={`relative w-[360px] h-full rounded-[40px] overflow-y-auto overflow-x-hidden no-scrollbar shadow-inner ${
+                scrollMode === 'snap' ? 'snap-y snap-mandatory scroll-smooth' : 'scroll-smooth'
+              }`}
+              style={{
+                backgroundColor: canvas.background,
+                scrollBehavior: 'smooth',
+              }}
             >
               {/* Envelope Opening Cover Overlay inside phone */}
               {canvas.envelopeCover?.enabled !== false && (
@@ -442,30 +534,78 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
                 )}
               </button>
 
+              {/* Floating Section Page Dots Indicator (Right edge of phone) */}
+              <div className="fixed top-1/2 -translate-y-1/2 right-4 z-40 flex flex-col items-center gap-1.5 p-1.5 bg-black/40 backdrop-blur-md rounded-full border border-white/10 shadow-lg pointer-events-auto">
+                {Array.from({ length: totalSections }).map((_, idx) => (
+                  <button
+                    key={`dot-${idx}`}
+                    onClick={() => scrollToSection(idx)}
+                    className={`rounded-full transition-all duration-300 ${
+                      currentSection === idx
+                        ? 'w-2 h-5 bg-rose-500 shadow-xs'
+                        : 'w-2 h-2 bg-white/50 hover:bg-white/90'
+                    }`}
+                    title={`Chuyển tới Màn ${idx + 1}`}
+                  />
+                ))}
+              </div>
+
+              {/* Bouncing Swipe Up Hint on Screen 1 */}
+              {currentSection === 0 && (
+                <div
+                  onClick={() => scrollToSection(1)}
+                  className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[10px] font-semibold flex items-center gap-1.5 cursor-pointer animate-bounce shadow-lg border border-white/20"
+                >
+                  <span>Vuốt lên để xem tiếp</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-rose-300" />
+                </div>
+              )}
+
               {/* Falling Petals/Snow Overlay inside phone */}
               {canvas.fallingEffect?.enabled && (
                 <div className="pointer-events-none sticky top-0 w-full h-0 z-30 overflow-visible">
                   <StudioFallingOverlay
                     enabled={canvas.fallingEffect.enabled}
                     type={canvas.fallingEffect.type || 'snow'}
-                    width={390}
+                    width={360}
                     height={780}
                   />
                 </div>
               )}
 
-              {/* Scaled Invitation Canvas */}
+              {/* Scaled Invitation Canvas - Exact Layout Dimension */}
               <div
                 style={{
-                  width: `${canvas.width}px`,
-                  height: `${canvas.height}px`,
-                  transform: `scale(${phoneScale})`,
-                  transformOrigin: 'top left',
-                  backgroundColor: canvas.background,
+                  width: `${INNER_SCREEN_WIDTH}px`,
+                  height: `${canvas.height * phoneScale}px`,
+                  position: 'relative',
                 }}
-                className="relative"
               >
-                {elements.map((el) => renderPreviewElement(el))}
+                {/* Section Snap Targets for smooth page-by-page swiping */}
+                {scrollMode === 'snap' && (
+                  <div className="absolute inset-0 pointer-events-none z-10">
+                    {Array.from({ length: totalSections }).map((_, idx) => (
+                      <div
+                        key={`snap-${idx}`}
+                        className="snap-start snap-always w-full"
+                        style={{ height: `${sectionFoldHeight}px` }}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                <div
+                  style={{
+                    width: `${canvas.width}px`,
+                    height: `${canvas.height}px`,
+                    transform: `scale(${phoneScale})`,
+                    transformOrigin: 'top left',
+                    backgroundColor: canvas.background,
+                  }}
+                  className="relative"
+                >
+                  {elements.map((el) => renderPreviewElement(el))}
+                </div>
               </div>
             </div>
           </div>
@@ -473,8 +613,11 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
           /* Fullscreen Scrollable Canvas View */
           <div
             ref={scrollContainerRef}
-            className="w-full max-w-lg h-full max-h-[88vh] rounded-3xl overflow-y-auto overflow-x-hidden shadow-2xl relative border border-stone-800"
-            style={{ backgroundColor: canvas.background }}
+            onScroll={handleScroll}
+            className={`w-full max-w-lg h-full max-h-[88vh] rounded-3xl overflow-y-auto overflow-x-hidden shadow-2xl relative border border-stone-800 ${
+              scrollMode === 'snap' ? 'snap-y snap-mandatory scroll-smooth' : 'scroll-smooth'
+            }`}
+            style={{ backgroundColor: canvas.background, scrollBehavior: 'smooth' }}
           >
             {/* Floating Music Button */}
             <button
@@ -498,6 +641,19 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
                   width={canvas.width}
                   height={canvas.height}
                 />
+              </div>
+            )}
+
+            {/* Snap Targets for Fullscreen */}
+            {scrollMode === 'snap' && (
+              <div className="absolute inset-0 pointer-events-none z-10">
+                {Array.from({ length: totalSections }).map((_, idx) => (
+                  <div
+                    key={`snap-full-${idx}`}
+                    className="snap-start snap-always w-full"
+                    style={{ height: `${FOLD_HEIGHT_CANVAS}px` }}
+                  />
+                ))}
               </div>
             )}
 

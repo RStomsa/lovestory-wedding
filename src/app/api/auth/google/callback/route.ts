@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     const callbackUrl = `${origin}/api/auth/google/callback`;
 
     // 1. Exchange authorization code for Google access token
-    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+    let tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
@@ -42,6 +42,32 @@ export async function GET(request: NextRequest) {
         grant_type: 'authorization_code',
       }),
     });
+
+    // Fallback if client_secret has ambiguous 'l' (lowercase L) vs 'I' (capital I)
+    if (!tokenResponse.ok) {
+      const altSecret = clientSecret.includes('lBpw')
+        ? clientSecret.replace('lBpw', 'IBpw')
+        : clientSecret.includes('IBpw')
+        ? clientSecret.replace('IBpw', 'lBpw')
+        : null;
+
+      if (altSecret) {
+        const retryRes = await fetch('https://oauth2.googleapis.com/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            code,
+            client_id: clientId,
+            client_secret: altSecret,
+            redirect_uri: callbackUrl,
+            grant_type: 'authorization_code',
+          }),
+        });
+        if (retryRes.ok) {
+          tokenResponse = retryRes;
+        }
+      }
+    }
 
     if (!tokenResponse.ok) {
       console.error('Google token exchange failed:', await tokenResponse.text());
