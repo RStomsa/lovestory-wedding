@@ -506,121 +506,251 @@ export default function StudioLeftRail() {
         )}
 
         {/* =========================================================================
-            SHAPES / HÌNH DẠNG (SCREENSHOT 3: "ĐƯỜNG KẺ, HÌNH VUÔNG, HÌNH CHỮ NHẬT, HÌNH TRÒN, TAM GIÁC")
+            COMPONENT BLOCKS / KHỐI MẪU (REUSABLE WEDDING SECTIONS)
+        ========================================================================= */}
+        {activeTab === 'block' && (
+          <div className="space-y-4">
+            <div>
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-stone-900 dark:text-white">Khối mẫu thiết kế</h3>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">
+                  {componentBlocksList.length} Khối
+                </span>
+              </div>
+              <p className="text-[11px] text-stone-500 mt-0.5">
+                Chèn nhanh các cụm thiết kế hoàn chỉnh (Tiêu đề, Lời mời, Lịch trình, Hộp mừng...)
+              </p>
+            </div>
+
+            {/* Block Category Filter */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[11px]">
+              {['all', 'header', 'invitation', 'schedule', 'giftbox'].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedBlockCategory(cat)}
+                  className={`px-2.5 py-1 rounded-full whitespace-nowrap transition-colors cursor-pointer ${
+                    selectedBlockCategory === cat
+                      ? 'bg-rose-500 text-white font-semibold shadow-xs'
+                      : 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-300 hover:bg-stone-200'
+                  }`}
+                >
+                  {cat === 'all'
+                    ? 'Tất cả'
+                    : cat === 'header'
+                    ? 'Tên Dâu Rể'
+                    : cat === 'invitation'
+                    ? 'Lời Mời'
+                    : cat === 'schedule'
+                    ? 'Lịch Trình'
+                    : 'Hộp Mừng'}
+                </button>
+              ))}
+            </div>
+
+            {/* Block Cards List */}
+            <div className="space-y-3">
+              {filteredComponentBlocks.map((block) => (
+                <div
+                  key={block.id}
+                  className="group rounded-2xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/90 p-3 hover:border-rose-400 hover:shadow-md transition-all space-y-2.5"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+                        {block.categoryLabel || block.category}
+                      </span>
+                      <h4 className="font-semibold text-stone-900 dark:text-white text-xs mt-0.5">
+                        {block.name}
+                      </h4>
+                      <p className="text-[10px] text-stone-400 mt-0.5">
+                        {block.elements?.length || 0} phần tử kết hợp
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleInsertBlock(block)}
+                    className="w-full py-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500 text-stone-700 dark:text-stone-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Chèn khối vào thiệp</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* =========================================================================
+            SHAPES / HÌNH DẠNG (WEDDING SHAPES, FRAMES & BASIC GEOMETRY)
         ========================================================================= */}
         {activeTab === 'shape' && (
           <div className="space-y-4">
             <div>
-              <h3 className="text-sm font-bold text-stone-900 dark:text-white">Hình dạng</h3>
-              <p className="text-[11px] text-stone-500 mt-0.5">Chọn hình để thêm vào thiệp cưới</p>
+              <h3 className="text-sm font-bold text-stone-900 dark:text-white">Hình dạng &amp; Khung viền</h3>
+              <p className="text-[11px] text-stone-500 mt-0.5">Chọn khung viền hoặc hình học để thêm vào thiệp cưới</p>
             </div>
 
+            {/* Classical Wedding Vector Shapes & Frames */}
             <div className="space-y-2">
-              <button
-                onClick={() =>
-                  addElement({
-                    type: 'shape',
-                    shapeType: 'line',
-                    x: 50,
-                    y: 400,
-                    width: 400,
-                    height: 2,
-                    rotation: 0,
-                    opacity: 1,
-                    fillColor: '#9c5a1a',
-                  })
-                }
-                className="w-full p-3 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-rose-400 flex items-center gap-3 transition-all"
-              >
-                <Minus className="w-4 h-4 text-stone-600 dark:text-stone-300" />
-                <span className="font-medium text-stone-800 dark:text-stone-200">Đường kẻ</span>
-              </button>
+              <span className="text-[11px] font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider block">
+                Khung Viền &amp; Hoa Văn Cưới
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {WEDDING_SHAPES_CATALOG.map((shp) => (
+                  <button
+                    key={shp.id}
+                    onClick={() =>
+                      addElement({
+                        type: 'shape',
+                        shapeType: 'custom_svg',
+                        x: 80,
+                        y: getSmartInsertY(shp.defaultHeight),
+                        width: shp.defaultWidth,
+                        height: shp.defaultHeight,
+                        rotation: 0,
+                        opacity: 1,
+                        fillColor: shp.fillColor || 'transparent',
+                        borderColor: shp.strokeColor || '#8B1E2D',
+                        borderWidth: 2,
+                        svgPath: shp.svgPath,
+                        viewBox: shp.viewBox,
+                      } as any)
+                    }
+                    className="p-2.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 hover:border-rose-400 hover:bg-rose-50/30 transition-all flex flex-col items-center justify-center gap-1.5 text-center cursor-pointer group"
+                    title={shp.name}
+                  >
+                    <div className="w-12 h-12 flex items-center justify-center text-rose-700 group-hover:scale-110 transition-transform">
+                      <svg
+                        viewBox={shp.viewBox}
+                        className="w-10 h-10"
+                        fill={shp.fillColor || 'none'}
+                        stroke={shp.strokeColor || '#8B1E2D'}
+                        strokeWidth={2}
+                      >
+                        <path d={shp.svgPath} />
+                      </svg>
+                    </div>
+                    <span className="text-[10px] font-medium text-stone-700 dark:text-stone-300 line-clamp-1">
+                      {shp.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
 
-              <button
-                onClick={() =>
-                  addElement({
-                    type: 'shape',
-                    shapeType: 'square',
-                    x: 175,
-                    y: 400,
-                    width: 150,
-                    height: 150,
-                    rotation: 0,
-                    opacity: 1,
-                    fillColor: '#EADBCE',
-                    borderRadius: 8,
-                  })
-                }
-                className="w-full p-3 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-rose-400 flex items-center gap-3 transition-all"
-              >
-                <Square className="w-4 h-4 text-stone-600 dark:text-stone-300" />
-                <span className="font-medium text-stone-800 dark:text-stone-200">Hình vuông</span>
-              </button>
+            {/* Basic Geometric Shapes */}
+            <div className="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
+              <span className="text-[11px] font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider block">
+                Hình Khối Cơ Bản
+              </span>
+              <div className="space-y-1.5">
+                <button
+                  onClick={() =>
+                    addElement({
+                      type: 'shape',
+                      shapeType: 'line',
+                      x: 50,
+                      y: getSmartInsertY(10),
+                      width: 400,
+                      height: 2,
+                      rotation: 0,
+                      opacity: 1,
+                      fillColor: '#9c5a1a',
+                    })
+                  }
+                  className="w-full p-2.5 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-rose-400 flex items-center gap-3 transition-all cursor-pointer"
+                >
+                  <Minus className="w-4 h-4 text-stone-600 dark:text-stone-300" />
+                  <span className="font-medium text-stone-800 dark:text-stone-200 text-xs">Đường kẻ phân cách</span>
+                </button>
 
-              <button
-                onClick={() =>
-                  addElement({
-                    type: 'shape',
-                    shapeType: 'rectangle',
-                    x: 50,
-                    y: 400,
-                    width: 400,
-                    height: 200,
-                    rotation: 0,
-                    opacity: 1,
-                    fillColor: '#FAF7F2',
-                    borderRadius: 16,
-                    borderWidth: 1,
-                    borderColor: '#EADBCE',
-                  })
-                }
-                className="w-full p-3 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-rose-400 flex items-center gap-3 transition-all"
-              >
-                <Square className="w-4 h-4 text-stone-600 dark:text-stone-300 aspect-[2/1]" />
-                <span className="font-medium text-stone-800 dark:text-stone-200">Hình chữ nhật</span>
-              </button>
+                <button
+                  onClick={() =>
+                    addElement({
+                      type: 'shape',
+                      shapeType: 'square',
+                      x: 175,
+                      y: getSmartInsertY(150),
+                      width: 150,
+                      height: 150,
+                      rotation: 0,
+                      opacity: 1,
+                      fillColor: '#EADBCE',
+                      borderRadius: 8,
+                    })
+                  }
+                  className="w-full p-2.5 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-rose-400 flex items-center gap-3 transition-all cursor-pointer"
+                >
+                  <Square className="w-4 h-4 text-stone-600 dark:text-stone-300" />
+                  <span className="font-medium text-stone-800 dark:text-stone-200 text-xs">Hình vuông bo góc</span>
+                </button>
 
-              <button
-                onClick={() =>
-                  addElement({
-                    type: 'shape',
-                    shapeType: 'circle',
-                    x: 180,
-                    y: 400,
-                    width: 140,
-                    height: 140,
-                    rotation: 0,
-                    opacity: 1,
-                    fillColor: '#FAF7F2',
-                    borderColor: '#C5A880',
-                    borderWidth: 2,
-                  })
-                }
-                className="w-full p-3 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-rose-400 flex items-center gap-3 transition-all"
-              >
-                <Circle className="w-4 h-4 text-stone-600 dark:text-stone-300" />
-                <span className="font-medium text-stone-800 dark:text-stone-200">Hình tròn</span>
-              </button>
+                <button
+                  onClick={() =>
+                    addElement({
+                      type: 'shape',
+                      shapeType: 'rectangle',
+                      x: 50,
+                      y: getSmartInsertY(200),
+                      width: 400,
+                      height: 200,
+                      rotation: 0,
+                      opacity: 1,
+                      fillColor: '#FAF7F2',
+                      borderRadius: 16,
+                      borderWidth: 1,
+                      borderColor: '#EADBCE',
+                    })
+                  }
+                  className="w-full p-2.5 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-rose-400 flex items-center gap-3 transition-all cursor-pointer"
+                >
+                  <Square className="w-4 h-4 text-stone-600 dark:text-stone-300 aspect-[2/1]" />
+                  <span className="font-medium text-stone-800 dark:text-stone-200 text-xs">Hình chữ nhật viền</span>
+                </button>
 
-              <button
-                onClick={() =>
-                  addElement({
-                    type: 'shape',
-                    shapeType: 'triangle',
-                    x: 180,
-                    y: 400,
-                    width: 140,
-                    height: 140,
-                    rotation: 0,
-                    opacity: 1,
-                    fillColor: '#EADBCE',
-                  })
-                }
-                className="w-full p-3 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-rose-400 flex items-center gap-3 transition-all"
-              >
-                <Triangle className="w-4 h-4 text-stone-600 dark:text-stone-300" />
-                <span className="font-medium text-stone-800 dark:text-stone-200">Tam giác</span>
-              </button>
+                <button
+                  onClick={() =>
+                    addElement({
+                      type: 'shape',
+                      shapeType: 'circle',
+                      x: 180,
+                      y: getSmartInsertY(140),
+                      width: 140,
+                      height: 140,
+                      rotation: 0,
+                      opacity: 1,
+                      fillColor: '#FAF7F2',
+                      borderColor: '#C5A880',
+                      borderWidth: 2,
+                    })
+                  }
+                  className="w-full p-2.5 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-rose-400 flex items-center gap-3 transition-all cursor-pointer"
+                >
+                  <Circle className="w-4 h-4 text-stone-600 dark:text-stone-300" />
+                  <span className="font-medium text-stone-800 dark:text-stone-200 text-xs">Hình tròn</span>
+                </button>
+
+                <button
+                  onClick={() =>
+                    addElement({
+                      type: 'shape',
+                      shapeType: 'triangle',
+                      x: 180,
+                      y: getSmartInsertY(140),
+                      width: 140,
+                      height: 140,
+                      rotation: 0,
+                      opacity: 1,
+                      fillColor: '#EADBCE',
+                    })
+                  }
+                  className="w-full p-2.5 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-rose-400 flex items-center gap-3 transition-all cursor-pointer"
+                >
+                  <Triangle className="w-4 h-4 text-stone-600 dark:text-stone-300" />
+                  <span className="font-medium text-stone-800 dark:text-stone-200 text-xs">Tam giác</span>
+                </button>
+              </div>
             </div>
           </div>
         )}

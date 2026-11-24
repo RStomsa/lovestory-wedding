@@ -28,6 +28,8 @@ import {
   UploadCloud,
   Image as ImageIcon,
   Link as LinkIcon,
+  Layers,
+  CheckCircle2,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useStudioStore } from './studioStore';
@@ -68,6 +70,82 @@ export default function StudioRightInspector() {
   const [gfxSubCategory, setGfxSubCategory] = useState('');
   const [isSavingGfx, setIsSavingGfx] = useState(false);
   const [gfxToast, setGfxToast] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  // Save element as component block modal
+  const [showSaveBlockModal, setShowSaveBlockModal] = useState(false);
+  const [blockName, setBlockName] = useState('');
+  const [blockCategory, setBlockCategory] = useState<'header' | 'invitation' | 'schedule' | 'giftbox' | 'custom'>('custom');
+  const [isSavingBlock, setIsSavingBlock] = useState(false);
+
+  const handleOpenSaveBlockModal = () => {
+    const defaultName = selectedElement?.type === 'text'
+      ? `Khối Chữ: ${(selectedElement as any).text?.slice(0, 20) || 'Tiêu đề'}`
+      : selectedElement?.type === 'widget'
+      ? `Khối Tiện Ích: ${(selectedElement as any).widgetType || 'Widget'}`
+      : `Khối Mẫu Thiết Kế Mới`;
+    setBlockName(defaultName);
+    setBlockCategory('custom');
+    setShowSaveBlockModal(true);
+  };
+
+  const handleConfirmSaveBlock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedElement || !blockName.trim()) return;
+
+    setIsSavingBlock(true);
+    try {
+      const blockId = `block-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+      const categoryLabels: Record<string, string> = {
+        header: 'Tiêu Đề & Tên',
+        invitation: 'Lời Mời & Cảm Ơn',
+        schedule: 'Lịch Trình',
+        giftbox: 'Hộp Mừng Cưới',
+        custom: 'Khối Tùy Chỉnh',
+      };
+
+      const normalizedElement = {
+        ...selectedElement,
+        id: `blk-${selectedElement.id}`,
+        x: 0,
+        y: 0,
+      };
+
+      const newBlock = {
+        id: blockId,
+        name: blockName.trim(),
+        category: blockCategory,
+        categoryLabel: categoryLabels[blockCategory] || 'Khối Tùy Chỉnh',
+        width: selectedElement.width,
+        height: selectedElement.height,
+        elements: [normalizedElement],
+      };
+
+      const res = await fetch('/api/realtime/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: typeof window !== 'undefined' && Boolean((window as any).__TAURI__) ? 'desktop' : 'web',
+          clientId: `client_${Math.random().toString(36).slice(2, 8)}`,
+          entityType: 'block',
+          action: 'create',
+          id: blockId,
+          data: newBlock,
+          timestamp: Date.now(),
+        }),
+      });
+
+      if (!res.ok) throw new Error('Không thể lưu khối mẫu');
+
+      setShowSaveBlockModal(false);
+      setGfxToast({ text: `Đã lưu khối mẫu "${blockName}" thành công!`, type: 'success' });
+      setTimeout(() => setGfxToast(null), 4000);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Lỗi khi lưu khối mẫu';
+      setGfxToast({ text: msg, type: 'error' });
+    } finally {
+      setIsSavingBlock(false);
+    }
+  };
 
   const handleOpenSaveGfxModal = (src: string, defaultName?: string) => {
     setGfxName(defaultName || 'Đồ họa trang trí mới');
@@ -521,6 +599,13 @@ export default function StudioRightInspector() {
                 title="Nhân bản"
               >
                 <Copy className="w-4 h-4" />
+              </button>
+              <button
+                onClick={handleOpenSaveBlockModal}
+                className="p-1.5 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-950/40 text-purple-600 dark:text-purple-400"
+                title="Lưu thành khối mẫu thiết kế (Component Block)"
+              >
+                <Layers className="w-4 h-4" />
               </button>
               <button
                 onClick={() => removeElement(selectedElement.id)}
@@ -2166,6 +2251,97 @@ export default function StudioRightInspector() {
                     <FolderPlus className="w-3.5 h-3.5" />
                   )}
                   <span>Xác nhận lưu</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* SAVE COMPONENT BLOCK MODAL (REUSABLE BLOCK CATALOG) */}
+      {/* ======================================================== */}
+      {showSaveBlockModal && selectedElement && (
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-2xs flex items-center justify-center p-4">
+          <div className="relative w-full max-w-md bg-white border border-stone-200 rounded-3xl shadow-2xl p-6 z-10 space-y-4 animate-in fade-in zoom-in-95 duration-150 text-stone-900">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+              <div>
+                <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">
+                  LoveStory Studio Engine
+                </span>
+                <h3 className="font-serif font-bold text-lg text-stone-900 flex items-center gap-2">
+                  <Layers className="w-5 h-5 text-purple-600" />
+                  <span>Lưu Thành Khối Mẫu Thiết Kế</span>
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSaveBlockModal(false)}
+                className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmSaveBlock} className="space-y-3.5 text-xs">
+              <div className="space-y-1">
+                <label className="font-semibold text-stone-700 block">
+                  Tên khối mẫu <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={blockName}
+                  onChange={(e) => setBlockName(e.target.value)}
+                  placeholder="Ví dụ: Cụm Tên Dâu Rể Tối Giản, Khối Lời Cảm Ơn..."
+                  className="w-full px-3.5 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 font-medium"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-stone-700 block">Phân loại khối</label>
+                <select
+                  value={blockCategory}
+                  onChange={(e) => setBlockCategory(e.target.value as any)}
+                  className="w-full px-3.5 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 font-medium cursor-pointer"
+                >
+                  <option value="header">Tiêu đề &amp; Tên Dâu Rể (Header)</option>
+                  <option value="invitation">Lời Ngỏ &amp; Lời Mời (Invitation)</option>
+                  <option value="schedule">Lịch Trình Tiệc Cưới (Schedule)</option>
+                  <option value="giftbox">Hộp Mừng Cưới &amp; VietQR (Giftbox)</option>
+                  <option value="custom">Khối Mẫu Tùy Chỉnh (Custom)</option>
+                </select>
+              </div>
+
+              <div className="p-3 bg-purple-50/70 border border-purple-200 rounded-xl text-[11px] text-purple-900 space-y-1">
+                <div className="font-bold flex items-center gap-1 text-purple-800">
+                  <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                  <span>Tự động đồng bộ Realtime:</span>
+                </div>
+                <p className="text-[10px] text-purple-800/80 leading-relaxed">
+                  Khối này sẽ được lưu vào kho &ldquo;Khối mẫu&rdquo; hệ thống và tự động phát sóng realtime sang Web &amp; Desktop App để tái sử dụng với 1 cú nhấp chuột.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={() => setShowSaveBlockModal(false)}
+                  className="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingBlock}
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold shadow-md shadow-purple-600/20 flex items-center gap-1.5 disabled:opacity-50"
+                >
+                  {isSavingBlock ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <FolderPlus className="w-3.5 h-3.5" />
+                  )}
+                  <span>Lưu Khối Mẫu</span>
                 </button>
               </div>
             </form>
