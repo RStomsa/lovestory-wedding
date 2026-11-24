@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @font-face {
   font-family: 'Paris Regular';
   src: local('Parisienne'), local('Parisienne-Regular'), url('https://fonts.gstatic.com/s/parisienne/v16/E21V_dn3jvZaLFDvSUUV-qBBbg.woff2') format('woff2');
@@ -76,6 +78,21 @@ body {
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #f0ede8 0%, #faf8f5 50%, #f0ede8 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite ease-in-out;
 }
 
 @keyframes slideRight {

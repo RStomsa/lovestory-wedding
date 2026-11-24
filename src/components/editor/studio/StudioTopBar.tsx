@@ -50,6 +50,8 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
     markSaved,
     elements,
     canvas,
+    selectedId,
+    selectElement,
     isInspectorOpen,
     toggleInspector,
     weddingProfile,
@@ -197,17 +199,49 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
     const node = document.getElementById('studio-main-canvas');
     if (!node) return;
     setIsExporting(true);
+
+    // Save previous selection and deselect so handles & toolbars are completely hidden from the exported image
+    const prevSelectedId = selectedId;
+    if (prevSelectedId) {
+      selectElement(null);
+      // Wait for React to flush DOM state
+      await new Promise((r) => setTimeout(r, 120));
+    }
+
     try {
       const { domToPng } = await import('modern-screenshot');
-      const dataUrl = await domToPng(node, { scale: 2 });
+      const dataUrl = await domToPng(node, {
+        scale: 2,
+        filter: (el) => {
+          if (el instanceof HTMLElement) {
+            if (
+              el.getAttribute('data-export-ignore') === 'true' ||
+              el.classList?.contains('moveable-control-box') ||
+              el.getAttribute('data-moveable') ||
+              el.classList?.contains('selection-toolbar')
+            ) {
+              return false;
+            }
+          }
+          return true;
+        },
+      });
       const link = document.createElement('a');
-      link.download = 'thiep-cuoi-lovestory.png';
+      link.download = `${(canvas.title || 'thiep-cuoi-lovestory')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '') || 'thiep-cuoi-lovestory'}.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
       console.error('Export error:', err);
       alert('Có lỗi khi xuất ảnh thiệp cưới.');
     } finally {
+      if (prevSelectedId) {
+        selectElement(prevSelectedId);
+      }
       setIsExporting(false);
     }
   };
@@ -556,24 +590,24 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
       {/* ADMIN: SAVE TO TEMPLATE WAREHOUSE MODAL */}
       {/* ======================================================== */}
       {showSavePresetModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-stone-900 border border-stone-800 rounded-3xl shadow-2xl w-full max-w-xl max-h-[92vh] overflow-y-auto p-6 relative animate-in fade-in zoom-in-95 duration-200 text-stone-100">
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-2xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl shadow-2xl w-full max-w-xl max-h-[92vh] overflow-y-auto p-6 relative animate-in fade-in zoom-in-95 duration-150 text-stone-900">
             <button
               onClick={() => setShowSavePresetModal(false)}
-              className="absolute top-4 right-4 p-2 text-stone-400 hover:text-white rounded-full hover:bg-stone-800"
+              className="absolute top-4 right-4 p-2 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-100 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-2xl bg-purple-500/20 border border-purple-500/30 text-purple-400 flex items-center justify-center shrink-0">
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-stone-100">
+              <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 border border-purple-200 flex items-center justify-center shrink-0">
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-base text-white flex items-center gap-2">
+                <h3 className="font-bold text-base text-stone-900 font-serif flex items-center gap-2">
                   Lưu Thiết Kế Vào Kho Mẫu Thiệp
                 </h3>
-                <p className="text-xs text-stone-400">
+                <p className="text-xs text-stone-500">
                   Mẫu này sẽ được lưu vào kho dữ liệu và hiển thị công khai trên danh mục LoveStory cho khách hàng chọn làm thiệp.
                 </p>
               </div>
@@ -584,29 +618,29 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
               <div
                 className={`p-3.5 rounded-2xl text-xs mb-4 flex items-center gap-2.5 ${
                   saveStatus.type === 'success'
-                    ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300'
-                    : 'bg-rose-500/10 border border-rose-500/30 text-rose-300'
+                    ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                    : 'bg-rose-50 border border-rose-200 text-rose-800'
                 }`}
               >
                 {saveStatus.type === 'success' ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 ) : (
-                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                 )}
                 <div className="flex-1">
-                  <p className="font-medium">{saveStatus.message}</p>
+                  <p className="font-semibold">{saveStatus.message}</p>
                   {saveStatus.type === 'success' && saveStatus.savedSlug && (
                     <div className="mt-2 flex items-center gap-3">
                       <Link
                         href="/admin/templates"
-                        className="text-[11px] underline text-purple-300 hover:text-white font-semibold"
+                        className="text-[11px] underline text-purple-700 hover:text-purple-900 font-semibold"
                       >
                         Quản lý trong Kho Templates →
                       </Link>
                       <Link
                         href={`/templates`}
                         target="_blank"
-                        className="text-[11px] underline text-emerald-300 hover:text-white font-semibold flex items-center gap-1"
+                        className="text-[11px] underline text-emerald-700 hover:text-emerald-900 font-semibold flex items-center gap-1"
                       >
                         <span>Xem trang khách hàng</span>
                         <ExternalLink className="w-3 h-3" />
@@ -621,28 +655,28 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
               {/* Tên mẫu thiệp & Slug */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-stone-300 block">
-                    Tên Mẫu Thiệp <span className="text-rose-400">*</span>
+                  <label className="font-semibold text-stone-700 block">
+                    Tên Mẫu Thiệp <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={tplName}
                     onChange={(e) => handleNameChange(e.target.value)}
-                    className="w-full bg-stone-800 border border-stone-700 rounded-xl p-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-purple-500 font-medium"
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 font-medium transition-colors"
                     placeholder="VD: Thiệp Cưới Burgundy Cinema"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-semibold text-stone-300 block">
-                    Đường dẫn mẫu (Slug) <span className="text-rose-400">*</span>
+                  <label className="font-semibold text-stone-700 block">
+                    Đường dẫn mẫu (Slug) <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={tplSlug}
                     onChange={(e) => setTplSlug(e.target.value)}
-                    className="w-full bg-stone-800 border border-stone-700 rounded-xl p-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-purple-500 font-mono"
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 font-mono transition-colors"
                     placeholder="thiep-cuoi-burgundy-cinema"
                   />
                 </div>
@@ -651,11 +685,11 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
               {/* Thể loại & Hạng mẫu (Tier) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-stone-300 block">Thể loại</label>
+                  <label className="font-semibold text-stone-700 block">Thể loại</label>
                   <select
                     value={tplCategory}
                     onChange={(e) => setTplCategory(e.target.value as 'wedding' | 'birthday' | 'event' | 'graduation')}
-                    className="w-full bg-stone-800 border border-stone-700 rounded-xl p-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                   >
                     <option value="wedding">Đám Cưới (Wedding)</option>
                     <option value="birthday">Sinh Nhật (Birthday)</option>
@@ -665,7 +699,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-stone-300 block">Hạng mẫu (Tier)</label>
+                  <label className="font-semibold text-stone-700 block">Hạng mẫu (Tier)</label>
                   <select
                     value={tplTier}
                     onChange={(e) => {
@@ -675,7 +709,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                       else if (newTier === 'BASIC') setTplPrice(50000);
                       else setTplPrice(30000);
                     }}
-                    className="w-full bg-stone-800 border border-stone-700 rounded-xl p-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                   >
                     <option value="PREMIUM">VIP (Mua lẻ 30k / Gói VIP 200k)</option>
                     <option value="BASIC">Chuẩn 1 Năm (50.000đ)</option>
@@ -684,13 +718,13 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-stone-300 block">Giá Bán Lẻ (VNĐ)</label>
+                  <label className="font-semibold text-stone-700 block">Giá Bán Lẻ (VNĐ)</label>
                   <input
                     type="number"
                     disabled={tplTier === 'FREE'}
                     value={tplPrice}
                     onChange={(e) => setTplPrice(Number(e.target.value))}
-                    className="w-full bg-stone-800 border border-stone-700 rounded-xl p-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-purple-500 font-mono disabled:opacity-50"
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 disabled:opacity-50 font-mono transition-colors"
                   />
                 </div>
               </div>
@@ -698,24 +732,24 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
               {/* Huy hiệu (Badge) & Ảnh xem trước (Thumbnail) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-stone-300 block">Huy hiệu hiển thị</label>
+                  <label className="font-semibold text-stone-700 block">Huy hiệu hiển thị</label>
                   <input
                     type="text"
                     value={tplBadge}
                     onChange={(e) => setTplBadge(e.target.value)}
-                    className="w-full bg-stone-800 border border-stone-700 rounded-xl p-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 transition-colors"
                     placeholder="Hot VIP, Mới, Nổi Bật"
                   />
                 </div>
 
                 <div className="sm:col-span-2 space-y-1">
                   <div className="flex items-center justify-between">
-                    <label className="font-semibold text-stone-300">Ảnh Thumbnail Xem Trước</label>
+                    <label className="font-semibold text-stone-700">Ảnh Thumbnail Xem Trước</label>
                     <button
                       type="button"
                       onClick={handleCaptureThumbnail}
                       disabled={isCapturingThumb}
-                      className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 font-medium"
+                      className="text-[11px] text-purple-600 hover:text-purple-800 flex items-center gap-1 font-semibold"
                     >
                       <Camera className="w-3.5 h-3.5" />
                       <span>{isCapturingThumb ? 'Đang chụp...' : 'Chụp Canvas làm ảnh'}</span>
@@ -727,25 +761,25 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                       required
                       value={tplThumbnail.startsWith('data:image/') ? '[Ảnh chụp từ Canvas - Sẽ lưu vào public/assets/uploads/thumbnails/]' : tplThumbnail}
                       onChange={(e) => setTplThumbnail(e.target.value)}
-                      className="w-full bg-stone-800 border border-stone-700 rounded-xl p-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-purple-500 font-mono truncate"
+                      className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 font-mono truncate transition-colors"
                       placeholder="https://... hoặc chụp Canvas"
                     />
                     {tplThumbnail && (
-                      <div className="w-9 h-9 rounded-lg border border-stone-700 overflow-hidden shrink-0 bg-stone-950 flex items-center justify-center shadow-xs">
+                      <div className="w-9 h-9 rounded-lg border border-stone-200 overflow-hidden shrink-0 bg-white flex items-center justify-center shadow-2xs">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={tplThumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>
-                  <span className="text-[10px] text-stone-400 block">
-                    📁 Vị trí lưu: <code className="text-purple-300">public/assets/uploads/thumbnails/</code>
+                  <span className="text-[10px] text-stone-500 block">
+                    📁 Vị trí lưu: <code className="text-purple-600 bg-purple-50 px-1 py-0.5 rounded border border-purple-200">public/assets/uploads/thumbnails/</code>
                   </span>
                 </div>
               </div>
 
               {/* Quick Preset Thumbnails */}
               <div className="space-y-1.5">
-                <span className="text-[11px] text-stone-400 block">Chọn nhanh ảnh bìa mẫu:</span>
+                <span className="text-[11px] text-stone-500 font-medium block">Chọn nhanh ảnh bìa mẫu:</span>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {SAMPLE_THUMBS.map((s, idx) => (
                     <button
@@ -754,8 +788,8 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                       onClick={() => setTplThumbnail(s.url)}
                       className={`p-1.5 rounded-xl border text-left text-[10px] transition-all flex items-center gap-2 ${
                         tplThumbnail === s.url
-                          ? 'border-purple-500 bg-purple-500/20 text-purple-300'
-                          : 'border-stone-800 bg-stone-850 hover:border-stone-700 text-stone-400'
+                          ? 'border-purple-600 bg-purple-50 text-purple-700 font-semibold shadow-2xs'
+                          : 'border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-600'
                       }`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -768,29 +802,29 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
 
               {/* Mô tả mẫu thiệp */}
               <div className="space-y-1">
-                <label className="font-semibold text-stone-300 block">Mô tả mẫu thiệp</label>
+                <label className="font-semibold text-stone-700 block">Mô tả mẫu thiệp</label>
                 <textarea
                   rows={2}
                   value={tplDescription}
                   onChange={(e) => setTplDescription(e.target.value)}
-                  className="w-full bg-stone-800 border border-stone-700 rounded-xl p-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-purple-500"
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                   placeholder="Mô tả phong cách, hiệu ứng nổi bật của mẫu thiệp này..."
                 />
               </div>
 
               {/* Footer Actions */}
-              <div className="pt-3 flex items-center justify-end gap-2 border-t border-stone-800">
+              <div className="pt-3 flex items-center justify-end gap-2 border-t border-stone-100">
                 <button
                   type="button"
                   onClick={() => setShowSavePresetModal(false)}
-                  className="px-4 py-2.5 rounded-xl border border-stone-700 text-stone-300 hover:bg-stone-800 font-medium"
+                  className="px-4 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition-colors"
                 >
                   Đóng
                 </button>
                 <button
                   type="submit"
                   disabled={isSavingPreset}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold shadow-lg shadow-purple-600/30 flex items-center gap-2 active:scale-95 disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs shadow-md shadow-purple-600/25 flex items-center gap-2 active:scale-95 disabled:opacity-50 transition-all"
                 >
                   {isSavingPreset ? (
                     <>
@@ -814,11 +848,11 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
       {/* CUSTOMER: PUBLISH PERSONAL WEDDING CARD MODAL */}
       {/* ======================================================== */}
       {showUserPublishModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-stone-900 border border-stone-800 rounded-3xl shadow-2xl w-full max-w-lg p-6 sm:p-8 relative animate-in fade-in zoom-in-95 duration-200 text-stone-100 max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-2xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl shadow-2xl w-full max-w-lg p-6 sm:p-8 relative animate-in fade-in zoom-in-95 duration-150 text-stone-900 max-h-[92vh] overflow-y-auto">
             <button
               onClick={() => setShowUserPublishModal(false)}
-              className="absolute top-4 right-4 p-2 text-stone-400 hover:text-white rounded-full hover:bg-stone-800 transition-colors"
+              className="absolute top-4 right-4 p-2 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-100 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -826,24 +860,24 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
             {publishSuccessData ? (
               /* Success State */
               <div className="text-center space-y-5 py-2">
-                <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto">
+                <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
 
                 <div className="space-y-1.5">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200">
                     Xuất bản thành công
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-white pt-2">
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-stone-900 pt-2">
                     Thiệp Cưới Của Bạn Đã Sẵn Sàng!
                   </h3>
-                  <p className="text-xs text-stone-400 max-w-sm mx-auto leading-relaxed">
+                  <p className="text-xs text-stone-500 max-w-sm mx-auto leading-relaxed">
                     Thiệp cưới đã được lưu vào hệ thống LoveStory và có thể chia sẻ cho người thân, bạn bè ngay bây giờ.
                   </p>
                 </div>
 
                 {/* QR Code */}
-                <div className="p-4 bg-white rounded-2xl inline-block mx-auto shadow-xl">
+                <div className="p-4 bg-white rounded-2xl inline-block mx-auto border border-stone-200 shadow-md">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
@@ -852,22 +886,22 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                     alt="QR Code Thiệp Cưới"
                     className="w-36 h-36 mx-auto"
                   />
-                  <span className="text-[10px] font-semibold text-stone-600 block mt-2">
+                  <span className="text-[10px] font-semibold text-stone-500 block mt-2">
                     Quét mở trên điện thoại
                   </span>
                 </div>
 
                 {/* URL display */}
-                <div className="p-3 rounded-2xl bg-stone-950 font-mono text-xs text-rose-300 border border-stone-800 flex items-center justify-between gap-2">
-                  <span className="truncate">
+                <div className="p-3 rounded-2xl bg-stone-50 font-mono text-xs text-rose-700 border border-stone-200 flex items-center justify-between gap-2">
+                  <span className="truncate font-semibold">
                     {typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/{publishSuccessData.slug}
                   </span>
                   <button
                     type="button"
                     onClick={handleCopyPublishedLink}
-                    className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-white shrink-0 text-xs flex items-center gap-1 transition-colors"
+                    className="p-1.5 px-2.5 rounded-xl bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 shrink-0 text-xs flex items-center gap-1 font-semibold transition-colors shadow-2xs"
                   >
-                    {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedLink ? 'Đã chép' : 'Chép'}</span>
                   </button>
                 </div>
@@ -878,7 +912,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                     href={`/${publishSuccessData.slug}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-rose-600/20 transition-transform active:scale-95"
+                    className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-rose-600/20 transition-transform active:scale-95"
                   >
                     <ExternalLink className="w-4 h-4" />
                     <span>Xem Thiệp Trực Tiếp</span>
@@ -886,7 +920,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
 
                   <Link
                     href="/dashboard"
-                    className="flex-1 py-3 px-4 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                    className="flex-1 py-3 px-4 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
                   >
                     <span>Về Bảng Điều Khiển</span>
                   </Link>
@@ -896,20 +930,20 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
               /* Publish Form */
               <form onSubmit={handleConfirmUserPublish} className="space-y-5">
                 <div className="space-y-1">
-                  <span className="text-xs uppercase tracking-widest text-rose-400 font-bold">
+                  <span className="text-xs uppercase tracking-widest text-rose-600 font-bold">
                     Xuất Bản Thiệp Cưới
                   </span>
-                  <h3 className="text-xl font-serif font-bold text-white">
+                  <h3 className="text-xl font-serif font-bold text-stone-900">
                     Phát Hành Thiệp Cưới Online
                   </h3>
-                  <p className="text-xs text-stone-400 leading-relaxed">
+                  <p className="text-xs text-stone-500 leading-relaxed">
                     Thiết lập tên và đường dẫn công khai cho thiệp cưới của hai bạn.
                   </p>
                 </div>
 
                 {publishError && (
-                  <div className="p-3.5 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5">
-                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-400 mt-0.5" />
+                  <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
                     <div className="space-y-2 flex-1">
                       <span>{publishError}</span>
                       {publishRequiresUpgrade && (
@@ -932,7 +966,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                 <div className="space-y-4 text-xs">
                   {/* Tên thiệp cưới */}
                   <div className="space-y-1.5">
-                    <label className="font-semibold text-stone-300 block">
+                    <label className="font-semibold text-stone-700 block">
                       Tên Thiệp Cưới
                     </label>
                     <input
@@ -949,7 +983,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                           .replace(/(^-|-$)+/g, '');
                         setUserSiteSlug(generated);
                       }}
-                      className="w-full bg-stone-800 border border-stone-700 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-rose-500"
+                      className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs text-stone-900 outline-none focus:bg-white focus:border-rose-500 focus:ring-1 focus:ring-rose-500/20 font-medium transition-colors"
                       placeholder="vd: Lễ Thành Hôn Bảo & Vy"
                     />
                   </div>
@@ -957,7 +991,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                   {/* Slug đường dẫn */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <label className="font-semibold text-stone-300 block">
+                      <label className="font-semibold text-stone-700 block">
                         Đường Dẫn Công Khai (Slug)
                       </label>
                       <span className="text-[10px] text-stone-400 font-mono">
@@ -965,8 +999,8 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                       </span>
                     </div>
 
-                    <div className="flex items-center rounded-xl bg-stone-800 border border-stone-700 overflow-hidden focus-within:ring-1 focus-within:ring-rose-500 transition-all">
-                      <span className="px-3 py-2.5 bg-stone-950 text-stone-400 font-mono text-xs border-r border-stone-700 shrink-0">
+                    <div className="flex items-center rounded-xl bg-stone-50 border border-stone-200 overflow-hidden focus-within:bg-white focus-within:border-rose-500 focus-within:ring-1 focus-within:ring-rose-500/20 transition-all">
+                      <span className="px-3 py-2.5 bg-stone-100 text-stone-600 font-mono text-xs border-r border-stone-200 shrink-0 font-medium">
                         {typeof window !== 'undefined' ? `${window.location.host}/` : 'lovestory.vn/'}
                       </span>
                       <input
@@ -978,14 +1012,14 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                             e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-')
                           )
                         }
-                        className="w-full bg-transparent px-3 py-2 text-xs text-white font-mono outline-none"
+                        className="w-full bg-transparent px-3 py-2 text-xs text-stone-900 font-mono outline-none"
                         placeholder="bao-va-vy-2026"
                       />
                     </div>
 
                     {/* Gợi ý nhanh đường dẫn đẹp từ Hồ sơ cưới hoặc Tên thiệp */}
                     <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                      <span className="text-[10px] text-stone-400">Gợi ý nhanh:</span>
+                      <span className="text-[10px] text-stone-500 font-medium">Gợi ý nhanh:</span>
                       {(() => {
                         const groomRaw = weddingProfile?.groom?.shortName || weddingProfile?.groom?.fullName || 'bao';
                         const brideRaw = weddingProfile?.bride?.shortName || weddingProfile?.bride?.fullName || 'vy';
@@ -1001,7 +1035,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                             key={chip}
                             type="button"
                             onClick={() => setUserSiteSlug(chip)}
-                            className="px-2 py-0.5 rounded-full bg-stone-800 hover:bg-rose-950/60 text-stone-300 hover:text-rose-300 border border-stone-700 hover:border-rose-700/50 text-[10px] font-mono transition-colors active:scale-95"
+                            className="px-2 py-0.5 rounded-full bg-stone-100 hover:bg-rose-50 text-stone-600 hover:text-rose-600 border border-stone-200 hover:border-rose-200 text-[10px] font-mono transition-colors active:scale-95"
                           >
                             +{chip}
                           </button>
@@ -1015,14 +1049,14 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                   </div>
 
                   {/* Quyền lợi gói */}
-                  <div className="p-3.5 rounded-2xl bg-stone-950/70 border border-stone-800 text-[11px] text-stone-400 space-y-1">
+                  <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-[11px] text-stone-600 space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span>Tài khoản của bạn:</span>
-                      <span className="font-bold text-white">{user?.email}</span>
+                      <span className="font-bold text-stone-900">{user?.email}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>Giới hạn lượt xem:</span>
-                      <span className="font-semibold text-amber-400">
+                      <span className="font-bold text-amber-700">
                         {user?.plan === 'LIFETIME_VIP_200K' || user?.plan === 'ANNUAL_50K' || user?.role === 'ADMIN'
                           ? 'Không giới hạn'
                           : '300 lượt xem (Gói Free)'}
@@ -1032,11 +1066,11 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                 </div>
 
                 {/* Submit button */}
-                <div className="pt-3 flex items-center justify-end gap-2 border-t border-stone-800">
+                <div className="pt-3 flex items-center justify-end gap-2 border-t border-stone-100">
                   <button
                     type="button"
                     onClick={() => setShowUserPublishModal(false)}
-                    className="px-4 py-2.5 rounded-xl border border-stone-700 text-stone-300 hover:bg-stone-800 font-medium text-xs"
+                    className="px-4 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs transition-colors"
                   >
                     Hủy bỏ
                   </button>
@@ -1044,7 +1078,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                   <button
                     type="submit"
                     disabled={isPublishingUser}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-bold text-xs shadow-lg shadow-rose-600/25 flex items-center gap-2 transition-transform active:scale-95 disabled:opacity-50"
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold text-xs shadow-md shadow-rose-600/25 flex items-center gap-2 transition-transform active:scale-95 disabled:opacity-50"
                   >
                     {isPublishingUser ? (
                       <>

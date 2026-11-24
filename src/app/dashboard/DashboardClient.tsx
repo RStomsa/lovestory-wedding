@@ -843,38 +843,38 @@ export default function DashboardClient({ initialUser, initialSites, initialOrde
 
       {/* QR Code Modal */}
       {qrModalSlug && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 animate-in fade-in zoom-in-95 duration-200 text-white relative">
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-2xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 animate-in fade-in zoom-in-95 duration-200 text-stone-900 relative shadow-2xl">
             <button
               onClick={() => setQrModalSlug(null)}
-              className="absolute top-4 right-4 p-2 text-stone-400 hover:text-white rounded-full hover:bg-stone-800"
+              className="absolute top-4 right-4 p-2 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-100 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <h3 className="font-serif font-bold text-lg">{qrModalSlug.title}</h3>
-            <p className="text-xs text-stone-400">
+            <h3 className="font-serif font-bold text-lg text-stone-900">{qrModalSlug.title}</h3>
+            <p className="text-xs text-stone-500">
               Quét mã QR bằng Camera điện thoại hoặc Zalo để mở xem thiệp cưới ngay lập tức:
             </p>
 
-            <div className="p-4 bg-white rounded-2xl inline-block mx-auto shadow-xl">
+            <div className="p-3 bg-stone-50 border border-stone-200 rounded-2xl inline-block mx-auto shadow-xs">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
                   `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/${qrModalSlug.slug}`
                 )}`}
                 alt="QR Code Thiệp Cưới"
-                className="w-48 h-48"
+                className="w-48 h-48 bg-white p-2 rounded-xl"
               />
             </div>
 
-            <div className="p-2.5 rounded-xl bg-stone-950 font-mono text-xs text-rose-300 break-all border border-stone-800">
+            <div className="p-2.5 rounded-xl bg-stone-50 font-mono text-xs text-stone-700 break-all border border-stone-200">
               {typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/{qrModalSlug.slug}
             </div>
 
             <button
               onClick={() => handleCopyLink(qrModalSlug.slug)}
-              className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center justify-center gap-2 transition-transform active:scale-95"
+              className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-md shadow-rose-600/20"
             >
               <Copy className="w-4 h-4" />
               <span>{copiedSlug === qrModalSlug.slug ? '✓ Đã sao chép link!' : 'Sao chép liên kết'}</span>
@@ -885,22 +885,22 @@ export default function DashboardClient({ initialUser, initialSites, initialOrde
 
       {/* Delete Confirmation Modal */}
       {deletingSite && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 text-white">
-            <div className="w-12 h-12 rounded-full bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto">
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-2xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 text-stone-900 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto">
               <Trash2 className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <h3 className="font-serif font-bold text-base">Xác nhận xóa thiệp cưới</h3>
-              <p className="text-xs text-stone-400">
-                Bạn có chắc chắn muốn xóa thiệp <strong className="text-white">&ldquo;{deletingSite.title}&rdquo;</strong>? Hành động này không thể hoàn tác.
+              <h3 className="font-serif font-bold text-base text-stone-900">Xác nhận xóa thiệp cưới</h3>
+              <p className="text-xs text-stone-500">
+                Bạn có chắc chắn muốn xóa thiệp <strong className="text-stone-900">&ldquo;{deletingSite.title}&rdquo;</strong>? Hành động này không thể hoàn tác.
               </p>
             </div>
             <div className="flex items-center gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setDeletingSite(null)}
-                className="flex-1 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold"
+                className="flex-1 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition-colors"
               >
                 Hủy bỏ
               </button>
@@ -908,7 +908,7 @@ export default function DashboardClient({ initialUser, initialSites, initialOrde
                 type="button"
                 onClick={handleDeleteSite}
                 disabled={isDeleting}
-                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center justify-center gap-1.5"
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-rose-600/20 transition-all"
               >
                 {isDeleting ? 'Đang xóa...' : 'Xóa vĩnh viễn'}
               </button>

@@ -38,6 +38,8 @@ import harvestedTemplates from '@/data/harvested_templates/index.json';
 import minviteTemplates from '@/data/minvite_templates.json';
 import { resolveFontFamily } from '@/lib/studioFonts';
 import { WEDDING_TEXT_TEMPLATES } from '@/data/weddingTextTemplates';
+import { Skeleton } from '@/components/common/Skeleton';
+import { compressWeddingPhoto } from '@/lib/imageCompressor';
 import {
   CalendarWidgetIcon,
   CountdownWidgetIcon,
@@ -105,6 +107,7 @@ export default function StudioLeftRail() {
 
   // Uploaded images state
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [isCompressingImages, setIsCompressingImages] = useState(false);
 
   // Dynamic Assets (Graphics & Music) loaded from server + Admin uploads
   const [graphicsList, setGraphicsList] = useState<GraphicSticker[]>(GRAPHICS_CATALOG);
@@ -913,24 +916,30 @@ export default function StudioLeftRail() {
                 accept="image/*"
                 multiple
                 className="hidden"
-                onChange={(e) => {
+                onChange={async (e) => {
                   const files = e.target.files;
                   if (!files || files.length === 0) return;
-                  Array.from(files).forEach((file, idx) => {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                      const dataUrl = reader.result as string;
+                  setIsCompressingImages(true);
+                  try {
+                    for (let idx = 0; idx < files.length; idx++) {
+                      const file = files[idx];
+                      // High-performance client-side WebP compression
+                      const { dataUrl } = await compressWeddingPhoto(file, {
+                        maxWidth: 1920,
+                        quality: 0.85,
+                      });
                       setUploadedImages((prev) => [dataUrl, ...prev]);
                       if (isReplaceMode && selectedId) {
                         updateElement(selectedId, { src: dataUrl }, true);
                         setIsReplaceMode(false);
                       } else {
+                        const targetY = getSmartInsertY(380);
                         addElement({
                           type: 'image',
                           x: 50 + idx * 20,
-                          y: 350 + idx * 20,
-                          width: 400,
-                          height: 500,
+                          y: targetY + idx * 20,
+                          width: 360,
+                          height: 460,
                           rotation: 0,
                           opacity: 1,
                           src: dataUrl,
@@ -938,9 +947,13 @@ export default function StudioLeftRail() {
                           objectFit: 'cover',
                         });
                       }
-                    };
-                    reader.readAsDataURL(file);
-                  });
+                    }
+                  } catch (err) {
+                    console.error('Failed to compress image:', err);
+                  } finally {
+                    setIsCompressingImages(false);
+                    if (e.target) e.target.value = '';
+                  }
                 }}
               />
             </label>
@@ -957,7 +970,19 @@ export default function StudioLeftRail() {
                 Thư viện ảnh
               </span>
 
-              {uploadedImages.length === 0 ? (
+              {/* Skeleton Placeholder while compressing/loading */}
+              {isCompressingImages && (
+                <div className="grid grid-cols-2 gap-2 mb-2">
+                  <div className="aspect-square rounded-xl overflow-hidden border border-stone-200/80">
+                    <Skeleton className="w-full h-full rounded-none" />
+                  </div>
+                  <div className="aspect-square rounded-xl overflow-hidden border border-stone-200/80">
+                    <Skeleton className="w-full h-full rounded-none" />
+                  </div>
+                </div>
+              )}
+
+              {uploadedImages.length === 0 && !isCompressingImages ? (
                 /* Empty state matching Screenshot 1 */
                 <div className="flex flex-col items-center justify-center py-8 text-center space-y-2 border border-stone-100 dark:border-stone-800 rounded-2xl bg-stone-50/50 dark:bg-stone-800/20">
                   <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 flex items-center justify-center text-rose-500 mb-1">

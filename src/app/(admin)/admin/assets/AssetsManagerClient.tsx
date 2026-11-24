@@ -20,6 +20,7 @@ import {
   Image as ImageIcon,
   Check,
   Wand2,
+  X,
 } from 'lucide-react';
 import { StudioFont, resolveFontFamily } from '@/lib/studioFonts';
 import { GraphicSticker } from '@/data/graphicsCatalog';

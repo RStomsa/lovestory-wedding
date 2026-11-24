@@ -889,6 +889,7 @@ export default function StudioCanvas() {
                 {/* In-Place Floating Image Toolbar on Mobile when Selected */}
                 {isTouchFriendly && isSelected && el.type === 'image' && (
                   <div
+                    data-export-ignore="true"
                     onClick={(e) => e.stopPropagation()}
                     className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 flex flex-wrap items-center justify-center gap-1.5 p-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 shadow-2xl rounded-2xl min-w-[280px] max-w-[95%] animate-in fade-in"
                   >
@@ -1032,7 +1033,7 @@ export default function StudioCanvas() {
 
                 {/* Direct Native Resize Handles for Selected Element */}
                 {isSelected && (
-                  <>
+                  <div data-export-ignore="true">
                     {/* 4 Corners */}
                     <div
                       onPointerDown={(e) => handleNativeResize(e, el, 'nw')}
@@ -1076,7 +1077,7 @@ export default function StudioCanvas() {
                       className="absolute top-1/2 -translate-y-1/2 -right-1.5 w-2 h-6 bg-white border border-blue-500 rounded-full shadow-xs z-30 cursor-ew-resize hover:scale-125 transition-transform"
                       title="Kéo chỉnh chiều rộng"
                     />
-                  </>
+                  </div>
                 )}
               </div>
             );
@@ -1168,6 +1169,7 @@ export default function StudioCanvas() {
           {/* FLOATING MINI ACTION TOOLBAR DIRECTLY ABOVE THE SELECTED ELEMENT (Desktop only) */}
           {!isTouchFriendly && selectedEl && (
             <div
+              data-export-ignore="true"
               className="absolute z-50 flex items-center bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 shadow-xl rounded-full px-2 py-1 gap-1 text-stone-700 dark:text-stone-200 transition-all"
               style={{
                 left: `${Math.max(10, selectedEl.x + selectedEl.width / 2 - 60)}px`,

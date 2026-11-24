@@ -199,7 +199,7 @@ export default function UpgradeModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+          className="fixed inset-0 bg-stone-900/40 backdrop-blur-2xs"
         />
 
         {/* Modal Window */}
@@ -207,12 +207,12 @@ export default function UpgradeModal({
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-xl bg-stone-900 text-stone-100 rounded-3xl shadow-2xl border border-stone-800 p-6 sm:p-8 z-10 overflow-hidden"
+          className="relative w-full max-w-xl bg-white text-stone-900 rounded-3xl shadow-2xl border border-stone-200 p-6 sm:p-8 z-10 overflow-hidden"
         >
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-5 right-5 p-2 rounded-full text-stone-400 hover:text-white hover:bg-stone-800 transition-colors"
+            className="absolute top-5 right-5 p-2 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -220,13 +220,13 @@ export default function UpgradeModal({
           {/* SUCCESS SCREEN */}
           {isPaid ? (
             <div className="text-center py-8 space-y-4">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto">
+              <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-10 h-10" />
               </div>
-              <h2 className="text-2xl font-serif font-bold text-white">
+              <h2 className="text-2xl font-serif font-bold text-stone-900">
                 Thanh Toán Thành Công! 🎉
               </h2>
-              <p className="text-sm text-stone-300 max-w-md mx-auto">
+              <p className="text-sm text-stone-600 max-w-md mx-auto">
                 Cảm ơn bạn đã tin tưởng LoveStory! Gói dịch vụ đã được kích hoạt tự động vào tài khoản của bạn.
               </p>
               <div className="pt-4">
@@ -242,13 +242,13 @@ export default function UpgradeModal({
             /* PLAN SELECTION SCREEN */
             <div className="space-y-6">
               <div className="text-center">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 text-xs font-bold mb-2">
-                  <Sparkles className="w-3.5 h-3.5" /> Nâng Cấp Thiệp Cưới Của Bạn
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-800 border border-amber-500/20 text-xs font-bold mb-2">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Nâng Cấp Thiệp Cưới Của Bạn
                 </span>
-                <h2 className="text-2xl font-serif font-bold text-white">
+                <h2 className="text-2xl font-serif font-bold text-stone-900">
                   Chọn Gói Dịch Vụ Phù Hợp
                 </h2>
-                <p className="text-xs text-stone-400 mt-1">
+                <p className="text-xs text-stone-500 mt-1">
                   Mở khóa tính năng cao cấp, xóa watermark và lưu giữ thiệp cưới trọn đời.
                 </p>
               </div>
@@ -260,8 +260,8 @@ export default function UpgradeModal({
                   onClick={() => setSelectedType('PLAN_LIFETIME_VIP_200K')}
                   className={`p-4 rounded-2xl border cursor-pointer transition-all relative overflow-hidden ${
                     selectedType === 'PLAN_LIFETIME_VIP_200K'
-                      ? 'bg-gradient-to-r from-amber-950/40 via-stone-900 to-amber-950/40 border-amber-500/60 shadow-lg shadow-amber-500/10 ring-2 ring-amber-500/30'
-                      : 'bg-stone-900/60 border-stone-800 hover:border-stone-700'
+                      ? 'bg-gradient-to-r from-amber-50/90 via-white to-amber-50/90 border-amber-400 shadow-md ring-2 ring-amber-400/40'
+                      : 'bg-stone-50/70 border-stone-200 hover:border-amber-300 hover:bg-white'
                   }`}
                 >
                   <div className="absolute top-0 right-0 px-3 py-0.5 bg-amber-500 text-stone-950 text-[10px] font-black uppercase tracking-wider rounded-bl-xl">
@@ -270,25 +270,25 @@ export default function UpgradeModal({
 
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
-                      <div className="p-2 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-300 shrink-0 mt-0.5">
+                      <div className="p-2 rounded-xl bg-amber-100 border border-amber-300 text-amber-800 shrink-0 mt-0.5">
                         <Crown className="w-5 h-5" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="font-bold text-sm text-white">VIP Trọn Đời (Lifetime)</h3>
-                          <span className="text-[11px] text-amber-300 font-bold">• Dùng Tất Cả Mẫu</span>
+                          <h3 className="font-bold text-sm text-stone-900">VIP Trọn Đời (Lifetime)</h3>
+                          <span className="text-[11px] text-amber-700 font-bold">• Dùng Tất Cả Mẫu</span>
                         </div>
-                        <ul className="text-[11px] text-stone-300 space-y-1 mt-1.5">
+                        <ul className="text-[11px] text-stone-600 space-y-1 mt-1.5">
                           <li className="flex items-center gap-1.5">
-                            <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <Check className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                             <span><strong>Mở khóa toàn bộ</strong> các template VIP (Không cần mua lẻ)</span>
                           </li>
                           <li className="flex items-center gap-1.5">
-                            <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <Check className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                             <span>Lưu trữ <strong>vĩnh viễn trọn đời</strong>, không giới hạn lượt xem</span>
                           </li>
                           <li className="flex items-center gap-1.5">
-                            <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <Check className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                             <span>Không watermark • Hỗ trợ tên miền riêng</span>
                           </li>
                         </ul>
@@ -296,8 +296,8 @@ export default function UpgradeModal({
                     </div>
 
                     <div className="text-right shrink-0">
-                      <div className="text-lg font-bold font-serif text-amber-300">200.000 đ</div>
-                      <span className="text-[10px] text-stone-400">Trả 1 lần duy nhất</span>
+                      <div className="text-lg font-bold font-serif text-amber-700">200.000 đ</div>
+                      <span className="text-[10px] text-stone-500">Trả 1 lần duy nhất</span>
                     </div>
                   </div>
                 </div>
@@ -307,24 +307,24 @@ export default function UpgradeModal({
                   onClick={() => setSelectedType('PLAN_ANNUAL_50K')}
                   className={`p-4 rounded-2xl border cursor-pointer transition-all ${
                     selectedType === 'PLAN_ANNUAL_50K'
-                      ? 'bg-stone-900 border-blue-500/60 shadow-lg shadow-blue-500/10 ring-2 ring-blue-500/30'
-                      : 'bg-stone-900/60 border-stone-800 hover:border-stone-700'
+                      ? 'bg-blue-50/70 border-blue-400 shadow-md ring-2 ring-blue-400/40'
+                      : 'bg-stone-50/70 border-stone-200 hover:border-blue-300 hover:bg-white'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
-                      <div className="p-2 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-300 shrink-0 mt-0.5">
+                      <div className="p-2 rounded-xl bg-blue-100 border border-blue-300 text-blue-700 shrink-0 mt-0.5">
                         <Zap className="w-5 h-5" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-sm text-white">Gói Tiêu Chuẩn 1 Năm</h3>
-                        <ul className="text-[11px] text-stone-300 space-y-1 mt-1.5">
+                        <h3 className="font-bold text-sm text-stone-900">Gói Tiêu Chuẩn 1 Năm</h3>
+                        <ul className="text-[11px] text-stone-600 space-y-1 mt-1.5">
                           <li className="flex items-center gap-1.5">
-                            <Check className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                            <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                             <span>Thời hạn <strong>1 năm (365 ngày)</strong>, không giới hạn views</span>
                           </li>
                           <li className="flex items-center gap-1.5">
-                            <Check className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                            <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                             <span>Không watermark • Thêm 1 tháng lưu trữ backup DB</span>
                           </li>
                         </ul>
@@ -332,8 +332,8 @@ export default function UpgradeModal({
                     </div>
 
                     <div className="text-right shrink-0">
-                      <div className="text-lg font-bold font-serif text-blue-300">50.000 đ</div>
-                      <span className="text-[10px] text-stone-400">Thời hạn 1 năm</span>
+                      <div className="text-lg font-bold font-serif text-blue-700">50.000 đ</div>
+                      <span className="text-[10px] text-stone-500">Thời hạn 1 năm</span>
                     </div>
                   </div>
                 </div>
@@ -344,30 +344,30 @@ export default function UpgradeModal({
                     onClick={() => setSelectedType('SINGLE_TEMPLATE_VIP')}
                     className={`p-4 rounded-2xl border cursor-pointer transition-all ${
                       selectedType === 'SINGLE_TEMPLATE_VIP'
-                        ? 'bg-stone-900 border-purple-500/60 shadow-lg shadow-purple-500/10 ring-2 ring-purple-500/30'
-                        : 'bg-stone-900/60 border-stone-800 hover:border-stone-700'
+                        ? 'bg-purple-50/70 border-purple-400 shadow-md ring-2 ring-purple-400/40'
+                        : 'bg-stone-50/70 border-stone-200 hover:border-purple-300 hover:bg-white'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3">
-                        <div className="p-2 rounded-xl bg-purple-500/20 border border-purple-500/30 text-purple-300 shrink-0 mt-0.5">
+                        <div className="p-2 rounded-xl bg-purple-100 border border-purple-300 text-purple-700 shrink-0 mt-0.5">
                           <Palette className="w-5 h-5" />
                         </div>
                         <div>
-                          <h3 className="font-bold text-sm text-white">
+                          <h3 className="font-bold text-sm text-stone-900">
                             Mua Lẻ Mẫu {templateName || 'VIP'}
                           </h3>
-                          <p className="text-[11px] text-stone-400 mt-1">
+                          <p className="text-[11px] text-stone-500 mt-1">
                             Sử dụng riêng mẫu VIP này cho thiệp cưới của bạn.
                           </p>
                         </div>
                       </div>
 
                       <div className="text-right shrink-0">
-                        <div className="text-lg font-bold font-serif text-purple-300">
+                        <div className="text-lg font-bold font-serif text-purple-700">
                           {templatePrice.toLocaleString('vi-VN')} đ
                         </div>
-                        <span className="text-[10px] text-stone-400">Mua lẻ 1 mẫu</span>
+                        <span className="text-[10px] text-stone-500">Mua lẻ 1 mẫu</span>
                       </div>
                     </div>
                   </div>
@@ -394,39 +394,39 @@ export default function UpgradeModal({
           ) : (
             /* VIETQR PAYMENT SCREEN */
             <div className="space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-stone-800">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-200">
                 <div>
-                  <h3 className="font-bold text-sm text-white">Quét Mã VietQR Thanh Toán</h3>
-                  <p className="text-[11px] text-stone-400">
+                  <h3 className="font-bold text-sm text-stone-900">Quét Mã VietQR Thanh Toán</h3>
+                  <p className="text-[11px] text-stone-500">
                     Mở app ngân hàng bất kỳ để quét mã Napas 24/7
                   </p>
                 </div>
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-mono font-bold">
-                  <Clock className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-800 text-xs font-mono font-bold">
+                  <Clock className="w-3.5 h-3.5 text-amber-600" />
                   <span>{formatTimer(timeLeft)}</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-center">
                 {/* QR Code Frame */}
-                <div className="p-3 bg-white rounded-2xl flex flex-col items-center justify-center shadow-lg">
+                <div className="p-3 bg-stone-50 border border-stone-200 rounded-2xl flex flex-col items-center justify-center shadow-xs">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={order.qrUrl}
                     alt={`VietQR ${order.code}`}
-                    className="w-full aspect-square object-contain rounded-lg"
+                    className="w-full aspect-square object-contain rounded-lg bg-white p-2"
                   />
                   <span className="text-[10px] text-stone-600 font-semibold mt-1">
-                    Quét để tự động điền số tiền & nội dung
+                    Quét để tự động điền số tiền &amp; nội dung
                   </span>
                 </div>
 
                 {/* Bank Info & Transfer Details */}
                 <div className="space-y-3 text-xs">
-                  <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 space-y-2">
+                  <div className="p-3 rounded-xl bg-stone-50 border border-stone-200 space-y-2">
                     <div>
                       <span className="text-stone-500 text-[10px] block">Số tiền cần thanh toán</span>
-                      <span className="text-lg font-bold font-serif text-emerald-400">
+                      <span className="text-lg font-bold font-serif text-emerald-600">
                         {order.amount.toLocaleString('vi-VN')} đ
                       </span>
                     </div>
@@ -434,16 +434,16 @@ export default function UpgradeModal({
                     <div>
                       <span className="text-stone-500 text-[10px] block">Nội dung chuyển khoản (Bắt buộc)</span>
                       <div className="flex items-center justify-between gap-1 mt-0.5">
-                        <span className="font-mono font-black text-amber-300 text-sm tracking-wide">
+                        <span className="font-mono font-black text-rose-600 text-sm tracking-wide">
                           {order.code}
                         </span>
                         <button
                           type="button"
                           onClick={() => handleCopy(order.code, 'code')}
-                          className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-[10px] font-medium flex items-center gap-1 transition-colors"
+                          className="p-1.5 rounded-lg bg-white border border-stone-200 hover:bg-stone-100 text-stone-700 text-[10px] font-medium flex items-center gap-1 transition-colors shadow-2xs"
                         >
                           {copiedField === 'code' ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
                           ) : (
                             <Copy className="w-3.5 h-3.5" />
                           )}
@@ -452,20 +452,20 @@ export default function UpgradeModal({
                       </div>
                     </div>
 
-                    <div className="pt-2 border-t border-stone-800/80">
+                    <div className="pt-2 border-t border-stone-200">
                       <span className="text-stone-500 text-[10px] block">Ngân hàng thụ hưởng</span>
-                      <span className="font-semibold text-stone-200">
+                      <span className="font-semibold text-stone-900">
                         {order.bankInfo.bankId} • {order.bankInfo.bankAccount}
                       </span>
-                      <span className="block text-[11px] text-stone-400 uppercase mt-0.5">
+                      <span className="block text-[11px] text-stone-600 uppercase mt-0.5">
                         {order.bankInfo.bankName}
                       </span>
                     </div>
                   </div>
 
                   {/* Polling Notice */}
-                  <div className="flex items-center gap-2 text-[11px] text-stone-400 bg-stone-950/60 p-2.5 rounded-xl border border-stone-800">
-                    <RefreshCw className="w-3.5 h-3.5 text-purple-400 animate-spin shrink-0" />
+                  <div className="flex items-center gap-2 text-[11px] text-stone-600 bg-stone-50 p-2.5 rounded-xl border border-stone-200">
+                    <RefreshCw className="w-3.5 h-3.5 text-rose-500 animate-spin shrink-0" />
                     <span>Hệ thống đang chờ SePay bắt biến động số dư và kích hoạt tự động...</span>
                   </div>
 
@@ -474,7 +474,7 @@ export default function UpgradeModal({
                     type="button"
                     disabled={isSimulating}
                     onClick={handleSimulatePayment}
-                    className="w-full py-2 px-3 rounded-xl bg-purple-600/30 hover:bg-purple-600/40 border border-purple-500/40 text-purple-200 text-[11px] font-semibold transition-all flex items-center justify-center gap-1.5"
+                    className="w-full py-2 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 text-[11px] font-semibold transition-all flex items-center justify-center gap-1.5"
                     title="Bấm để kích hoạt thanh toán ngay lập tức phục vụ kiểm thử"
                   >
                     <span>⚡ Giả Lập Thanh Toán Thành Công (Test Dev)</span>

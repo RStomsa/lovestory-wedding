@@ -1522,25 +1522,25 @@ export default function TemplatesManagerClient({
           {/* Backdrop */}
           <div
             onClick={() => !isSubmitting && setShowCreateModal(false)}
-            className="fixed inset-0 bg-black/80 backdrop-blur-md"
+            className="fixed inset-0 bg-stone-900/40 backdrop-blur-2xs"
           />
 
           {/* Modal Container */}
-          <div className="relative w-full max-w-2xl bg-stone-900 border border-stone-200/90 rounded-3xl shadow-2xl p-6 z-10 overflow-hidden space-y-5">
+          <div className="relative w-full max-w-2xl bg-white border border-stone-200 rounded-3xl shadow-2xl p-6 z-10 overflow-hidden space-y-5 text-stone-900 animate-in fade-in zoom-in-95 duration-150">
             {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-stone-200/90">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100">
               <div>
-                <span className="text-[10px] font-bold text-stone-700 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
                   Admin Studio Publishing
                 </span>
-                <h2 className="text-lg font-serif font-bold text-white">
+                <h2 className="text-xl font-serif font-bold text-stone-900">
                   Phát Hành Mẫu Thiệp Mới Lên Thị Trường
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="p-1.5 rounded-full text-stone-500 hover:text-white hover:bg-stone-800 transition-colors"
+                className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1551,8 +1551,8 @@ export default function TemplatesManagerClient({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Name */}
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-stone-300">
-                    Tên mẫu thiệp <span className="text-rose-400">*</span>
+                  <label className="block text-xs font-semibold text-stone-700">
+                    Tên mẫu thiệp <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -1560,13 +1560,13 @@ export default function TemplatesManagerClient({
                     placeholder="VD: Hoàng Gia Scrollytelling"
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors font-medium"
                   />
                 </div>
 
                 {/* Slug */}
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-stone-300">
+                  <label className="block text-xs font-semibold text-stone-700">
                     Mã Slug URL (Tùy chọn)
                   </label>
                   <input
@@ -1574,7 +1574,7 @@ export default function TemplatesManagerClient({
                     placeholder="VD: hoang-gia-scrollytelling"
                     value={formSlug}
                     onChange={(e) => setFormSlug(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 font-mono transition-colors"
                   />
                 </div>
               </div>
@@ -1582,13 +1582,13 @@ export default function TemplatesManagerClient({
               {/* Category and Base Engine */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-stone-300">
+                  <label className="block text-xs font-semibold text-stone-700">
                     Danh mục thiệp
                   </label>
                   <select
                     value={formCategory}
                     onChange={(e) => setFormCategory(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-stone-200 focus:outline-none focus:border-stone-900"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                   >
                     <option value="wedding">Thiệp cưới (Wedding)</option>
                     <option value="birthday">Thiệp sinh nhật (Birthday)</option>
@@ -1599,13 +1599,13 @@ export default function TemplatesManagerClient({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-stone-300">
+                  <label className="block text-xs font-semibold text-stone-700">
                     Giao diện cốt lõi (Base Engine Render)
                   </label>
                   <select
                     value={formBaseEngine}
                     onChange={(e) => setFormBaseEngine(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-stone-200 focus:outline-none focus:border-stone-900 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 font-mono transition-colors"
                   >
                     <option value="burgundy">burgundy — Scrollytelling Điện Ảnh Sang Trọng</option>
                     <option value="floral">floral — Lãng Mạn Hoa Cỏ Tự Nhiên</option>
@@ -1618,7 +1618,7 @@ export default function TemplatesManagerClient({
               {/* Tier, Price, and Badge */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-stone-300">
+                  <label className="block text-xs font-semibold text-stone-700">
                     Phân hạng gói
                   </label>
                   <select
@@ -1630,7 +1630,7 @@ export default function TemplatesManagerClient({
                       else if (t === 'BASIC') setFormPrice(50000);
                       else setFormPrice(30000);
                     }}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-stone-200 focus:outline-none focus:border-stone-900"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                   >
                     <option value="FREE">Miễn phí (Free)</option>
                     <option value="BASIC">Gói Cơ Bản (50k/năm)</option>
@@ -1639,7 +1639,7 @@ export default function TemplatesManagerClient({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-stone-300">
+                  <label className="block text-xs font-semibold text-stone-700">
                     Giá bán lẻ (VNĐ)
                   </label>
                   <input
@@ -1648,12 +1648,12 @@ export default function TemplatesManagerClient({
                     disabled={formTier === 'FREE'}
                     value={formPrice}
                     onChange={(e) => setFormPrice(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900 disabled:opacity-50"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 disabled:opacity-50 font-mono transition-colors"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-stone-300">
+                  <label className="block text-xs font-semibold text-stone-700">
                     Huy hiệu (Badge)
                   </label>
                   <input
@@ -1661,15 +1661,15 @@ export default function TemplatesManagerClient({
                     placeholder="Hot, Mới, VIP Luxury..."
                     value={formBadge}
                     onChange={(e) => setFormBadge(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 transition-colors"
                   />
                 </div>
               </div>
 
               {/* Long Thumbnail & Preview */}
               <div className="space-y-2">
-                <label className="block text-xs font-semibold text-stone-300">
-                  Ảnh bìa xem trước dọc (Long Thumbnail URL) <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-stone-700">
+                  Ảnh bìa xem trước dọc (Long Thumbnail URL) <span className="text-rose-500">*</span>
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -1678,19 +1678,19 @@ export default function TemplatesManagerClient({
                     placeholder="https://..."
                     value={formThumbnail}
                     onChange={(e) => setFormThumbnail(e.target.value)}
-                    className="flex-1 px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900 font-mono"
+                    className="flex-1 px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 font-mono transition-colors"
                   />
                 </div>
 
                 {/* Quick Presets */}
                 <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                  <span className="text-[10px] text-stone-500">Chọn nhanh ảnh mẫu:</span>
+                  <span className="text-[10px] text-stone-500 font-medium">Chọn nhanh ảnh mẫu:</span>
                   {SAMPLE_PRESETS.map((preset) => (
                     <button
                       key={preset.name}
                       type="button"
                       onClick={() => setFormThumbnail(preset.url)}
-                      className="px-2 py-0.5 rounded-md text-[10px] bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-200/80/60"
+                      className="px-2.5 py-1 rounded-lg text-[10px] bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200 font-medium transition-colors"
                     >
                       {preset.name}
                     </button>
@@ -1699,8 +1699,8 @@ export default function TemplatesManagerClient({
 
                 {/* Live Preview of Thumbnail */}
                 {formThumbnail && (
-                  <div className="mt-2 p-2 rounded-xl bg-stone-50/60 border border-stone-200/90 flex items-center gap-3">
-                    <div className="w-12 h-16 rounded-lg overflow-hidden border border-stone-200/80 shrink-0 bg-stone-800">
+                  <div className="mt-2 p-2.5 rounded-xl bg-stone-50 border border-stone-200 flex items-center gap-3">
+                    <div className="w-12 h-16 rounded-lg overflow-hidden border border-stone-200 shrink-0 bg-white shadow-2xs">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={formThumbnail}
@@ -1713,7 +1713,7 @@ export default function TemplatesManagerClient({
                       />
                     </div>
                     <div className="text-[11px] text-stone-500 flex-1 min-w-0">
-                      <span className="text-stone-300 font-semibold block">Xem trước ảnh bìa hiển thị</span>
+                      <span className="text-stone-800 font-semibold block">Xem trước ảnh bìa hiển thị</span>
                       <span className="truncate block font-mono text-[10px] text-stone-500">{formThumbnail}</span>
                     </div>
                   </div>
@@ -1722,31 +1722,32 @@ export default function TemplatesManagerClient({
 
               {/* Description */}
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-stone-300">
+                <label className="block text-xs font-semibold text-stone-700">
                   Mô tả nổi bật
                 </label>
                 <textarea
                   rows={2}
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900 resize-none"
+                  placeholder="Mô tả phong cách, hiệu ứng nổi bật..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 resize-none transition-colors"
                 />
               </div>
 
               {/* Actions */}
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-stone-200/90">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-stone-100">
                 <button
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-500 hover:text-white transition-colors"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors"
                 >
                   Hủy Bỏ
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-medium text-xs shadow-2xs flex items-center gap-2 transition-all transform active:scale-95 disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs shadow-2xs flex items-center gap-2 transition-all transform active:scale-95 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <span>Đang phát hành...</span>
@@ -1767,22 +1768,22 @@ export default function TemplatesManagerClient({
       {/* MODAL: CHỈNH SỬA THÔNG TIN MẪU THIỆP                     */}
       {/* ======================================================== */}
       {editingCatalogTemplate && (
-        <div className="fixed inset-0 z-50 bg-stone-50/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-stone-900 border border-stone-200/90 rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl relative max-h-[92vh] overflow-y-auto text-stone-100">
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-2xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl relative max-h-[92vh] overflow-y-auto text-stone-900 animate-in fade-in zoom-in-95 duration-150">
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-stone-200/90 pb-4">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-3">
               <div className="space-y-0.5">
-                <span className="text-[10px] uppercase font-bold text-stone-700 tracking-wider">
+                <span className="text-[10px] uppercase font-bold text-stone-500 tracking-wider">
                   Chỉnh Sửa Giao Diện &amp; Bảng Giá
                 </span>
-                <h3 className="text-lg font-serif font-bold text-white">
+                <h3 className="text-lg font-serif font-bold text-stone-900">
                   Chỉnh Sửa: {editingCatalogTemplate.name}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setEditingCatalogTemplate(null)}
-                className="p-1.5 rounded-xl hover:bg-stone-800 text-stone-500 hover:text-white transition-colors"
+                className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1791,7 +1792,7 @@ export default function TemplatesManagerClient({
             <form onSubmit={handleSaveCatalogTemplate} className="space-y-4 text-xs">
               {/* Tên mẫu */}
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-stone-300">
+                <label className="block text-xs font-semibold text-stone-700">
                   Tên mẫu thiệp <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -1799,20 +1800,20 @@ export default function TemplatesManagerClient({
                   required
                   value={editFormName}
                   onChange={(e) => setEditFormName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors font-medium"
                 />
               </div>
 
               {/* Danh mục & Phân hạng */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-stone-300">
+                  <label className="block text-xs font-semibold text-stone-700">
                     Danh mục
                   </label>
                   <select
                     value={editFormCategory}
                     onChange={(e) => setEditFormCategory(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                   >
                     <option value="wedding">Thiệp cưới (Wedding)</option>
                     <option value="birthday">Thiệp sinh nhật (Birthday)</option>
@@ -1823,7 +1824,7 @@ export default function TemplatesManagerClient({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-stone-300">
+                  <label className="block text-xs font-semibold text-stone-700">
                     Phân hạng gói
                   </label>
                   <select
@@ -1835,7 +1836,7 @@ export default function TemplatesManagerClient({
                       else if (t === 'BASIC') setEditFormPrice(50000);
                       else if (t === 'PREMIUM') setEditFormPrice(30000);
                     }}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                   >
                     <option value="FREE">Miễn phí (Free - 300 views)</option>
                     <option value="BASIC">Gói Chuẩn (Basic - 50.000 đ)</option>
@@ -1847,7 +1848,7 @@ export default function TemplatesManagerClient({
               {/* Giá & Huy hiệu */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-stone-300">
+                  <label className="block text-xs font-semibold text-stone-700">
                     Giá bán hiển thị (VNĐ)
                   </label>
                   <input
@@ -1855,12 +1856,12 @@ export default function TemplatesManagerClient({
                     value={editFormPrice}
                     onChange={(e) => setEditFormPrice(Number(e.target.value))}
                     disabled={editFormTier === 'FREE'}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900 disabled:opacity-50"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 disabled:opacity-50 font-mono transition-colors"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-stone-300">
+                  <label className="block text-xs font-semibold text-stone-700">
                     Huy hiệu (Badge)
                   </label>
                   <input
@@ -1868,14 +1869,14 @@ export default function TemplatesManagerClient({
                     value={editFormBadge}
                     placeholder="Hot VIP, Bán chạy, Mới..."
                     onChange={(e) => setEditFormBadge(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 transition-colors"
                   />
                 </div>
               </div>
 
               {/* URL Ảnh xem trước (Long thumbnail) */}
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-stone-300">
+                <label className="block text-xs font-semibold text-stone-700">
                   Ảnh xem trước (Thumbnail URL)
                 </label>
                 <input
@@ -1883,12 +1884,12 @@ export default function TemplatesManagerClient({
                   required
                   value={editFormThumbnail}
                   onChange={(e) => setEditFormThumbnail(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 font-mono transition-colors"
                 />
 
                 {editFormThumbnail && (
-                  <div className="mt-2 p-2 rounded-xl bg-stone-50/60 border border-stone-200/90 flex items-center gap-3">
-                    <div className="w-12 h-16 rounded-lg overflow-hidden border border-stone-200/80 shrink-0 bg-stone-800">
+                  <div className="mt-2 p-2.5 rounded-xl bg-stone-50 border border-stone-200 flex items-center gap-3">
+                    <div className="w-12 h-16 rounded-lg overflow-hidden border border-stone-200 shrink-0 bg-white shadow-2xs">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={editFormThumbnail}
@@ -1901,7 +1902,7 @@ export default function TemplatesManagerClient({
                       />
                     </div>
                     <div className="text-[11px] text-stone-500 flex-1 min-w-0">
-                      <span className="text-stone-300 font-semibold block">Ảnh bìa hiển thị</span>
+                      <span className="text-stone-800 font-semibold block">Ảnh bìa hiển thị</span>
                       <span className="truncate block font-mono text-[10px] text-stone-500">{editFormThumbnail}</span>
                     </div>
                   </div>
@@ -1910,22 +1911,23 @@ export default function TemplatesManagerClient({
 
               {/* Mô tả */}
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-stone-300">
+                <label className="block text-xs font-semibold text-stone-700">
                   Mô tả nổi bật
                 </label>
                 <textarea
                   rows={2}
                   value={editFormDescription}
                   onChange={(e) => setEditFormDescription(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white focus:outline-none focus:border-stone-900 resize-none"
+                  placeholder="Mô tả phong cách, hiệu ứng nổi bật..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 resize-none transition-colors"
                 />
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-between pt-3 border-t border-stone-200/90">
+              <div className="flex items-center justify-between pt-3 border-t border-stone-100">
                 <Link
                   href={`/admin/studio?template=${encodeURIComponent(editingCatalogTemplate.slug || editingCatalogTemplate.id)}`}
-                  className="px-4 py-2 rounded-xl bg-stone-900/20 hover:bg-stone-900/30 text-stone-700 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-stone-900/30"
+                  className="px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-purple-200"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Mở Soạn Trong Studio</span>
@@ -1936,14 +1938,14 @@ export default function TemplatesManagerClient({
                     type="button"
                     disabled={isSavingEdit}
                     onClick={() => setEditingCatalogTemplate(null)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-500 hover:text-white transition-colors"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 transition-colors"
                   >
                     Hủy
                   </button>
                   <button
                     type="submit"
                     disabled={isSavingEdit}
-                    className="px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-medium text-xs shadow-2xs flex items-center gap-2 transition-all transform active:scale-95 disabled:opacity-50"
+                    className="px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs shadow-2xs flex items-center gap-2 transition-all transform active:scale-95 disabled:opacity-50"
                   >
                     {isSavingEdit ? (
                       <span>Đang lưu...</span>

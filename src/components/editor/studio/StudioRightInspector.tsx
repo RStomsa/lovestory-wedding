@@ -21,7 +21,12 @@ import {
   Maximize2,
   Lock,
   Unlock,
+  FolderPlus,
+  Wand2,
+  X,
+  Check,
 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 import { useStudioStore } from './studioStore';
 import { resolveFontFamily } from '@/lib/studioFonts';
 import { resolveStudioAssetUrl } from '@/lib/studioUtils';
@@ -49,6 +54,64 @@ export default function StudioRightInspector() {
     autoPushDown,
     setAutoPushDown,
   } = useStudioStore();
+
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN' || (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin'));
+
+  // Save graphic to warehouse modal
+  const [showSaveGfxModal, setShowSaveGfxModal] = useState(false);
+  const [gfxName, setGfxName] = useState('');
+  const [gfxCategory, setGfxCategory] = useState('Yếu tố đám cưới');
+  const [gfxSubCategory, setGfxSubCategory] = useState('');
+  const [isSavingGfx, setIsSavingGfx] = useState(false);
+  const [gfxToast, setGfxToast] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  const handleOpenSaveGfxModal = (src: string, defaultName?: string) => {
+    setGfxName(defaultName || 'Đồ họa trang trí mới');
+    setGfxCategory('Yếu tố đám cưới');
+    setGfxSubCategory('');
+    setShowSaveGfxModal(true);
+  };
+
+  const handleConfirmSaveGfx = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedElement || !selectedElement.src) return;
+    if (!gfxName.trim()) {
+      alert('Vui lòng nhập tên đồ họa');
+      return;
+    }
+
+    setIsSavingGfx(true);
+    try {
+      const res = await fetch('/api/admin/assets/graphics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: gfxName.trim(),
+          src: selectedElement.src,
+          category: gfxCategory,
+          subCategory: gfxSubCategory.trim() || undefined,
+          defaultWidth: selectedElement.width || 120,
+          defaultHeight: selectedElement.height || 120,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Lỗi khi lưu đồ họa');
+      }
+
+      setShowSaveGfxModal(false);
+      setGfxToast({ text: `Đã lưu đồ họa "${gfxName}" vào kho thành công!`, type: 'success' });
+      setTimeout(() => setGfxToast(null), 4000);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Lỗi lưu đồ họa';
+      setGfxToast({ text: msg, type: 'error' });
+      setTimeout(() => setGfxToast(null), 4000);
+    } finally {
+      setIsSavingGfx(false);
+    }
+  };
 
   const selectedElement = elements.find((e) => e.id === selectedId);
   const [lockRatio, setLockRatio] = useState(false);
@@ -657,35 +720,84 @@ export default function StudioRightInspector() {
                 />
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    const newUrl = prompt('Nhập URL hình ảnh/đồ họa mới:', selectedElement.src);
-                    if (newUrl) updateElement(selectedElement.id, { src: newUrl }, true);
-                  }}
-                  className="flex-1 py-1.5 rounded-xl bg-stone-900 text-white hover:bg-black text-[11px] font-medium transition-all shadow-xs flex items-center justify-center gap-1.5"
-                >
-                  <RefreshCw className="w-3 h-3" />
-                  <span>Thay đổi ảnh</span>
-                </button>
+              {/* Action Buttons: Thay đổi ảnh, Tách nền AI, Làm nét AI, Lưu vào kho */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      const newUrl = prompt('Nhập URL hình ảnh/đồ họa mới:', selectedElement.src);
+                      if (newUrl) updateElement(selectedElement.id, { src: newUrl }, true);
+                    }}
+                    className="flex-1 py-1.5 rounded-xl bg-stone-900 text-white hover:bg-black text-[11px] font-medium transition-all shadow-xs flex items-center justify-center gap-1.5"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                    <span>Thay đổi ảnh</span>
+                  </button>
 
-                <button
-                  onClick={() => {
-                    updateElement(
-                      selectedElement.id,
-                      {
-                        isCutout: !selectedElement.isCutout,
-                        borderRadius: 16,
-                      },
-                      true
-                    );
-                    alert('✨ Đã áp dụng hiệu ứng tách nền AI (AI Cutout) cho ảnh!');
-                  }}
-                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-rose-500 text-white text-[11px] font-semibold hover:opacity-90 shadow-xs flex items-center gap-1"
-                  title="Tự động nhận diện và tách nền chủ thể"
-                >
-                  <span>✨ Tách nền AI</span>
-                </button>
+                  <button
+                    onClick={() => {
+                      updateElement(
+                        selectedElement.id,
+                        {
+                          isCutout: !selectedElement.isCutout,
+                          borderRadius: 16,
+                        },
+                        true
+                      );
+                      alert(selectedElement.isCutout ? 'Đã tắt tách nền' : '✨ Đã áp dụng hiệu ứng tách nền AI (AI Cutout) cho ảnh!');
+                    }}
+                    className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold transition-all shadow-xs flex items-center gap-1 ${
+                      selectedElement.isCutout
+                        ? 'bg-rose-500 text-white'
+                        : 'bg-gradient-to-r from-violet-600 to-rose-500 text-white hover:opacity-90'
+                    }`}
+                    title="Tự động nhận diện và tách nền chủ thể"
+                  >
+                    <Wand2 className="w-3 h-3" />
+                    <span>{selectedElement.isCutout ? 'Đã tách nền' : '✨ Tách nền AI'}</span>
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {/* AI HD Sharpness Boost */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const curFilter = selectedElement.filter || { brightness: 100, contrast: 100, saturate: 100, sepia: 0, preset: 'none' };
+                      const isHighContrast = (curFilter.contrast ?? 100) > 110;
+                      updateElement(
+                        selectedElement.id,
+                        {
+                          filter: {
+                            ...curFilter,
+                            contrast: isHighContrast ? 100 : 125,
+                            brightness: isHighContrast ? 100 : 105,
+                            saturate: isHighContrast ? 100 : 115,
+                          },
+                        },
+                        true
+                      );
+                    }}
+                    className="flex-1 py-1.5 px-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 hover:bg-stone-100 text-[11px] font-medium text-stone-700 dark:text-stone-300 transition-all flex items-center justify-center gap-1"
+                    title="AI tăng cường độ nét, tương phản & độ sâu chi tiết"
+                  >
+                    <Sparkles className="w-3 h-3 text-amber-500" />
+                    <span>Làm nét AI</span>
+                  </button>
+
+                  {/* ADMIN: Save Graphic to Master Warehouse */}
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenSaveGfxModal(selectedElement.src || '', 'Đồ họa trang trí')}
+                      className="flex-1 py-1.5 px-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-[11px] font-bold transition-all shadow-xs flex items-center justify-center gap-1 active:scale-95 whitespace-nowrap"
+                      title="Lưu đồ họa này trực tiếp vào kho tài nguyên dùng chung của hệ thống"
+                    >
+                      <FolderPlus className="w-3.5 h-3.5" />
+                      <span>Lưu vào kho đồ họa</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Color Grading Presets */}
@@ -1788,6 +1900,149 @@ export default function StudioRightInspector() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* TOAST NOTIFICATION */}
+      {gfxToast && (
+        <div className="fixed bottom-5 right-5 z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div
+            className={`px-4 py-2.5 rounded-2xl shadow-xl text-xs font-semibold flex items-center gap-2 border ${
+              gfxToast.type === 'success'
+                ? 'bg-emerald-600 text-white border-emerald-500 shadow-emerald-600/20'
+                : 'bg-rose-600 text-white border-rose-500 shadow-rose-600/20'
+            }`}
+          >
+            <span>{gfxToast.text}</span>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODAL: ADMIN SAVE GRAPHIC TO SYSTEM WAREHOUSE */}
+      {/* ======================================================== */}
+      {showSaveGfxModal && selectedElement && (
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-2xs flex items-center justify-center p-4">
+          <div className="relative w-full max-w-md bg-white border border-stone-200 rounded-3xl shadow-2xl p-6 z-10 space-y-4 animate-in fade-in zoom-in-95 duration-150 text-stone-900">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+              <div>
+                <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">
+                  Admin Master Assets
+                </span>
+                <h3 className="text-base font-serif font-bold text-stone-900 mt-0.5">
+                  Lưu Đồ Họa Vào Kho Hệ Thống
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSaveGfxModal(false)}
+                className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Graphic Live Preview */}
+            <div className="p-4 bg-stone-50 border border-stone-200 rounded-2xl flex flex-col items-center justify-center gap-2">
+              <div
+                className="w-28 h-28 flex items-center justify-center p-2 rounded-xl bg-white border border-stone-200 shadow-xs"
+                style={{
+                  backgroundImage: 'radial-gradient(circle, #e2e8f0 10%, transparent 11%)',
+                  backgroundSize: '10px 10px',
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={selectedElement.src}
+                  alt={gfxName}
+                  className="max-w-full max-h-full object-contain"
+                  style={{
+                    filter: selectedElement.filter
+                      ? `brightness(${selectedElement.filter.brightness ?? 100}%) contrast(${selectedElement.filter.contrast ?? 100}%) saturate(${selectedElement.filter.saturate ?? 100}%)`
+                      : undefined,
+                  }}
+                />
+              </div>
+              <div className="text-[10px] text-stone-500 font-mono">
+                Kích thước: {selectedElement.width}px × {selectedElement.height}px
+              </div>
+            </div>
+
+            <form onSubmit={handleConfirmSaveGfx} className="space-y-3.5 text-xs">
+              <div className="space-y-1">
+                <label className="font-semibold text-stone-700 block">
+                  Tên đồ họa <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={gfxName}
+                  onChange={(e) => setGfxName(e.target.value)}
+                  placeholder="Ví dụ: Hoa Hồng Pastel, Bản Đồ Chỉ Đường..."
+                  className="w-full px-3.5 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 font-medium"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-stone-700 block">Danh mục hiển thị</label>
+                <select
+                  value={gfxCategory}
+                  onChange={(e) => setGfxCategory(e.target.value)}
+                  className="w-full px-3.5 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 font-medium cursor-pointer"
+                >
+                  <option value="Bản đồ">Bản đồ (Icons địa điểm, chỉ đường)</option>
+                  <option value="Yếu tố đám cưới">Yếu tố đám cưới (Nhẫn cưới, nến, hoa cưới...)</option>
+                  <option value="Hoa lá & Cây cỏ">Hoa lá &amp; Cây cỏ (Hoa hồng, hoa sen, cành lá...)</option>
+                  <option value="Họa tiết & Khung viền">Họa tiết &amp; Khung viền (Border, khung ảnh...)</option>
+                  <option value="Nhãn dán cảm xúc">Nhãn dán cảm xúc (Trái tim, chim bồ câu...)</option>
+                  <option value="Biểu tượng & Icon">Biểu tượng &amp; Icon (Icon tiệc cưới, phong bì...)</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-stone-700 block">Phân loại phụ (tùy chọn)</label>
+                <input
+                  type="text"
+                  value={gfxSubCategory}
+                  onChange={(e) => setGfxSubCategory(e.target.value)}
+                  placeholder="Ví dụ: pastel, vintage, vector, watercolor..."
+                  className="w-full px-3.5 py-2 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 font-medium"
+                />
+              </div>
+
+              <div className="p-3 bg-purple-50/70 border border-purple-200 rounded-xl text-[11px] text-purple-900 space-y-1">
+                <div className="font-bold flex items-center gap-1 text-purple-800">
+                  <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                  <span>Đồng bộ toàn hệ thống:</span>
+                </div>
+                <p className="text-[10px] text-purple-800/80 leading-relaxed">
+                  Đồ họa này sẽ được lưu vào kho tài nguyên hệ thống và tự động xuất hiện trong thẻ &ldquo;Đồ họa&rdquo; bên trái để mọi khách hàng có thể chọn chèn vào thiệp cưới.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={() => setShowSaveGfxModal(false)}
+                  className="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingGfx}
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold shadow-md shadow-purple-600/20 flex items-center gap-1.5 disabled:opacity-50"
+                >
+                  {isSavingGfx ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <FolderPlus className="w-3.5 h-3.5" />
+                  )}
+                  <span>Xác nhận lưu</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
