@@ -55,5 +55,6 @@ next-env.d.ts
 # scratch files
 scratch/
 
-tools/
+# Rust build artifacts
+tools/**/target/
 
