@@ -62,6 +62,7 @@ export default function TemplatesManagerClient({
   const [searchCatalog, setSearchCatalog] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [tierFilter, setTierFilter] = useState<string>('all');
+  const [publishFilter, setPublishFilter] = useState<'all' | 'published' | 'draft'>('all');
 
   // State for Harvested Templates
   const [harvestedTemplates] = useState<any[]>(initialHarvestedTemplates);
@@ -173,14 +174,22 @@ export default function TemplatesManagerClient({
     return catalogTemplates.filter((item) => {
       const matchCat = categoryFilter === 'all' || item.category === categoryFilter;
       const matchTier = tierFilter === 'all' || item.tier === tierFilter;
+      const matchPublish =
+        publishFilter === 'all'
+          ? true
+          : publishFilter === 'published'
+          ? item.isPublished !== false
+          : item.isPublished === false;
       const matchSearch =
         !searchCatalog.trim() ||
         item.name.toLowerCase().includes(searchCatalog.toLowerCase()) ||
+        (item.code && item.code.toLowerCase().includes(searchCatalog.toLowerCase())) ||
+        (item.subtitle && item.subtitle.toLowerCase().includes(searchCatalog.toLowerCase())) ||
         item.description.toLowerCase().includes(searchCatalog.toLowerCase()) ||
         item.id.toLowerCase().includes(searchCatalog.toLowerCase());
-      return matchCat && matchTier && matchSearch;
+      return matchCat && matchTier && matchPublish && matchSearch;
     });
-  }, [catalogTemplates, categoryFilter, tierFilter, searchCatalog]);
+  }, [catalogTemplates, categoryFilter, tierFilter, publishFilter, searchCatalog]);
 
   // Filtering Harvested Templates (190 templates)
   const filteredHarvested = useMemo(() => {
@@ -312,6 +321,39 @@ export default function TemplatesManagerClient({
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : 'Đã có lỗi xảy ra';
       setMessage({ text: errorMsg, type: 'error' });
+    }
+  };
+
+  // Handle Quick Toggle Publish/Draft Status
+  const handleTogglePublish = async (tpl: CatalogTemplate) => {
+    const nextStatus = tpl.isPublished === false ? true : false;
+    // Optimistic UI update
+    setCatalogTemplates((prev) =>
+      prev.map((t) => (t.id === tpl.id ? { ...t, isPublished: nextStatus } : t))
+    );
+    try {
+      const res = await fetch(`/api/admin/templates/${tpl.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPublished: nextStatus }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Cập nhật trạng thái thất bại');
+      }
+      setMessage({
+        text: `Đã ${nextStatus ? 'phát hành' : 'chuyển sang bản nháp'} mẫu "${tpl.code || tpl.name}"!`,
+        type: 'success',
+      });
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err: unknown) {
+      // Rollback on error
+      setCatalogTemplates((prev) =>
+        prev.map((t) => (t.id === tpl.id ? { ...t, isPublished: !nextStatus } : t))
+      );
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi cập nhật trạng thái';
+      setMessage({ text: errorMsg, type: 'error' });
+      setTimeout(() => setMessage(null), 4000);
     }
   };
 
@@ -591,64 +633,131 @@ export default function TemplatesManagerClient({
       {/* TAB 1: CATALOG TEMPLATES */}
       {activeTab === 'catalog' && (
         <div className="space-y-4">
-          {/* Filter Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 rounded-2xl bg-white border border-stone-200/90">
-            {/* Search */}
-            <div className="relative w-full sm:w-72">
-              <Search className="w-3.5 h-3.5 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Tìm mẫu theo tên, mã hoặc mô tả..."
-                value={searchCatalog}
-                onChange={(e) => setSearchCatalog(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900"
-              />
+          {/* Status Tabs & Filter Bar */}
+          <div className="flex flex-col gap-3 p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-xs">
+            {/* Top row: Status Tabs */}
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-2.5">
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setPublishFilter('all')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                    publishFilter === 'all'
+                      ? 'bg-stone-900 text-white shadow-xs'
+                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                  }`}
+                >
+                  Tất cả ({catalogTemplates.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPublishFilter('published')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                    publishFilter === 'published'
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  Đã phát hành ({catalogTemplates.filter((t) => t.isPublished !== false).length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPublishFilter('draft')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                    publishFilter === 'draft'
+                      ? 'bg-amber-600 text-white shadow-xs'
+                      : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  Chưa phát hành / Bản nháp ({catalogTemplates.filter((t) => t.isPublished === false).length})
+                </button>
+              </div>
+
+              <span className="text-[11px] text-stone-500 whitespace-nowrap">
+                Hiển thị: <strong className="text-stone-900 font-bold">{filteredCatalog.length}</strong> mẫu
+              </span>
             </div>
 
-            {/* Category & Tier Filters */}
-            <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto">
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className="px-3 py-1.5 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-stone-300 focus:outline-none focus:border-stone-900"
-              >
-                <option value="all">Tất cả danh mục</option>
-                <option value="wedding">Thiệp cưới</option>
-                <option value="birthday">Thiệp sinh nhật</option>
-                <option value="graduation">Thiệp tốt nghiệp</option>
-                <option value="event">Sự kiện &amp; Khai trương</option>
-                <option value="anniversary">Kỷ niệm &amp; Tình yêu</option>
-              </select>
+            {/* Bottom row: Search & Category Filter */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              {/* Search */}
+              <div className="relative w-full sm:w-72">
+                <Search className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Tìm theo Mẫu 01, tên hoặc mô tả..."
+                  value={searchCatalog}
+                  onChange={(e) => setSearchCatalog(e.target.value)}
+                  className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-800 placeholder:text-stone-400 focus:outline-none focus:border-stone-900"
+                />
+              </div>
 
-              <select
-                value={tierFilter}
-                onChange={(e) => setTierFilter(e.target.value)}
-                className="px-3 py-1.5 rounded-xl bg-stone-50/60 border border-stone-200/90 text-xs text-stone-300 focus:outline-none focus:border-stone-900"
-              >
-                <option value="all">Tất cả phân hạng</option>
-                <option value="FREE">Miễn phí (Free)</option>
-                <option value="BASIC">Gói Cơ Bản (Basic)</option>
-                <option value="PREMIUM">Gói VIP (Premium)</option>
-              </select>
+              {/* Category & Tier Filters */}
+              <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto">
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="px-3 py-1.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-700 focus:outline-none focus:border-stone-900"
+                >
+                  <option value="all">Tất cả danh mục</option>
+                  <option value="wedding">Thiệp cưới</option>
+                  <option value="birthday">Thiệp sinh nhật</option>
+                  <option value="graduation">Thiệp tốt nghiệp</option>
+                  <option value="event">Sự kiện &amp; Khai trương</option>
+                  <option value="anniversary">Kỷ niệm &amp; Tình yêu</option>
+                </select>
 
-              <span className="text-[11px] text-stone-500 whitespace-nowrap pl-2">
-                Hiển thị: <strong className="text-stone-300">{filteredCatalog.length}</strong> mẫu
-              </span>
+                <select
+                  value={tierFilter}
+                  onChange={(e) => setTierFilter(e.target.value)}
+                  className="px-3 py-1.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-700 focus:outline-none focus:border-stone-900"
+                >
+                  <option value="all">Tất cả phân hạng</option>
+                  <option value="FREE">Miễn phí (Free)</option>
+                  <option value="BASIC">Gói Cơ Bản (Basic)</option>
+                  <option value="PREMIUM">Gói VIP (Premium)</option>
+                </select>
+              </div>
             </div>
           </div>
 
           {/* Catalog Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredCatalog.map((tpl) => {
+            {filteredCatalog.map((tpl, idx) => {
               const isCustom = tpl.id.startsWith('tpl-') && !tpl.id.startsWith('tpl-wedding-');
+              const templateCode = tpl.code || `Mẫu ${String(idx + 1).padStart(2, '0')}`;
+              const templateSubtitle = tpl.subtitle || tpl.name.replace(/^Mẫu\s*\d+\s*[-—:]\s*/i, '');
+              const isPublished = tpl.isPublished !== false;
 
               return (
                 <div
                   key={tpl.id}
-                  className="rounded-2xl border border-stone-200/90 bg-white overflow-hidden flex flex-col justify-between hover:border-stone-900/50 transition-all group"
+                  className="rounded-2xl border border-stone-200/90 bg-white overflow-hidden flex flex-col justify-between hover:border-stone-900/50 shadow-xs hover:shadow-lg transition-all group"
                 >
                   {/* Image & Header */}
                   <div>
+                    {/* Header Bar with Template Number and Status Toggle */}
+                    <div className="px-3 py-2 bg-stone-50 border-b border-stone-200 flex items-center justify-between gap-2">
+                      <span className="font-serif font-black text-xs text-stone-900 tracking-wider">
+                        {templateCode}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleTogglePublish(tpl)}
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 transition-all active:scale-95 cursor-pointer ${
+                          isPublished
+                            ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                            : 'bg-amber-100 text-amber-800 hover:bg-amber-200'
+                        }`}
+                        title="Bấm để bật/tắt phát hành ra ngoài web"
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${isPublished ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                        <span>{isPublished ? 'Đã phát hành' : 'Bản nháp'}</span>
+                      </button>
+                    </div>
+
                     <div className="relative aspect-[3/4] bg-stone-50/60 overflow-hidden border-b border-stone-200/90">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -660,11 +769,11 @@ export default function TemplatesManagerClient({
                       {/* Badges on Thumbnail */}
                       <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
                         {tpl.badge && (
-                          <span className="px-2 py-0.5 rounded-md bg-white backdrop-blur-xs text-amber-300 text-[10px] font-bold border border-amber-500/30">
+                          <span className="px-2 py-0.5 rounded-md bg-stone-900/80 backdrop-blur-xs text-amber-300 text-[10px] font-bold border border-amber-500/30">
                             {tpl.badge}
                           </span>
                         )}
-                        <span className="px-2 py-0.5 rounded-md bg-white backdrop-blur-xs text-stone-300 text-[9px] font-medium border border-stone-200/80">
+                        <span className="px-2 py-0.5 rounded-md bg-stone-900/80 backdrop-blur-xs text-stone-300 text-[9px] font-medium border border-stone-700/80">
                           Engine: {tpl.baseTemplateId}
                         </span>
                       </div>
@@ -686,10 +795,10 @@ export default function TemplatesManagerClient({
                       </div>
 
                       {/* Hover action overlay */}
-                      <div className="absolute inset-0 bg-stone-50/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-4">
+                      <div className="absolute inset-0 bg-stone-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-4">
                         <Link
                           href={`/admin/studio?template=${encodeURIComponent(tpl.slug || tpl.id)}`}
-                          className="w-full py-2 rounded-xl bg-stone-900 hover:bg-purple-500 text-white font-bold text-xs text-center flex items-center justify-center gap-1.5 shadow-lg"
+                          className="w-full py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs text-center flex items-center justify-center gap-1.5 shadow-lg"
                         >
                           <Sparkles className="w-3.5 h-3.5" />
                           <span>Soạn trong Admin Studio</span>
@@ -697,7 +806,7 @@ export default function TemplatesManagerClient({
                         <Link
                           href="/templates"
                           target="_blank"
-                          className="w-full py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 font-semibold text-xs text-center flex items-center justify-center gap-1.5"
+                          className="w-full py-2 rounded-xl bg-white hover:bg-stone-100 text-stone-900 font-semibold text-xs text-center flex items-center justify-center gap-1.5"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>Xem ngoài web</span>
@@ -708,15 +817,20 @@ export default function TemplatesManagerClient({
                     {/* Metadata Content */}
                     <div className="p-4 space-y-2">
                       <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-bold text-sm text-white truncate" title={tpl.name}>
-                          {tpl.name}
-                        </h3>
+                        <div>
+                          <span className="text-[10px] text-stone-400 block font-serif uppercase tracking-wider font-semibold">
+                            {templateCode}
+                          </span>
+                          <h3 className="font-bold text-sm text-stone-900 truncate" title={tpl.name}>
+                            {templateSubtitle}
+                          </h3>
+                        </div>
                         {isCustom && (
                           <button
                             type="button"
                             title="Xóa mẫu tự tạo"
                             onClick={() => handleDeleteCustomTemplate(tpl.id, tpl.name)}
-                            className="text-stone-500 hover:text-rose-400 p-1 rounded-md transition-colors"
+                            className="text-stone-400 hover:text-rose-600 p-1 rounded-md transition-colors"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -727,8 +841,8 @@ export default function TemplatesManagerClient({
                         {tpl.description}
                       </p>
 
-                      <div className="flex items-center justify-between text-[11px] pt-1">
-                        <span className="text-stone-500">
+                      <div className="flex items-center justify-between text-[11px] pt-1 border-t border-stone-100">
+                        <span className="text-stone-500 capitalize">
                           {tpl.category === 'wedding'
                             ? 'Thiệp cưới'
                             : tpl.category === 'birthday'
@@ -740,7 +854,7 @@ export default function TemplatesManagerClient({
                             : 'Kỷ niệm'}
                         </span>
 
-                        <span className="font-bold text-stone-200">
+                        <span className="font-bold text-stone-900">
                           {tpl.tier === 'PREMIUM'
                             ? `${tpl.price ? tpl.price.toLocaleString('vi-VN') : '30.000'} đ`
                             : tpl.tier === 'BASIC'

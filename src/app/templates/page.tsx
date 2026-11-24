@@ -25,6 +25,7 @@ import { useAuth } from '@/context/AuthContext';
 type CategoryFilter = 'all' | 'wedding' | 'birthday' | 'graduation' | 'event' | 'anniversary';
 type StyleFilter = 'all' | 'envelope' | 'traditional' | 'minimalist' | 'korean_pastel' | 'editorial';
 type TierFilter = 'all' | 'FREE' | 'BASIC' | 'PREMIUM';
+type PublishFilter = 'all' | 'published' | 'draft';
 type SortOption = 'recommended' | 'views' | 'likes' | 'newest';
 
 const CATEGORY_TABS: { id: CategoryFilter; label: string; count?: number }[] = [
@@ -61,11 +62,13 @@ const SORT_OPTIONS: { id: SortOption; label: string }[] = [
 
 export default function TemplatesCatalogPage() {
   const { user, openUpgradeModal } = useAuth();
+  const isAdmin = user?.role === 'ADMIN' || (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin'));
 
   const [allTemplates, setAllTemplates] = useState<CatalogTemplate[]>(CATALOG_TEMPLATES);
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
   const [activeStyle, setActiveStyle] = useState<StyleFilter>('all');
   const [activeTier, setActiveTier] = useState<TierFilter>('all');
+  const [activePublish, setActivePublish] = useState<PublishFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('recommended');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<CatalogTemplate | null>(null);
@@ -73,6 +76,14 @@ export default function TemplatesCatalogPage() {
 
   // Fetch dynamic templates (including admin newly published templates)
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const cat = params.get('category');
+      if (cat && (['wedding', 'birthday', 'graduation', 'event', 'anniversary'] as string[]).includes(cat)) {
+        setActiveCategory(cat as CategoryFilter);
+      }
+    }
+
     fetch('/api/templates')
       .then((res) => res.json())
       .then((data) => {
@@ -111,6 +122,15 @@ export default function TemplatesCatalogPage() {
   const filteredTemplates = useMemo(() => {
     let result = [...allTemplates];
 
+    // Filter Published Status
+    if (!isAdmin) {
+      result = result.filter((item) => item.isPublished !== false);
+    } else if (activePublish === 'published') {
+      result = result.filter((item) => item.isPublished !== false);
+    } else if (activePublish === 'draft') {
+      result = result.filter((item) => item.isPublished === false);
+    }
+
     // Filter Category
     if (activeCategory !== 'all') {
       result = result.filter((item) => item.category === activeCategory);
@@ -133,7 +153,9 @@ export default function TemplatesCatalogPage() {
         (item) =>
           item.name.toLowerCase().includes(q) ||
           item.description.toLowerCase().includes(q) ||
-          item.badge.toLowerCase().includes(q)
+          item.badge.toLowerCase().includes(q) ||
+          (item.code && item.code.toLowerCase().includes(q)) ||
+          (item.subtitle && item.subtitle.toLowerCase().includes(q))
       );
     }
 
@@ -159,12 +181,13 @@ export default function TemplatesCatalogPage() {
     }
 
     return result;
-  }, [activeCategory, activeTier, sortBy, searchQuery, likedMap]);
+  }, [allTemplates, activeCategory, activeStyle, activeTier, activePublish, sortBy, searchQuery, likedMap, isAdmin]);
 
   const resetFilters = () => {
     setActiveCategory('all');
     setActiveStyle('all');
     setActiveTier('all');
+    setActivePublish('all');
     setSortBy('recommended');
     setSearchQuery('');
   };
@@ -332,6 +355,42 @@ export default function TemplatesCatalogPage() {
                 ))}
               </div>
 
+              {/* Admin Publish Filter Toggle */}
+              {isAdmin && (
+                <div className="flex items-center gap-1 bg-amber-50 dark:bg-amber-950/40 p-1 rounded-xl border border-amber-300 dark:border-amber-800 text-xs">
+                  <button
+                    onClick={() => setActivePublish('all')}
+                    className={`px-2 py-1 rounded-lg font-medium transition-all ${
+                      activePublish === 'all'
+                        ? 'bg-amber-600 text-white font-bold shadow-xs'
+                        : 'text-amber-800 dark:text-amber-300 hover:text-amber-950'
+                    }`}
+                  >
+                    Tất cả
+                  </button>
+                  <button
+                    onClick={() => setActivePublish('published')}
+                    className={`px-2 py-1 rounded-lg font-medium transition-all ${
+                      activePublish === 'published'
+                        ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                        : 'text-amber-800 dark:text-amber-300 hover:text-amber-950'
+                    }`}
+                  >
+                    Đã phát hành
+                  </button>
+                  <button
+                    onClick={() => setActivePublish('draft')}
+                    className={`px-2 py-1 rounded-lg font-medium transition-all ${
+                      activePublish === 'draft'
+                        ? 'bg-rose-600 text-white font-bold shadow-xs'
+                        : 'text-amber-800 dark:text-amber-300 hover:text-amber-950'
+                    }`}
+                  >
+                    Bản nháp
+                  </button>
+                </div>
+              )}
+
               {/* Sort Selector */}
               <div className="relative">
                 <select
@@ -391,132 +450,153 @@ export default function TemplatesCatalogPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-5">
-            {filteredTemplates.map((tmpl) => {
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-7 md:gap-8">
+            {filteredTemplates.map((tmpl, idx) => {
               const isLiked = !!likedMap[tmpl.id];
               const likeCount = tmpl.likes + (isLiked ? 1 : 0);
+              const templateCode = tmpl.code || `Mẫu ${String(idx + 1).padStart(2, '0')}`;
+              const templateSubtitle = tmpl.subtitle || tmpl.name.replace(/^Mẫu\s*\d+\s*[-—:]\s*/i, '');
 
               return (
                 <div
                   key={tmpl.id}
-                  className="group relative flex flex-col rounded-2xl bg-white dark:bg-stone-900 border border-stone-200/90 dark:border-stone-800 hover:border-rose-400/70 dark:hover:border-rose-500/60 shadow-xs hover:shadow-2xl transition-all duration-300 overflow-hidden"
+                  className="group flex flex-col items-center"
                 >
-                  {/* Thumbnail Container with Auto-Scroll on Hover */}
-                  <div
-                    onClick={() => setSelectedTemplate(tmpl)}
-                    className="relative aspect-[9/13] w-full overflow-hidden bg-stone-100 dark:bg-stone-800 cursor-pointer"
-                  >
-                    {/* The Long Thumbnail image with smooth gliding on hover */}
-                    <div className="w-full h-full overflow-hidden relative">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={tmpl.longThumbnail}
-                        alt={tmpl.name}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-auto object-cover object-top transition-transform duration-[8500ms] ease-linear group-hover:-translate-y-[calc(100%-250px)]"
-                      />
+                  {/* Realistic Smartphone Chassis Frame (M-Invite style) */}
+                  <div className="relative w-full max-w-[285px] mx-auto rounded-[2.8rem] p-2.5 sm:p-3 bg-gradient-to-b from-[#24242a] via-[#15151a] to-[#0a0a0d] border-[2px] border-[#363642] shadow-xl group-hover:shadow-2xl group-hover:border-rose-500/40 group-hover:-translate-y-1.5 transition-all duration-300">
+                    {/* Physical phone side buttons accents */}
+                    <div className="absolute -left-[3px] top-20 w-[3px] h-7 bg-stone-600 rounded-l-xs" />
+                    <div className="absolute -left-[3px] top-30 w-[3px] h-7 bg-stone-600 rounded-l-xs" />
+                    <div className="absolute -right-[3px] top-24 w-[3px] h-10 bg-stone-600 rounded-r-xs" />
+
+                    {/* Top Dynamic Island / Speaker Pill */}
+                    <div className="w-20 h-3.5 bg-black rounded-full mx-auto mb-2 flex items-center justify-center gap-1.5 shadow-inner">
+                      <div className="w-1.5 h-1.5 rounded-full bg-stone-800" />
+                      <div className="w-1 h-1 rounded-full bg-blue-950/80" />
                     </div>
 
-                    {/* Corner Badge */}
-                    <div className="absolute top-2.5 left-2.5 z-10">
-                      {tmpl.tier === 'PREMIUM' ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-yellow-400 text-stone-950 font-black text-[10px] shadow-md tracking-wider">
-                          <Crown className="w-3 h-3 fill-stone-950" />
-                          <span>VIP</span>
-                        </span>
-                      ) : tmpl.tier === 'BASIC' ? (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-[10px] shadow-sm">
-                          Basic
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-[10px] shadow-sm">
-                          Miễn phí
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Floating Like Button */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleLike(tmpl.id);
-                      }}
-                      title="Yêu thích mẫu này"
-                      className="absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white flex items-center justify-center transition-all active:scale-90"
+                    {/* Inner Smartphone Screen (9:16 aspect ratio) */}
+                    <div
+                      onClick={() => setSelectedTemplate(tmpl)}
+                      className="relative aspect-[9/16] w-full rounded-[2.1rem] overflow-hidden bg-stone-100 dark:bg-stone-900 cursor-pointer shadow-inner"
                     >
-                      <Heart
-                        className={`w-3.5 h-3.5 transition-colors ${
-                          isLiked ? 'text-rose-500 fill-rose-500 scale-110' : 'text-white'
-                        }`}
-                      />
-                    </button>
+                      {/* Gliding preview thumbnail on hover */}
+                      <div className="w-full h-full overflow-hidden relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={tmpl.longThumbnail}
+                          alt={tmpl.name}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-auto object-cover object-top transition-transform duration-[8500ms] ease-linear group-hover:-translate-y-[calc(100%-250px)]"
+                        />
+                      </div>
 
-                    {/* Dark Hover Action Overlay */}
-                    <div className="absolute inset-0 bg-stone-950/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center gap-2 p-3 pointer-events-none group-hover:pointer-events-auto">
+                      {/* Floating Status / Draft Badge */}
+                      <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1 items-start">
+                        {tmpl.isPublished === false && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-stone-900/90 text-amber-300 font-bold text-[9px] shadow-sm backdrop-blur-xs border border-amber-500/40">
+                            Bản nháp
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Floating Like Button */}
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSelectedTemplate(tmpl);
+                          toggleLike(tmpl.id);
                         }}
-                        className="w-full py-2 px-3 rounded-xl bg-white hover:bg-rose-600 hover:text-white text-stone-900 font-bold text-xs shadow-lg transition-all transform translate-y-2 group-hover:translate-y-0 flex items-center justify-center gap-1.5"
+                        title="Yêu thích mẫu này"
+                        className="absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white flex items-center justify-center transition-all active:scale-90"
                       >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>Xem mẫu</span>
+                        <Heart
+                          className={`w-3.5 h-3.5 transition-colors ${
+                            isLiked ? 'text-rose-500 fill-rose-500 scale-110' : 'text-white'
+                          }`}
+                        />
                       </button>
 
-                      <Link
-                        href={`/editor/studio?template=${encodeURIComponent(tmpl.slug || tmpl.id)}`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="w-full py-2 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-lg transition-all transform translate-y-2 group-hover:translate-y-0 flex items-center justify-center gap-1.5"
-                      >
-                        <span>Soạn thảo Studio</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
+                      {/* Dark Hover Action Overlay */}
+                      <div className="absolute inset-0 bg-stone-950/50 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center gap-2.5 p-4 pointer-events-none group-hover:pointer-events-auto">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedTemplate(tmpl);
+                          }}
+                          className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-rose-600 hover:text-white text-stone-900 font-bold text-xs shadow-lg transition-all transform translate-y-2 group-hover:translate-y-0 flex items-center justify-center gap-1.5 active:scale-95"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Xem trực tiếp</span>
+                        </button>
+
+                        <Link
+                          href={`/editor/studio?template=${encodeURIComponent(tmpl.slug || tmpl.id)}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-full py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-lg transition-all transform translate-y-2 group-hover:translate-y-0 flex items-center justify-center gap-1.5 active:scale-95"
+                        >
+                          <span>Dùng mẫu này</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Card Content & Metadata */}
-                  <div className="p-3 flex-1 flex flex-col justify-between space-y-2">
-                    <div>
+                  {/* Underneath Phone Information (Clean M-Invite Style) */}
+                  <div className="w-full max-w-[285px] mt-3.5 px-1 space-y-1">
+                    <div className="flex items-center justify-between gap-2">
                       <h3
                         onClick={() => setSelectedTemplate(tmpl)}
-                        className="text-xs font-semibold text-stone-900 dark:text-stone-100 truncate hover:text-rose-600 cursor-pointer"
+                        className="font-serif font-bold text-base text-stone-900 dark:text-stone-100 truncate hover:text-rose-600 cursor-pointer tracking-wide"
                         title={tmpl.name}
                       >
-                        {tmpl.name}
+                        {templateCode}
                       </h3>
-                      <div className="flex items-center justify-between text-[11px] text-stone-500 dark:text-stone-400 mt-1">
-                        <span className="capitalize">
-                          {tmpl.category === 'wedding'
-                            ? 'Thiệp cưới'
-                            : tmpl.category === 'birthday'
-                            ? 'Sinh nhật'
-                            : tmpl.category === 'graduation'
-                            ? 'Tốt nghiệp'
-                            : 'Sự kiện'}
-                        </span>
+                      <div>
                         {tmpl.tier === 'PREMIUM' ? (
-                          <span className="text-amber-600 dark:text-amber-400 font-bold">200k/trọn đời</span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#7a1b2e] text-rose-100 font-bold text-[10px] shadow-xs tracking-wider">
+                            <Crown className="w-2.5 h-2.5 text-amber-300" />
+                            <span>Premium</span>
+                          </span>
                         ) : tmpl.tier === 'BASIC' ? (
-                          <span className="text-blue-600 dark:text-blue-400 font-semibold">50k/năm</span>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold text-[10px]">
+                            Basic
+                          </span>
                         ) : (
-                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Free</span>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold text-[10px]">
+                            Miễn phí
+                          </span>
                         )}
                       </div>
                     </div>
 
-                    {/* Stats Bar (Views & Likes) */}
-                    <div className="pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between text-[11px] text-stone-500 dark:text-stone-400">
-                      <div className="flex items-center gap-1">
-                        <Heart className={`w-3 h-3 ${isLiked ? 'text-rose-500 fill-rose-500' : ''}`} />
-                        <span>{likeCount.toLocaleString('vi-VN')}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Eye className="w-3 h-3" />
-                        <span>{tmpl.views >= 1000 ? `${(tmpl.views / 1000).toFixed(1)}k` : tmpl.views}</span>
+                    {/* Secondary Subtitle */}
+                    <p className="text-xs text-stone-500 dark:text-stone-400 truncate">
+                      {templateSubtitle}
+                    </p>
+
+                    {/* Metadata bar: Category & Likes */}
+                    <div className="flex items-center justify-between text-[11px] text-stone-400 dark:text-stone-500 pt-1 border-t border-stone-200/50 dark:border-stone-800">
+                      <span className="capitalize">
+                        {tmpl.category === 'wedding'
+                          ? 'Thiệp cưới'
+                          : tmpl.category === 'birthday'
+                          ? 'Sinh nhật'
+                          : tmpl.category === 'graduation'
+                          ? 'Tốt nghiệp'
+                          : 'Sự kiện'}
+                      </span>
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex items-center gap-1">
+                          <Heart className={`w-3 h-3 ${isLiked ? 'text-rose-500 fill-rose-500' : ''}`} />
+                          {likeCount}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3 h-3" />
+                          {tmpl.views >= 1000 ? `${(tmpl.views / 1000).toFixed(1)}k` : tmpl.views}
+                        </span>
                       </div>
                     </div>
                   </div>

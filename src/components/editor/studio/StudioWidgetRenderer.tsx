@@ -21,6 +21,9 @@ import {
   Volume2,
   Film,
   Send,
+  ChevronLeft,
+  ChevronRight,
+  Sparkles,
 } from 'lucide-react';
 import { CanvasElement } from './studioTypes';
 
@@ -422,40 +425,242 @@ export default function StudioWidgetRenderer({ element }: Props) {
     );
   }
 
-  // 9. PHOTO ALBUM / SLIDESHOW WIDGET
+  // 9. PHOTO ALBUM / SLIDESHOW WIDGET (HỖ TRỢ 5 LOẠI BỐ CỤC: GRID-2, GRID-3, MASONRY, SLIDESHOW, SINGLE-STACK)
   if (widgetType === 'album' || widgetType === 'slideshow') {
+    const title = widgetConfig.title || 'Album Kỷ Niệm Cưới';
+    const layout = widgetConfig.layout || (widgetType === 'slideshow' ? 'slideshow' : 'grid-2');
+    const rawPhotos: string[] =
+      Array.isArray(widgetConfig.photos) && widgetConfig.photos.length > 0
+        ? widgetConfig.photos
+        : [
+            '/assets/wedding/samples/sample_01.jpg',
+            '/assets/wedding/samples/sample_02.jpg',
+            '/assets/wedding/samples/sample_03.jpg',
+            '/assets/wedding/samples/sample_04.jpg',
+          ];
+    const borderRadius = widgetConfig.borderRadius ?? 16;
+    const gap = widgetConfig.gap ?? 8;
+    const photoCountText = `${rawPhotos.length} bức ảnh`;
+
     return (
-      <div className="w-full h-full bg-white/90 dark:bg-stone-900/90 rounded-2xl p-3 border border-stone-200 dark:border-stone-800 flex flex-col justify-between select-none">
-        <div className="flex items-center justify-between pb-1.5 border-b border-stone-200 dark:border-stone-800">
+      <div
+        className="w-full h-full bg-white/95 dark:bg-stone-900/95 rounded-2xl p-3 border border-stone-200 dark:border-stone-800 flex flex-col justify-between select-none shadow-xs"
+        style={{ borderRadius: `${borderRadius}px` }}
+      >
+        <div className="flex items-center justify-between pb-2 border-b border-stone-200/80 dark:border-stone-800">
           <span className="text-xs font-serif font-bold text-stone-800 dark:text-stone-200 flex items-center gap-1.5">
             <ImageIcon className="w-3.5 h-3.5 text-rose-500" />
-            <span>Album Kỷ Niệm Cưới</span>
+            <span>{title}</span>
           </span>
-          <span className="text-[10px] text-stone-400 font-mono">14 bức ảnh</span>
+          <span className="text-[10px] text-stone-500 font-mono bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-full font-semibold">
+            {photoCountText}
+          </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 my-1.5 flex-1">
-          <div className="rounded-xl overflow-hidden bg-stone-200 dark:bg-stone-800 relative">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/assets/wedding/templates/c165/photo_02.jpg"
-              alt="Preview"
-              className="w-full h-full object-cover"
-            />
+        {/* Layout Mode 1: grid-2 (2 Cột Song Song) */}
+        {layout === 'grid-2' && (
+          <div className="grid grid-cols-2 flex-1 my-2 overflow-hidden" style={{ gap: `${gap}px` }}>
+            {rawPhotos.slice(0, 4).map((src: string, idx: number) => (
+              <div
+                key={idx}
+                className="rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 relative group aspect-square shadow-2xs"
+                style={{ borderRadius: `${Math.max(4, borderRadius - 4)}px` }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={src}
+                  alt={`Album photo ${idx + 1}`}
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    e.currentTarget.src = `/assets/wedding/samples/sample_0${(idx % 4) + 1}.jpg`;
+                  }}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                {idx === 3 && rawPhotos.length > 4 && (
+                  <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center text-white font-bold text-xs">
+                    +{rawPhotos.length - 3} ảnh
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-          <div className="rounded-xl overflow-hidden bg-stone-200 dark:bg-stone-800 relative">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/assets/wedding/templates/c165/photo_03.jpg"
-              alt="Preview"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
+        )}
 
-        <span className="text-[10px] text-stone-400 text-center block">
-          Chạm vào ảnh để xem trọn bộ sưu tập
-        </span>
+        {/* Layout Mode 2: grid-3 (Lưới 3 Cột Bento) */}
+        {layout === 'grid-3' && (
+          <div className="grid grid-cols-3 flex-1 my-2 overflow-hidden" style={{ gap: `${gap}px` }}>
+            {rawPhotos.slice(0, 6).map((src: string, idx: number) => (
+              <div
+                key={idx}
+                className="rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 relative group aspect-square shadow-2xs"
+                style={{ borderRadius: `${Math.max(4, borderRadius - 6)}px` }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={src}
+                  alt={`Album photo ${idx + 1}`}
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    e.currentTarget.src = `/assets/wedding/samples/sample_0${(idx % 4) + 1}.jpg`;
+                  }}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                {idx === 5 && rawPhotos.length > 6 && (
+                  <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center text-white font-bold text-xs">
+                    +{rawPhotos.length - 5}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Layout Mode 3: masonry (Xếp Tầng So Le Nghệ Thuật) */}
+        {layout === 'masonry' && (
+          <div className="grid grid-cols-2 flex-1 my-2 overflow-hidden" style={{ gap: `${gap}px` }}>
+            <div className="flex flex-col" style={{ gap: `${gap}px` }}>
+              <div
+                className="rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 aspect-[3/4] shadow-2xs relative"
+                style={{ borderRadius: `${Math.max(4, borderRadius - 4)}px` }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={rawPhotos[0]}
+                  alt="Album photo 1"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    e.currentTarget.src = '/assets/wedding/samples/sample_01.jpg';
+                  }}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {rawPhotos[2] && (
+                <div
+                  className="rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 aspect-square shadow-2xs relative"
+                  style={{ borderRadius: `${Math.max(4, borderRadius - 4)}px` }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={rawPhotos[2]}
+                    alt="Album photo 3"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      e.currentTarget.src = '/assets/wedding/samples/sample_03.jpg';
+                    }}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col" style={{ gap: `${gap}px` }}>
+              {rawPhotos[1] && (
+                <div
+                  className="rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 aspect-square shadow-2xs relative"
+                  style={{ borderRadius: `${Math.max(4, borderRadius - 4)}px` }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={rawPhotos[1]}
+                    alt="Album photo 2"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      e.currentTarget.src = '/assets/wedding/samples/sample_02.jpg';
+                    }}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              {rawPhotos[3] && (
+                <div
+                  className="rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 aspect-[3/4] shadow-2xs relative"
+                  style={{ borderRadius: `${Math.max(4, borderRadius - 4)}px` }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={rawPhotos[3]}
+                    alt="Album photo 4"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      e.currentTarget.src = '/assets/wedding/samples/sample_04.jpg';
+                    }}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Layout Mode 4: slideshow (Trượt Carousel Có Nút & Dots) */}
+        {layout === 'slideshow' && (
+          <div
+            className="flex-1 my-2 relative rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 flex flex-col justify-between shadow-2xs"
+            style={{ borderRadius: `${Math.max(4, borderRadius - 4)}px` }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={rawPhotos[0]}
+              alt="Slideshow"
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                e.currentTarget.src = '/assets/wedding/samples/sample_01.jpg';
+              }}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+            <div className="relative z-10 flex items-center justify-between p-2 mt-auto">
+              <span className="text-[10px] text-white font-medium drop-shadow-xs">1 / {rawPhotos.length}</span>
+              <div className="flex items-center gap-1">
+                {rawPhotos.slice(0, 5).map((_: any, dotIdx: number) => (
+                  <span
+                    key={dotIdx}
+                    className={`w-1.5 h-1.5 rounded-full ${dotIdx === 0 ? 'bg-white scale-125' : 'bg-white/50'}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Layout Mode 5: single-stack (Khung Ảnh Lớn Xếp Lớp) */}
+        {layout === 'single-stack' && (
+          <div className="flex-1 my-2 relative flex items-center justify-center p-2">
+            <div className="absolute inset-x-5 inset-y-1 bg-stone-200 dark:bg-stone-800 rounded-2xl rotate-2 shadow-xs" />
+            <div
+              className="relative w-full h-full rounded-2xl overflow-hidden bg-stone-100 dark:bg-stone-800 border-2 border-white dark:border-stone-700 shadow-md"
+              style={{ borderRadius: `${borderRadius}px` }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={rawPhotos[0]}
+                alt="Single stack preview"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  e.currentTarget.src = '/assets/wedding/samples/sample_01.jpg';
+                }}
+                className="w-full h-full object-cover"
+              />
+              <span className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-xs text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                {photoCountText}
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div className="pt-1.5 border-t border-stone-200/80 dark:border-stone-800 flex items-center justify-between text-[10px] text-stone-500">
+          <span>Chạm vào ảnh để mở Lightbox phóng to</span>
+          <span className="font-semibold text-rose-500 uppercase text-[9px] tracking-wider">
+            {layout === 'grid-2'
+              ? '2 Cột'
+              : layout === 'grid-3'
+              ? '3 Cột'
+              : layout === 'masonry'
+              ? 'So Le'
+              : layout === 'slideshow'
+              ? 'Slideshow'
+              : 'Khung Đơn'}
+          </span>
+        </div>
       </div>
     );
   }

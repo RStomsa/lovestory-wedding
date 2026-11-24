@@ -30,6 +30,16 @@ import {
   Link as LinkIcon,
   Layers,
   CheckCircle2,
+  Plus,
+  Grid,
+  Sliders,
+  SlidersHorizontal,
+  Eye,
+  Type,
+  Palette,
+  Film,
+  ArrowUp,
+  ArrowDown,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useStudioStore } from './studioStore';
@@ -48,6 +58,7 @@ export default function StudioRightInspector() {
     removeSelectedElements,
     duplicateSelectedElements,
     alignSelectedElements,
+    updateElementsBatch,
     hiddenElementIds,
     updateElement,
     removeElement,
@@ -57,6 +68,7 @@ export default function StudioRightInspector() {
     triggerPreviewAnim,
     toggleInspector,
     weddingProfile,
+    applyWeddingProfileToCanvas,
     setProfileModalOpen,
     setEnvelopeCover,
     setFallingEffect,
@@ -203,6 +215,8 @@ export default function StudioRightInspector() {
 
   // Stock Wedding Photos & Direct Upload State
   const photoFileInputRef = useRef<HTMLInputElement>(null);
+  const albumPhotoFileInputRef = useRef<HTMLInputElement>(null);
+  const [replacingPhotoIndex, setReplacingPhotoIndex] = useState<number | null>(null);
   const [showStockPickerModal, setShowStockPickerModal] = useState(false);
   const [stockCategoryFilter, setStockCategoryFilter] = useState('all');
   const [customUrlInput, setCustomUrlInput] = useState('');
@@ -425,6 +439,347 @@ export default function StudioRightInspector() {
             </button>
           </div>
 
+          {/* Batch Text Controls */}
+          {(() => {
+            const selectedItems = elements.filter((e) => selectedIds.includes(e.id));
+            const textElements = selectedItems.filter((e) => e.type === 'text');
+            const imageElements = selectedItems.filter((e) => e.type === 'image');
+
+            return (
+              <>
+                {/* 1. Batch Text Controls */}
+                {textElements.length > 0 && (
+                  <div className="p-3.5 bg-rose-50/50 dark:bg-rose-950/20 rounded-2xl border border-rose-200/80 dark:border-rose-800/60 space-y-3.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <Type className="w-3.5 h-3.5" />
+                        Thiết lập văn bản ({textElements.length} khối chữ)
+                      </span>
+                      <span className="text-[10px] text-rose-600 bg-rose-100 dark:bg-rose-900/50 px-2 py-0.5 rounded-full font-semibold">
+                        Đồng loạt
+                      </span>
+                    </div>
+
+                    {/* Màu chữ chung */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-semibold text-stone-600 dark:text-stone-400 block uppercase">
+                        Màu chữ chung
+                      </label>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {[
+                          { name: 'Vàng Gold', color: '#C5A880' },
+                          { name: 'Đỏ Rượu', color: '#800020' },
+                          { name: 'Nâu Cổ Điển', color: '#5c4033' },
+                          { name: 'Đen Than', color: '#1c1917' },
+                          { name: 'Hồng Phấn', color: '#db7093' },
+                          { name: 'Trắng Sữa', color: '#ffffff' },
+                          { name: 'Xanh Rêu', color: '#2d5a4c' },
+                        ].map((c) => (
+                          <button
+                            key={c.color}
+                            type="button"
+                            title={c.name}
+                            onClick={() =>
+                              updateElementsBatch(
+                                textElements.map((el) => ({ id: el.id, updates: { color: c.color } })),
+                                true
+                              )
+                            }
+                            className="w-6 h-6 rounded-full border border-stone-300 dark:border-stone-600 shadow-2xs hover:scale-110 active:scale-95 transition-all"
+                            style={{ backgroundColor: c.color }}
+                          />
+                        ))}
+
+                        {/* Custom color input */}
+                        <label
+                          title="Tự chọn màu tùy ý"
+                          className="w-6 h-6 rounded-full border border-dashed border-stone-400 dark:border-stone-500 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform overflow-hidden bg-white dark:bg-stone-800"
+                        >
+                          <Palette className="w-3.5 h-3.5 text-stone-600 dark:text-stone-300" />
+                          <input
+                            type="color"
+                            defaultValue="#C5A880"
+                            onChange={(e) =>
+                              updateElementsBatch(
+                                textElements.map((el) => ({ id: el.id, updates: { color: e.target.value } })),
+                                false
+                              )
+                            }
+                            onBlur={(e) =>
+                              updateElementsBatch(
+                                textElements.map((el) => ({ id: el.id, updates: { color: e.target.value } })),
+                                true
+                              )
+                            }
+                            className="opacity-0 w-0 h-0 absolute pointer-events-none"
+                          />
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Cỡ chữ chung */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-semibold text-stone-600 dark:text-stone-400 block uppercase">
+                        Cỡ chữ chung
+                      </label>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {[-2, +2, -10, +10].map((delta) => (
+                          <button
+                            key={delta}
+                            type="button"
+                            onClick={() =>
+                              updateElementsBatch(
+                                textElements.map((el) => ({
+                                  id: el.id,
+                                  updates: { fontSize: Math.max(10, (el.fontSize || 16) + delta) },
+                                })),
+                                true
+                              )
+                            }
+                            className="py-1 px-1.5 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-xs font-semibold text-stone-700 dark:text-stone-300 hover:bg-stone-100 transition-all active:scale-95 text-center"
+                          >
+                            {delta > 0 ? `+${delta}px` : `${delta}px`}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-1.5 pt-1">
+                        <span className="text-[10px] text-stone-400">Gán cỡ nhanh:</span>
+                        {[14, 18, 24, 32, 42].map((sz) => (
+                          <button
+                            key={sz}
+                            type="button"
+                            onClick={() =>
+                              updateElementsBatch(
+                                textElements.map((el) => ({ id: el.id, updates: { fontSize: sz } })),
+                                true
+                              )
+                            }
+                            className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 text-[10px] font-semibold text-stone-700 dark:text-stone-300 hover:bg-rose-100 dark:hover:bg-rose-950 transition-all"
+                          >
+                            {sz}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Phông chữ chung */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-semibold text-stone-600 dark:text-stone-400 block uppercase">
+                        Phông chữ chung
+                      </label>
+                      <select
+                        onChange={(e) => {
+                          if (!e.target.value) return;
+                          updateElementsBatch(
+                            textElements.map((el) => ({ id: el.id, updates: { fontFamily: e.target.value } })),
+                            true
+                          );
+                        }}
+                        defaultValue=""
+                        className="w-full py-1.5 px-2 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium text-stone-800 dark:text-stone-200 outline-none focus:ring-1 focus:ring-rose-500"
+                      >
+                        <option value="" disabled>-- Chọn phông áp dụng cho tất cả --</option>
+                        <option value="Playfair Display">Playfair Display (Quý phái & Cổ điển)</option>
+                        <option value="Cormorant Garamond">Cormorant Garamond (Hoàng gia & Nghệ thuật)</option>
+                        <option value="Great Vibes">Great Vibes (Chữ ký lãng mạn)</option>
+                        <option value="Pinyon Script">Pinyon Script (Thư pháp hoàng tộc)</option>
+                        <option value="Montserrat">Montserrat (Hiện đại & Tinh tế)</option>
+                        <option value="Cinzel">Cinzel (Điện ảnh & Đẳng cấp)</option>
+                        <option value="Alex Brush">Alex Brush (Mềm mại & Bay bổng)</option>
+                        <option value="Be Vietnam Pro">Be Vietnam Pro (Chuẩn mực & Dễ đọc)</option>
+                      </select>
+                    </div>
+
+                    {/* Căn lề chữ chung */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-semibold text-stone-600 dark:text-stone-400 block uppercase">
+                        Căn lề chữ chung
+                      </label>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {[
+                          { align: 'left', label: 'Trái', icon: AlignLeft },
+                          { align: 'center', label: 'Giữa', icon: AlignCenter },
+                          { align: 'right', label: 'Phải', icon: AlignRight },
+                        ].map((btn) => {
+                          const Icon = btn.icon;
+                          return (
+                            <button
+                              key={btn.align}
+                              type="button"
+                              onClick={() =>
+                                updateElementsBatch(
+                                  textElements.map((el) => ({ id: el.id, updates: { textAlign: btn.align as any } })),
+                                  true
+                                )
+                              }
+                              className="py-1 px-2 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-xs font-medium text-stone-700 dark:text-stone-300 hover:bg-rose-50 flex items-center justify-center gap-1 active:scale-95 transition-all"
+                            >
+                              <Icon className="w-3.5 h-3.5" />
+                              <span>{btn.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Chuyển động chung */}
+                    <div className="space-y-1.5 pt-1 border-t border-rose-200/60 dark:border-rose-900/40">
+                      <label className="text-[10px] font-semibold text-stone-600 dark:text-stone-400 block uppercase flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-amber-500" />
+                        Chuyển động chung (Animations)
+                      </label>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-[9px] text-stone-400 block mb-0.5">Xuất hiện:</span>
+                          <select
+                            onChange={(e) =>
+                              updateElementsBatch(
+                                textElements.map((el) => ({
+                                  id: el.id,
+                                  updates: {
+                                    animation: {
+                                      type: e.target.value as any,
+                                      duration: el.animation?.duration ?? 1.2,
+                                      delay: el.animation?.delay ?? 0,
+                                    },
+                                  },
+                                })),
+                                true
+                              )
+                            }
+                            defaultValue=""
+                            className="w-full py-1 px-1.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg text-xs"
+                          >
+                            <option value="" disabled>-- Chọn hiệu ứng --</option>
+                            <option value="none">Không hiệu ứng</option>
+                            <option value="fade-in">Mờ dần (Fade In)</option>
+                            <option value="slide-up">Trượt lên (Slide Up)</option>
+                            <option value="zoom-in">Phóng to (Zoom In)</option>
+                            <option value="bounce-in">Nảy nhẹ (Bounce)</option>
+                            <option value="flip">Lật thẻ (Flip)</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <span className="text-[9px] text-stone-400 block mb-0.5">Hiệu ứng liên tục:</span>
+                          <select
+                            onChange={(e) =>
+                              updateElementsBatch(
+                                textElements.map((el) => ({
+                                  id: el.id,
+                                  updates: {
+                                    continuousAnimation: {
+                                      type: e.target.value as any,
+                                      duration: el.continuousAnimation?.duration ?? 2.0,
+                                      delay: el.continuousAnimation?.delay ?? 0,
+                                    },
+                                  },
+                                })),
+                                true
+                              )
+                            }
+                            defaultValue=""
+                            className="w-full py-1 px-1.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg text-xs"
+                          >
+                            <option value="" disabled>-- Chọn hiệu ứng --</option>
+                            <option value="none">Tắt liên tục</option>
+                            <option value="floating">Lơ lửng bay bổng (Floating)</option>
+                            <option value="pulse">Nhịp thở nhẹ (Pulse)</option>
+                            <option value="heartbeat">Nhịp tim (Heartbeat)</option>
+                            <option value="glow">Phát sáng (Glow)</option>
+                            <option value="sway">Đung đưa (Sway)</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. Batch Image Controls */}
+                {imageElements.length > 0 && (
+                  <div className="p-3.5 bg-blue-50/50 dark:bg-blue-950/20 rounded-2xl border border-blue-200/80 dark:border-blue-800/60 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <ImageIcon className="w-3.5 h-3.5" />
+                        Thiết lập hình ảnh ({imageElements.length} ảnh)
+                      </span>
+                      <span className="text-[10px] text-blue-600 bg-blue-100 dark:bg-blue-900/50 px-2 py-0.5 rounded-full font-semibold">
+                        Đồng loạt
+                      </span>
+                    </div>
+
+                    {/* Bo góc viền chung */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-semibold text-stone-600 dark:text-stone-400 block uppercase">
+                        Bo góc viền ảnh chung
+                      </label>
+                      <div className="grid grid-cols-5 gap-1 text-xs">
+                        {[
+                          { label: '0px', val: 0 },
+                          { label: '8px', val: 8 },
+                          { label: '16px', val: 16 },
+                          { label: '24px', val: 24 },
+                          { label: 'Tròn', val: 9999 },
+                        ].map((r) => (
+                          <button
+                            key={r.label}
+                            type="button"
+                            onClick={() =>
+                              updateElementsBatch(
+                                imageElements.map((el) => ({ id: el.id, updates: { borderRadius: r.val } })),
+                                true
+                              )
+                            }
+                            className="py-1 px-1 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 font-medium text-stone-700 dark:text-stone-300 hover:bg-blue-100 text-center active:scale-95 transition-all"
+                          >
+                            {r.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Chuyển động lơ lửng chung */}
+                    <div className="space-y-1.5 pt-1 border-t border-blue-200/60 dark:border-blue-900/40">
+                      <label className="text-[10px] font-semibold text-stone-600 dark:text-stone-400 block uppercase">
+                        Hiệu ứng chuyển động ảnh chung
+                      </label>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {[
+                          { label: 'Tắt hiệu ứng', val: 'none' },
+                          { label: 'Lơ lửng bay', val: 'floating' },
+                          { label: 'Nhịp thở', val: 'pulse' },
+                        ].map((anim) => (
+                          <button
+                            key={anim.val}
+                            type="button"
+                            onClick={() =>
+                              updateElementsBatch(
+                                imageElements.map((el) => ({
+                                  id: el.id,
+                                  updates: {
+                                    continuousAnimation: {
+                                      type: anim.val as any,
+                                      duration: el.continuousAnimation?.duration ?? 2.0,
+                                      delay: el.continuousAnimation?.delay ?? 0,
+                                    },
+                                  },
+                                })),
+                                true
+                              )
+                            }
+                            className="py-1 px-1.5 rounded-lg bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-xs font-medium text-stone-700 dark:text-stone-300 hover:bg-blue-100 text-center active:scale-95 transition-all truncate"
+                          >
+                            {anim.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            );
+          })()}
+
           {/* List of Selected Elements */}
           <div className="space-y-2">
             <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block">
@@ -547,14 +902,34 @@ export default function StudioRightInspector() {
                   ? `${weddingProfile.groom.fullName || 'Chú rể'} & ${weddingProfile.bride.fullName || 'Cô dâu'}`
                   : 'Chưa gắn hồ sơ cô dâu chú rể'}
               </p>
-              <button
-                type="button"
-                onClick={() => setProfileModalOpen(true)}
-                className="w-full py-1.5 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[11px] font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-2xs"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-purple-500" />
-                <span>{weddingProfile.isLinked ? 'Sửa hồ sơ cưới' : 'Tạo hồ sơ cưới nhanh'}</span>
-              </button>
+              {weddingProfile.isLinked ? (
+                <div className="space-y-1.5 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => applyWeddingProfileToCanvas(weddingProfile)}
+                    className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-[11px] font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>⚡ Điền Vào Thiệp Ngay</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setProfileModalOpen(true)}
+                    className="w-full py-1.5 px-3 rounded-xl bg-white dark:bg-stone-800 hover:bg-stone-100 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 text-[11px] font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <span>✏️ Sửa hồ sơ cưới</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setProfileModalOpen(true)}
+                  className="w-full py-1.5 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[11px] font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+                  <span>Tạo hồ sơ cưới nhanh</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -1496,6 +1871,324 @@ export default function StudioRightInspector() {
               <span className="text-[11px] font-bold text-rose-500 uppercase tracking-wider block">
                 Cài đặt tiện ích: {selectedElement.widgetType}
               </span>
+
+              {/* 0. ALBUM & SLIDESHOW WIDGET INSPECTOR */}
+              {(selectedElement.widgetType === 'album' || selectedElement.widgetType === 'slideshow') && (
+                <div className="space-y-4 text-xs">
+                  {/* Hidden file input for album photos */}
+                  <input
+                    type="file"
+                    ref={albumPhotoFileInputRef}
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      const files = e.target.files;
+                      if (!files || files.length === 0) return;
+                      const currentPhotos = Array.isArray(selectedElement.widgetConfig?.photos)
+                        ? [...selectedElement.widgetConfig.photos]
+                        : WEDDING_STOCK_PHOTOS.slice(0, 6).map((p) => p.src);
+
+                      const updated = [...currentPhotos];
+                      Array.from(files).forEach((file, fIdx) => {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          const dataUrl = reader.result as string;
+                          if (replacingPhotoIndex !== null && replacingPhotoIndex >= 0 && fIdx === 0) {
+                            updated[replacingPhotoIndex] = dataUrl;
+                            setReplacingPhotoIndex(null);
+                          } else {
+                            updated.push(dataUrl);
+                          }
+                          updateElement(
+                            selectedElement.id,
+                            {
+                              widgetConfig: {
+                                ...selectedElement.widgetConfig,
+                                photos: updated,
+                              },
+                            },
+                            true
+                          );
+                        };
+                        reader.readAsDataURL(file);
+                      });
+                      if (e.target) e.target.value = '';
+                    }}
+                  />
+
+                  {/* 1. Layout Chooser (5 Styles) */}
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-bold text-stone-700 dark:text-stone-300 block uppercase tracking-wider">
+                      Kiểu bố cục Album ({selectedElement.widgetConfig?.layout || 'grid-2'})
+                    </label>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {[
+                        { id: 'grid-2', label: 'Lưới 2 Cột', desc: 'Song song cổ điển' },
+                        { id: 'grid-3', label: 'Lưới 3 Cột', desc: 'Bento hiện đại' },
+                        { id: 'masonry', label: 'So Le Nghệ Thuật', desc: 'Pinterest so le' },
+                        { id: 'slideshow', label: 'Băng Chuyền Trượt', desc: 'Carousel vuốt ngang' },
+                        { id: 'single-stack', label: 'Khung Xếp Lớp', desc: 'Polaroid nghệ thuật' },
+                      ].map((item) => {
+                        const isCurrentLayout =
+                          (selectedElement.widgetConfig?.layout || 'grid-2') === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() =>
+                              updateElement(
+                                selectedElement.id,
+                                {
+                                  widgetConfig: {
+                                    ...selectedElement.widgetConfig,
+                                    layout: item.id,
+                                  },
+                                },
+                                true
+                              )
+                            }
+                            className={`p-2 rounded-xl text-left border transition-all ${
+                              isCurrentLayout
+                                ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-500 text-rose-700 dark:text-rose-300 font-bold shadow-xs'
+                                : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-stone-400'
+                            }`}
+                          >
+                            <span className="block text-xs">{item.label}</span>
+                            <span className="block text-[9px] text-stone-400 font-normal">
+                              {item.desc}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 2. Tiêu đề & Phụ đề Album */}
+                  <div className="space-y-2 pt-1 border-t border-stone-200 dark:border-stone-700">
+                    <div>
+                      <label className="text-[10px] text-stone-500 block mb-1">Tiêu đề Album</label>
+                      <input
+                        type="text"
+                        value={selectedElement.widgetConfig?.title ?? 'Album Kỷ Niệm Cưới'}
+                        onChange={(e) =>
+                          updateElement(selectedElement.id, {
+                            widgetConfig: { ...selectedElement.widgetConfig, title: e.target.value },
+                          })
+                        }
+                        onBlur={(e) =>
+                          updateElement(
+                            selectedElement.id,
+                            { widgetConfig: { ...selectedElement.widgetConfig, title: e.target.value } },
+                            true
+                          )
+                        }
+                        className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-2 text-xs outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-stone-500 block mb-1">Phụ đề hướng dẫn</label>
+                      <input
+                        type="text"
+                        value={selectedElement.widgetConfig?.subtitle ?? 'Chạm vào ảnh để mở xem toàn màn hình'}
+                        onChange={(e) =>
+                          updateElement(selectedElement.id, {
+                            widgetConfig: { ...selectedElement.widgetConfig, subtitle: e.target.value },
+                          })
+                        }
+                        onBlur={(e) =>
+                          updateElement(
+                            selectedElement.id,
+                            { widgetConfig: { ...selectedElement.widgetConfig, subtitle: e.target.value } },
+                            true
+                          )
+                        }
+                        className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-2 text-xs outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 3. Quản lý danh sách ảnh */}
+                  <div className="space-y-2.5 pt-2 border-t border-stone-200 dark:border-stone-700">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider block">
+                        Bộ ảnh cưới ({
+                          (Array.isArray(selectedElement.widgetConfig?.photos)
+                            ? selectedElement.widgetConfig.photos
+                            : WEDDING_STOCK_PHOTOS.slice(0, 6)
+                          ).length
+                        } tấm)
+                      </label>
+                    </div>
+
+                    {/* Upload Buttons Row */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReplacingPhotoIndex(null);
+                          albumPhotoFileInputRef.current?.click();
+                        }}
+                        className="py-2 px-2.5 rounded-xl bg-stone-900 text-white hover:bg-stone-800 text-[11px] font-semibold transition-all shadow-xs flex items-center justify-center gap-1.5 active:scale-95"
+                      >
+                        <UploadCloud className="w-3.5 h-3.5 text-rose-400" />
+                        <span>Tải ảnh từ máy / ĐT</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentPhotos = Array.isArray(selectedElement.widgetConfig?.photos)
+                            ? [...selectedElement.widgetConfig.photos]
+                            : [];
+                          // Add 4 sample photos from WEDDING_STOCK_PHOTOS
+                          const samplesToAdd = WEDDING_STOCK_PHOTOS.slice(0, 4).map((p) => p.src);
+                          updateElement(
+                            selectedElement.id,
+                            {
+                              widgetConfig: {
+                                ...selectedElement.widgetConfig,
+                                photos: [...currentPhotos, ...samplesToAdd],
+                              },
+                            },
+                            true
+                          );
+                        }}
+                        className="py-2 px-2.5 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-[11px] font-semibold transition-all shadow-xs flex items-center justify-center gap-1.5 active:scale-95"
+                      >
+                        <Plus className="w-3.5 h-3.5 text-rose-500" />
+                        <span>Thêm ảnh mẫu</span>
+                      </button>
+                    </div>
+
+                    {/* Photos Preview & Actions List */}
+                    <div className="space-y-1.5 max-h-60 overflow-y-auto pr-1">
+                      {(Array.isArray(selectedElement.widgetConfig?.photos) &&
+                      selectedElement.widgetConfig.photos.length > 0
+                        ? selectedElement.widgetConfig.photos
+                        : WEDDING_STOCK_PHOTOS.slice(0, 6).map((p) => p.src)
+                      ).map((photoUrl: string, pIdx: number) => (
+                        <div
+                          key={pIdx}
+                          className="p-2 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 flex items-center justify-between gap-2 shadow-2xs"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={photoUrl}
+                              alt={`Ảnh cưới ${pIdx + 1}`}
+                              className="w-10 h-10 rounded-lg object-cover bg-stone-100 shrink-0 border border-stone-200 dark:border-stone-700"
+                            />
+                            <div className="truncate">
+                              <span className="font-semibold text-xs text-stone-800 dark:text-stone-200 block truncate">
+                                Ảnh #{pIdx + 1}
+                              </span>
+                              <span className="text-[9px] text-stone-400 block truncate">
+                                {photoUrl.startsWith('data:') ? 'Ảnh tải từ máy' : photoUrl.split('/').pop()}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1 shrink-0">
+                            {/* Thay ảnh button */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReplacingPhotoIndex(pIdx);
+                                albumPhotoFileInputRef.current?.click();
+                              }}
+                              className="px-2 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 text-[10px] font-semibold transition-all active:scale-95"
+                              title="Thay đổi bức ảnh này"
+                            >
+                              Thay ảnh
+                            </button>
+
+                            {/* Xóa ảnh button */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const currentPhotos = Array.isArray(selectedElement.widgetConfig?.photos)
+                                  ? [...selectedElement.widgetConfig.photos]
+                                  : WEDDING_STOCK_PHOTOS.slice(0, 6).map((p) => p.src);
+                                const updated = currentPhotos.filter((_, idx) => idx !== pIdx);
+                                updateElement(
+                                  selectedElement.id,
+                                  {
+                                    widgetConfig: {
+                                      ...selectedElement.widgetConfig,
+                                      photos: updated,
+                                    },
+                                  },
+                                  true
+                                );
+                              }}
+                              className="p-1 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-all"
+                              title="Xóa ảnh này khỏi Album"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 4. Tùy chỉnh Khoảng cách & Bo góc */}
+                  <div className="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-700">
+                    <div>
+                      <label className="text-[10px] text-stone-500 block mb-1">Khoảng cách giữa các ảnh</label>
+                      <div className="grid grid-cols-4 gap-1">
+                        {[4, 8, 12, 16].map((g) => (
+                          <button
+                            key={g}
+                            type="button"
+                            onClick={() =>
+                              updateElement(
+                                selectedElement.id,
+                                { widgetConfig: { ...selectedElement.widgetConfig, gap: g } },
+                                true
+                              )
+                            }
+                            className={`py-1 rounded-lg text-xs font-semibold border transition-all ${
+                              (selectedElement.widgetConfig?.gap ?? 8) === g
+                                ? 'bg-rose-50 border-rose-400 text-rose-700 font-bold'
+                                : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-700 text-stone-600'
+                            }`}
+                          >
+                            {g}px
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] text-stone-500 block mb-1">Bo góc viền ảnh</label>
+                      <div className="grid grid-cols-4 gap-1">
+                        {[0, 8, 16, 24].map((r) => (
+                          <button
+                            key={r}
+                            type="button"
+                            onClick={() =>
+                              updateElement(
+                                selectedElement.id,
+                                { widgetConfig: { ...selectedElement.widgetConfig, borderRadius: r } },
+                                true
+                              )
+                            }
+                            className={`py-1 rounded-lg text-xs font-semibold border transition-all ${
+                              (selectedElement.widgetConfig?.borderRadius ?? 16) === r
+                                ? 'bg-rose-50 border-rose-400 text-rose-700 font-bold'
+                                : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-700 text-stone-600'
+                            }`}
+                          >
+                            {r}px
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* 1. Countdown */}
               {selectedElement.widgetType === 'countdown' && (

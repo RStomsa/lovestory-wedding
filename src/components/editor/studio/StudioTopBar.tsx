@@ -558,7 +558,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
 
           {mode === 'admin' ? (
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700 flex items-center gap-1.5">
+              <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700 flex items-center gap-1.5 shrink-0">
                 <Sparkles className="w-3.5 h-3.5 text-purple-500" />
                 <span>Soạn Mẫu</span>
               </span>
@@ -566,7 +566,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
               {/* Admin test profile button */}
               <button
                 onClick={() => setProfileModalOpen(true)}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
+                className={`hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium transition-colors shrink-0 ${
                   weddingProfile.isLinked
                     ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
                     : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800 border border-stone-700'
@@ -582,44 +582,41 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
               </button>
             </div>
           ) : (
-            <>
-              <span className="text-stone-400 text-[11px]">
-                Xuất bản để lưu thiết kế vào hệ thống
-              </span>
-
+            <div className="flex items-center gap-2 shrink-0">
               {/* Save status */}
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-stone-600 dark:text-stone-300 text-[11px] font-medium">
-                  Đã lưu tạm thời
+              <div className="flex items-center gap-1.5" title="Thiết kế đã được lưu tạm thời trên trình duyệt">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span className="text-stone-500 dark:text-stone-400 text-[11px] font-medium hidden 2xl:inline">
+                  Đã lưu tạm
                 </span>
               </div>
 
               {/* Wedding Profile Link Button */}
               <button
                 onClick={() => setProfileModalOpen(true)}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
+                className={`hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors shrink-0 ${
                   weddingProfile.isLinked
                     ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300'
                     : 'text-stone-600 dark:text-stone-300 hover:text-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-700'
                 }`}
+                title="Hồ sơ cô dâu chú rể điền nhanh"
               >
                 {weddingProfile.isLinked ? (
                   <>
                     <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>
-                      Hồ sơ: {weddingProfile.groom.shortName || weddingProfile.groom.fullName || 'Bảo'} &{' '}
+                    <span className="truncate max-w-[140px]">
+                      {weddingProfile.groom.shortName || weddingProfile.groom.fullName || 'Bảo'} &{' '}
                       {weddingProfile.bride.shortName || weddingProfile.bride.fullName || 'Vy'}
                     </span>
                   </>
                 ) : (
                   <>
                     <UserPlus className="w-3.5 h-3.5 text-stone-500" />
-                    <span>Hồ sơ cưới: Chưa gắn, bấm để gắn</span>
+                    <span>Gắn hồ sơ cưới</span>
                   </>
                 )}
               </button>
-            </>
+            </div>
           )}
         </div>
 
@@ -722,11 +719,11 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
           {isAdmin && mode !== 'admin' && (
             <Link
               href="/admin"
-              className="px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-700 dark:text-purple-300 border border-purple-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
-              title="Mở Bảng Điều Khiển Admin"
+              className="px-2.5 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-700 dark:text-purple-300 border border-purple-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0"
+              title="Mở Bảng Điều Khiển Quản Trị Admin"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-purple-500" />
-              <span className="hidden md:inline">Quản Trị Admin</span>
+              <span className="hidden xl:inline">Quản Trị</span>
             </Link>
           )}
 

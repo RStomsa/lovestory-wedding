@@ -27,6 +27,7 @@ import {
   ArrowUpToLine,
   Globe,
   X,
+  CheckCircle2,
 } from 'lucide-react';
 import { useStudioStore } from './studioStore';
 import { SidebarTab } from './studioTypes';
@@ -93,9 +94,12 @@ export default function StudioLeftRail() {
     loadTemplateData,
     setProfileModalOpen,
     weddingProfile,
+    applyWeddingProfileToCanvas,
     currentTemplateSlug,
     setCurrentTemplateSlug,
   } = useStudioStore();
+
+  const [profileToast, setProfileToast] = useState<string | null>(null);
 
   // Collapsible sub-panel drawer state
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
@@ -350,6 +354,13 @@ export default function StudioLeftRail() {
           const newUrl = `${window.location.pathname}?template=${encodeURIComponent(slug)}`;
           window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
         }
+
+        // If wedding profile is linked, auto-populate the new template immediately
+        if (weddingProfile.isLinked) {
+          setTimeout(() => {
+            applyWeddingProfileToCanvas(weddingProfile);
+          }, 100);
+        }
       } else {
         alert('Không thể nạp dữ liệu chi tiết của mẫu này.');
       }
@@ -361,6 +372,11 @@ export default function StudioLeftRail() {
         if (typeof window !== 'undefined') {
           const newUrl = `${window.location.pathname}?template=${encodeURIComponent(slug)}`;
           window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
+        }
+        if (weddingProfile.isLinked) {
+          setTimeout(() => {
+            applyWeddingProfileToCanvas(weddingProfile);
+          }, 100);
         }
       } else {
         alert('Lỗi kết nối khi nạp mẫu.');
@@ -1261,7 +1277,7 @@ export default function StudioLeftRail() {
         {activeTab === 'text' && (
           <div className="space-y-4">
             {/* Quick Wedding Profile Creator Banner */}
-            <div className="p-3.5 rounded-2xl bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-stone-850 dark:to-stone-800 border border-rose-200/80 dark:border-stone-700 space-y-2">
+            <div className="p-3.5 rounded-2xl bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-stone-850 dark:to-stone-800 border border-rose-200/80 dark:border-stone-700 space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-xs text-rose-950 dark:text-rose-200 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-rose-500" />
@@ -1272,16 +1288,50 @@ export default function StudioLeftRail() {
                 </span>
               </div>
               <p className="text-[11px] text-stone-600 dark:text-stone-300 leading-relaxed">
-                Tạo hồ sơ cưới để tự động điền tên cô dâu, chú rể, ngày cưới, địa điểm và các lễ lên thiệp.
+                {weddingProfile.isLinked
+                  ? `Đã gắn: ${weddingProfile.groom.shortName || 'Bảo'} & ${weddingProfile.bride.shortName || 'Vy'}. Chạm để điền nhanh lên toàn bộ thiệp.`
+                  : 'Tạo hồ sơ cưới để tự động điền tên cô dâu, chú rể, ngày cưới, địa điểm và các lễ lên thiệp.'}
               </p>
-              <button
-                type="button"
-                onClick={() => setProfileModalOpen(true)}
-                className="w-full py-2 px-3 rounded-xl bg-stone-900 hover:bg-black text-white dark:bg-white dark:text-stone-900 font-bold text-xs shadow-xs transition-all active:scale-95 flex items-center justify-center gap-1.5"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>{weddingProfile.isLinked ? 'Sửa hồ sơ cưới' : 'Tạo hồ sơ cưới'}</span>
-              </button>
+
+              {weddingProfile.isLinked ? (
+                <div className="space-y-1.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      applyWeddingProfileToCanvas(weddingProfile);
+                      setProfileToast(`✓ Đã điền thông tin ${weddingProfile.groom.shortName || 'Bảo'} & ${weddingProfile.bride.shortName || 'Vy'} lên thiệp thành công!`);
+                      setTimeout(() => setProfileToast(null), 3500);
+                    }}
+                    className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold text-xs shadow-md shadow-rose-600/20 transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>⚡ Điền Vào Thiệp Ngay</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setProfileModalOpen(true)}
+                    className="w-full py-1.5 px-3 rounded-xl bg-white dark:bg-stone-800 hover:bg-stone-100 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 font-semibold text-[11px] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <span>✏️ Sửa hồ sơ cưới</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setProfileModalOpen(true)}
+                  className="w-full py-2 px-3 rounded-xl bg-stone-900 hover:bg-black text-white dark:bg-white dark:text-stone-900 font-bold text-xs shadow-xs transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Tạo hồ sơ cưới</span>
+                </button>
+              )}
+
+              {profileToast && (
+                <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-semibold flex items-center gap-1.5 animate-in fade-in duration-200">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>{profileToast}</span>
+                </div>
+              )}
             </div>
 
             {/* MẪU VĂN BẢN (Exact Match to User Screenshot) */}
@@ -1917,80 +1967,93 @@ export default function StudioLeftRail() {
               </span>
 
               <div className="space-y-3">
-                {STUDIO_TEMPLATE_PRESETS.map((preset) => (
-                  <div
-                    key={preset.id}
-                    className={`group rounded-2xl border ${
-                      currentTemplateSlug === preset.slug
-                        ? 'border-purple-600 dark:border-purple-500 ring-2 ring-purple-500/30 bg-purple-50/20 shadow-md'
-                        : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800'
-                    } overflow-hidden shadow-xs hover:shadow-md hover:border-rose-400 transition-all`}
-                  >
-                    <div className="relative aspect-[16/10] bg-stone-200 overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={resolveStudioAssetUrl(preset.thumbnail) || '/assets/wedding/samples/sample_01.jpg'}
-                        alt={preset.name}
-                        referrerPolicy="no-referrer"
-                        loading="lazy"
-                        onError={(e) => {
-                          const target = e.currentTarget;
-                          if (target.dataset.hasError === 'true') return;
-                          target.dataset.hasError = 'true';
-                          target.src = '/assets/wedding/samples/sample_01.jpg';
-                        }}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <span className="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-black/70 text-white backdrop-blur-xs">
-                        {preset.tier}
-                      </span>
-                      {currentTemplateSlug === preset.slug && (
-                        <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white shadow-md animate-pulse">
-                          ✓ ĐANG MỞ
-                        </span>
-                      )}
-                      <span className="absolute bottom-2 right-2 text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/90 text-stone-800 font-semibold shadow-xs">
-                        {preset.imagesCount} ảnh
-                      </span>
-                    </div>
-
-                    <div className="p-3">
-                      <h4 className="font-bold text-xs text-stone-800 dark:text-stone-100 line-clamp-1">
-                        {preset.name}
-                      </h4>
-                      <p className="text-[10px] text-stone-500 line-clamp-2 mt-1 leading-relaxed">
-                        {preset.description}
-                      </p>
-
-                      <button
-                        disabled={loadingTemplateSlug === preset.slug}
-                        onClick={() => handleApplyTemplate(preset.slug, preset, preset.name)}
-                        className={`w-full mt-3 py-1.5 rounded-xl text-white text-[11px] font-semibold transition-all shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 ${
-                          currentTemplateSlug === preset.slug
-                            ? 'bg-purple-600 hover:bg-purple-700'
-                            : 'bg-stone-900 hover:bg-black'
-                        }`}
-                      >
-                        {loadingTemplateSlug === preset.slug ? (
-                          <>
-                            <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-400" />
-                            <span>Đang nạp dữ liệu thật...</span>
-                          </>
-                        ) : currentTemplateSlug === preset.slug ? (
-                          <>
-                            <Check className="w-3.5 h-3.5" />
-                            <span>✓ Đang mở mẫu này</span>
-                          </>
-                        ) : (
-                          <>
-                            <Check className="w-3.5 h-3.5" />
-                            <span>Áp dụng mẫu này</span>
-                          </>
+                {STUDIO_TEMPLATE_PRESETS.map((preset, pIdx) => {
+                  const presetCode = `Mẫu 0${pIdx + 1}`;
+                  return (
+                    <div
+                      key={preset.id}
+                      className={`group rounded-2xl border ${
+                        currentTemplateSlug === preset.slug
+                          ? 'border-purple-600 dark:border-purple-500 ring-2 ring-purple-500/30 bg-purple-50/20 shadow-md'
+                          : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800'
+                      } overflow-hidden shadow-xs hover:shadow-md hover:border-rose-400 transition-all`}
+                    >
+                      <div className="relative aspect-[16/10] bg-stone-200 overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={resolveStudioAssetUrl(preset.thumbnail) || '/assets/wedding/samples/sample_01.jpg'}
+                          alt={preset.name}
+                          referrerPolicy="no-referrer"
+                          loading="lazy"
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            if (target.dataset.hasError === 'true') return;
+                            target.dataset.hasError = 'true';
+                            target.src = '/assets/wedding/samples/sample_01.jpg';
+                          }}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-2 left-2 flex items-center gap-1.5">
+                          <span className="text-[10px] font-serif font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-stone-900/90 text-white shadow-xs">
+                            {presetCode}
+                          </span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-black/60 text-white backdrop-blur-xs">
+                            {preset.tier}
+                          </span>
+                        </div>
+                        {currentTemplateSlug === preset.slug && (
+                          <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white shadow-md animate-pulse">
+                            ✓ ĐANG MỞ
+                          </span>
                         )}
-                      </button>
+                        <span className="absolute bottom-2 right-2 text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/90 text-stone-800 font-semibold shadow-xs">
+                          {preset.imagesCount} ảnh
+                        </span>
+                      </div>
+
+                      <div className="p-3">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-serif font-black text-xs text-rose-600 dark:text-rose-400">
+                            {presetCode}:
+                          </span>
+                          <h4 className="font-bold text-xs text-stone-800 dark:text-stone-100 line-clamp-1">
+                            {preset.name}
+                          </h4>
+                        </div>
+                        <p className="text-[10px] text-stone-500 line-clamp-2 mt-1 leading-relaxed">
+                          {preset.description}
+                        </p>
+
+                        <button
+                          disabled={loadingTemplateSlug === preset.slug}
+                          onClick={() => handleApplyTemplate(preset.slug, preset, preset.name)}
+                          className={`w-full mt-3 py-1.5 rounded-xl text-white text-[11px] font-semibold transition-all shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 ${
+                            currentTemplateSlug === preset.slug
+                              ? 'bg-purple-600 hover:bg-purple-700'
+                              : 'bg-stone-900 hover:bg-black'
+                          }`}
+                        >
+                          {loadingTemplateSlug === preset.slug ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-400" />
+                              <span>Đang nạp dữ liệu thật...</span>
+                            </>
+                          ) : currentTemplateSlug === preset.slug ? (
+                            <>
+                              <Check className="w-3.5 h-3.5" />
+                              <span>✓ Đang mở mẫu này</span>
+                            </>
+                          ) : (
+                            <>
+                              <Check className="w-3.5 h-3.5" />
+                              <span>Áp dụng mẫu này</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -2021,8 +2084,10 @@ export default function StudioLeftRail() {
                         : true;
                       return matchCat && matchSearch;
                     })
-                    .map((m: any) => {
+                    .map((m: any, mIdx: number) => {
                       const isCurrent = currentTemplateSlug === m.slug || currentTemplateSlug === m.id;
+                      const templateCode = m.code || `Mẫu ${String(mIdx + 1).padStart(2, '0')}`;
+                      const templateSubtitle = m.subtitle || m.name.replace(/^Mẫu\s*\d+\s*[-—:]\s*/i, '');
                       return (
                         <div
                           key={m.id || m.slug}
@@ -2057,8 +2122,11 @@ export default function StudioLeftRail() {
 
                           <div className="overflow-hidden flex-1 min-w-0">
                             <div className="flex items-center gap-1.5">
+                              <span className="font-serif font-black text-xs text-rose-600 dark:text-rose-400 shrink-0">
+                                {templateCode}
+                              </span>
                               <h5 className="font-semibold text-xs text-stone-800 dark:text-stone-200 truncate">
-                                {m.name}
+                                {templateSubtitle}
                               </h5>
                               {isCurrent && (
                                 <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-purple-600 text-white shrink-0">

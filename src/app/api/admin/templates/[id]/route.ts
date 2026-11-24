@@ -15,11 +15,14 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const { name, tier, price, badge, category, longThumbnail, description, isActive, displayOrder } = body;
+    const { name, tier, price, badge, category, longThumbnail, description, isActive, displayOrder, isPublished, code, subtitle } = body;
 
     // 1. Update in Catalog templates (customTemplates.json / CATALOG_TEMPLATES overrides)
     const updatedCatalog = updateCatalogTemplate(id, {
       ...(name ? { name: String(name).trim() } : {}),
+      ...(code ? { code: String(code).trim() } : {}),
+      ...(subtitle ? { subtitle: String(subtitle).trim() } : {}),
+      ...(isPublished !== undefined ? { isPublished: Boolean(isPublished) } : {}),
       ...(tier ? { tier } : {}),
       ...(price !== undefined ? { price: Number(price) } : {}),
       ...(badge !== undefined ? { badge: String(badge).trim() as 'Miễn phí' | 'Basic' | 'Premium' } : {}),
@@ -38,7 +41,7 @@ export async function PATCH(
           ...(tier !== undefined ? { tier } : {}),
           ...(price !== undefined ? { price: Number(price) } : {}),
           ...(badge !== undefined ? { badge: String(badge).trim() } : {}),
-          ...(isActive !== undefined ? { isActive: Boolean(isActive) } : {}),
+          ...(isActive !== undefined ? { isActive: Boolean(isActive) } : (isPublished !== undefined ? { isActive: Boolean(isPublished) } : {})),
           ...(displayOrder !== undefined ? { displayOrder: Number(displayOrder) } : {}),
         },
       });

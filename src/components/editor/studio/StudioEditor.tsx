@@ -84,6 +84,12 @@ function StudioEditorInner({ mode = 'user' }: StudioEditorProps) {
             data.preset.slug || templateSlug
           );
           setCurrentTemplateSlug(data.preset.slug || templateSlug);
+
+          // Auto-apply wedding profile if linked
+          if (useStudioStore.getState().weddingProfile?.isLinked) {
+            useStudioStore.getState().applyWeddingProfileToCanvas(useStudioStore.getState().weddingProfile);
+          }
+
           setLoadedNotification(`✓ Đang mở mẫu: "${data.preset.name}" (${data.preset.slug || templateSlug})`);
           setTimeout(() => setLoadedNotification(null), 4000);
         } else {
