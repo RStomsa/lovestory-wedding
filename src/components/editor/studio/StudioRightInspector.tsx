@@ -64,6 +64,7 @@ export default function StudioRightInspector() {
     pushElementsBelow,
     autoPushDown,
     setAutoPushDown,
+    currentTemplateSlug,
   } = useStudioStore();
 
   const { user } = useAuth();
@@ -497,18 +498,33 @@ export default function StudioRightInspector() {
               </div>
             </div>
 
-            <div>
-              <h4 className="font-bold text-sm text-stone-900 dark:text-white">
+            <div className="p-3 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700/80 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">
+                  Mẫu đang mở
+                </span>
+                {currentTemplateSlug && (
+                  <span className="text-[9px] font-bold text-purple-600 bg-purple-50 dark:bg-purple-950/60 px-1.5 py-0.5 rounded-full border border-purple-200 dark:border-purple-800">
+                    Kho hệ thống
+                  </span>
+                )}
+              </div>
+              <h4 className="font-bold text-xs text-stone-900 dark:text-white">
                 {canvas.title || 'Thiết kế chưa đặt tên'}
               </h4>
+              {currentTemplateSlug && (
+                <p className="text-[10px] text-purple-600 dark:text-purple-400 font-mono">
+                  Slug: /{currentTemplateSlug}
+                </p>
+              )}
               <button
                 onClick={() => {
                   const newTitle = prompt('Nhập tên thiệp cưới:', canvas.title);
-                  if (newTitle) setCanvasTitle(newTitle);
+                  if (newTitle && newTitle.trim()) setCanvasTitle(newTitle.trim());
                 }}
-                className="text-[11px] text-rose-500 hover:underline mt-0.5 font-medium"
+                className="text-[11px] text-rose-500 hover:underline font-medium block pt-0.5 cursor-pointer"
               >
-                Sửa tên và ảnh
+                ✏️ Đổi tên hiển thị thiệp
               </button>
             </div>
 

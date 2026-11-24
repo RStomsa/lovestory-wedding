@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import fs from 'fs';
 import { broadcastSyncEvent, SyncPayload } from '@/lib/realtimeSync';
+import { saveCustomStudioPreset } from '@/lib/studioPresetsService';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,25 +23,29 @@ export async function POST(req: NextRequest) {
     // 1. Persist Template Changes to customStudioPresets.json
     if (payload.entityType === 'template') {
       try {
-        const presetsPath = path.join(process.cwd(), 'src', 'data', 'customStudioPresets.json');
-        let presets: Record<string, any> = {};
-
-        if (fs.existsSync(presetsPath)) {
-          presets = JSON.parse(fs.readFileSync(presetsPath, 'utf-8'));
-        }
-
         if (payload.action === 'delete') {
-          delete presets[payload.id];
+          const presetsPath = path.join(process.cwd(), 'src', 'data', 'customStudioPresets.json');
+          if (fs.existsSync(presetsPath)) {
+            const list = JSON.parse(fs.readFileSync(presetsPath, 'utf-8'));
+            if (Array.isArray(list)) {
+              const filtered = list.filter((p: any) => p.slug !== payload.id && p.id !== payload.id);
+              fs.writeFileSync(presetsPath, JSON.stringify(filtered, null, 2), 'utf-8');
+            }
+          }
         } else if (payload.data) {
-          presets[payload.id] = {
-            ...payload.data,
-            updatedAt: new Date(timestamp).toISOString(),
-            version: (payload.version || 0) + 1,
-          };
-          payload.version = presets[payload.id].version;
+          saveCustomStudioPreset({
+            id: payload.data.id || `studio-preset-${payload.id}`,
+            slug: payload.data.slug || payload.id,
+            name: payload.data.name || payload.id,
+            category: payload.data.category || 'wedding',
+            tier: payload.data.tier || 'PREMIUM',
+            thumbnail: payload.data.thumbnail || '',
+            imagesCount: payload.data.elements?.filter((e: any) => e.type === 'image').length || 10,
+            description: payload.data.description || 'Mẫu thiết kế LoveStory Studio',
+            config: payload.data.canvasConfig || payload.data.config || {},
+            elements: payload.data.elements || [],
+          });
         }
-
-        fs.writeFileSync(presetsPath, JSON.stringify(presets, null, 2), 'utf-8');
       } catch (err) {
         console.error('Failed to persist template to customStudioPresets.json:', err);
       }

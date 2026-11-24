@@ -93,6 +93,8 @@ export default function StudioLeftRail() {
     loadTemplateData,
     setProfileModalOpen,
     weddingProfile,
+    currentTemplateSlug,
+    setCurrentTemplateSlug,
   } = useStudioStore();
 
   // Collapsible sub-panel drawer state
@@ -331,17 +333,35 @@ export default function StudioLeftRail() {
     try {
       const res = await fetch(`/api/templates/studio?slug=${encodeURIComponent(slug)}`);
       const data = await res.json();
-      if (data.success && data.preset && Array.isArray(data.preset.elements) && data.preset.elements.length > 0) {
-        loadTemplateData(data.preset.elements, data.preset.config);
-      } else if (fallbackPreset && fallbackPreset.elements) {
-        loadTemplateData(fallbackPreset.elements, fallbackPreset.config);
+      const loadedElements = data.success && data.preset && Array.isArray(data.preset.elements) && data.preset.elements.length > 0
+        ? data.preset.elements
+        : fallbackPreset?.elements;
+      const loadedConfig = data.success && data.preset?.config
+        ? data.preset.config
+        : fallbackPreset?.config;
+      const loadedName = data.success && data.preset?.name ? data.preset.name : tName;
+
+      if (loadedElements && loadedElements.length > 0) {
+        loadTemplateData(loadedElements, loadedConfig, loadedName, slug);
+        setCurrentTemplateSlug(slug);
+
+        // Update browser URL query string without reloading
+        if (typeof window !== 'undefined') {
+          const newUrl = `${window.location.pathname}?template=${encodeURIComponent(slug)}`;
+          window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
+        }
       } else {
         alert('Không thể nạp dữ liệu chi tiết của mẫu này.');
       }
     } catch (err) {
       console.error('Lỗi khi nạp mẫu studio:', err);
       if (fallbackPreset && fallbackPreset.elements) {
-        loadTemplateData(fallbackPreset.elements, fallbackPreset.config);
+        loadTemplateData(fallbackPreset.elements, fallbackPreset.config, tName, slug);
+        setCurrentTemplateSlug(slug);
+        if (typeof window !== 'undefined') {
+          const newUrl = `${window.location.pathname}?template=${encodeURIComponent(slug)}`;
+          window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
+        }
       } else {
         alert('Lỗi kết nối khi nạp mẫu.');
       }
@@ -1867,6 +1887,29 @@ export default function StudioLeftRail() {
               ))}
             </div>
 
+            {/* Pinned Active Template Card */}
+            {currentTemplateSlug && (
+              <div className="p-3 rounded-2xl bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-rose-500/10 border-2 border-purple-500/40 space-y-2 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
+                    Mẫu Đang Mở Biên Tập
+                  </span>
+                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white shadow-2xs">
+                    ✓ ĐANG MỞ
+                  </span>
+                </div>
+                <div>
+                  <h4 className="font-bold text-xs text-stone-900 dark:text-white line-clamp-1">
+                    {canvas.title || currentTemplateSlug}
+                  </h4>
+                  <p className="text-[10px] text-purple-700 dark:text-purple-300 font-mono mt-0.5">
+                    Mã mẫu: /{currentTemplateSlug}
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Curated Presets Section (4 Mẫu Thiết Kế Nổi Bật) */}
             <div className="space-y-3">
               <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block">
@@ -1877,21 +1920,35 @@ export default function StudioLeftRail() {
                 {STUDIO_TEMPLATE_PRESETS.map((preset) => (
                   <div
                     key={preset.id}
-                    className="group rounded-2xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 overflow-hidden shadow-xs hover:shadow-md hover:border-rose-400 transition-all"
+                    className={`group rounded-2xl border ${
+                      currentTemplateSlug === preset.slug
+                        ? 'border-purple-600 dark:border-purple-500 ring-2 ring-purple-500/30 bg-purple-50/20 shadow-md'
+                        : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800'
+                    } overflow-hidden shadow-xs hover:shadow-md hover:border-rose-400 transition-all`}
                   >
                     <div className="relative aspect-[16/10] bg-stone-200 overflow-hidden">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={resolveStudioAssetUrl(preset.thumbnail)}
+                        src={resolveStudioAssetUrl(preset.thumbnail) || '/assets/wedding/samples/sample_01.jpg'}
                         alt={preset.name}
+                        referrerPolicy="no-referrer"
+                        loading="lazy"
                         onError={(e) => {
-                          e.currentTarget.src = '/assets/wedding/samples/sample_01.jpg';
+                          const target = e.currentTarget;
+                          if (target.dataset.hasError === 'true') return;
+                          target.dataset.hasError = 'true';
+                          target.src = '/assets/wedding/samples/sample_01.jpg';
                         }}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <span className="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-black/70 text-white backdrop-blur-xs">
                         {preset.tier}
                       </span>
+                      {currentTemplateSlug === preset.slug && (
+                        <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white shadow-md animate-pulse">
+                          ✓ ĐANG MỞ
+                        </span>
+                      )}
                       <span className="absolute bottom-2 right-2 text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/90 text-stone-800 font-semibold shadow-xs">
                         {preset.imagesCount} ảnh
                       </span>
@@ -1908,12 +1965,21 @@ export default function StudioLeftRail() {
                       <button
                         disabled={loadingTemplateSlug === preset.slug}
                         onClick={() => handleApplyTemplate(preset.slug, preset, preset.name)}
-                        className="w-full mt-3 py-1.5 rounded-xl bg-stone-900 hover:bg-black text-white text-[11px] font-semibold transition-all shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50"
+                        className={`w-full mt-3 py-1.5 rounded-xl text-white text-[11px] font-semibold transition-all shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 ${
+                          currentTemplateSlug === preset.slug
+                            ? 'bg-purple-600 hover:bg-purple-700'
+                            : 'bg-stone-900 hover:bg-black'
+                        }`}
                       >
                         {loadingTemplateSlug === preset.slug ? (
                           <>
                             <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-400" />
                             <span>Đang nạp dữ liệu thật...</span>
+                          </>
+                        ) : currentTemplateSlug === preset.slug ? (
+                          <>
+                            <Check className="w-3.5 h-3.5" />
+                            <span>✓ Đang mở mẫu này</span>
                           </>
                         ) : (
                           <>
@@ -1955,57 +2021,80 @@ export default function StudioLeftRail() {
                         : true;
                       return matchCat && matchSearch;
                     })
-                    .map((m: any) => (
-                      <div
-                        key={m.id || m.slug}
-                        className="p-2.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/80 hover:border-rose-400 transition-all flex items-center justify-between gap-2"
-                      >
-                        <div className="w-12 h-16 rounded-lg bg-stone-200 overflow-hidden flex-shrink-0 relative">
-                          {m.thumbnail ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={resolveStudioAssetUrl(m.thumbnail)}
-                              alt={m.name}
-                              onError={(e) => {
-                                e.currentTarget.src = '/assets/wedding/samples/sample_01.jpg';
-                              }}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-[10px] text-stone-400">
-                              Ảnh
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="overflow-hidden flex-1 min-w-0">
-                          <h5 className="font-semibold text-xs text-stone-800 dark:text-stone-200 truncate">
-                            {m.name}
-                          </h5>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-600 uppercase">
-                              {m.badge || m.tier || 'VIP'}
-                            </span>
-                            <span className="text-[10px] font-medium text-stone-500">
-                              {m.price ? `${m.price.toLocaleString('vi-VN')} đ` : '50.000 đ'}
-                            </span>
-                          </div>
-                        </div>
-
-                        <button
-                          disabled={loadingTemplateSlug === m.slug}
-                          onClick={() => handleApplyTemplate(m.slug || m.id, null, m.name)}
-                          className="px-2.5 py-1.5 rounded-lg bg-stone-900 hover:bg-black text-white text-[10px] font-semibold transition-all flex-shrink-0 flex items-center gap-1 disabled:opacity-50"
+                    .map((m: any) => {
+                      const isCurrent = currentTemplateSlug === m.slug || currentTemplateSlug === m.id;
+                      return (
+                        <div
+                          key={m.id || m.slug}
+                          className={`p-2.5 rounded-xl border ${
+                            isCurrent
+                              ? 'border-purple-600 dark:border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/25'
+                              : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/80'
+                          } hover:border-rose-400 transition-all flex items-center justify-between gap-2`}
                         >
-                          {loadingTemplateSlug === m.slug ? (
-                            <Loader2 className="w-3 h-3 animate-spin text-rose-400" />
-                          ) : (
-                            <Check className="w-3 h-3" />
-                          )}
-                          <span>Áp dụng</span>
-                        </button>
-                      </div>
-                    ))}
+                          <div className="w-12 h-16 rounded-lg bg-stone-200 overflow-hidden flex-shrink-0 relative">
+                            {m.thumbnail ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={resolveStudioAssetUrl(m.thumbnail) || '/assets/wedding/samples/sample_01.jpg'}
+                                alt={m.name}
+                                referrerPolicy="no-referrer"
+                                loading="lazy"
+                                onError={(e) => {
+                                  const target = e.currentTarget;
+                                  if (target.dataset.hasError === 'true') return;
+                                  target.dataset.hasError = 'true';
+                                  target.src = '/assets/wedding/samples/sample_01.jpg';
+                                }}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-[10px] text-stone-400">
+                                Ảnh
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="overflow-hidden flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <h5 className="font-semibold text-xs text-stone-800 dark:text-stone-200 truncate">
+                                {m.name}
+                              </h5>
+                              {isCurrent && (
+                                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-purple-600 text-white shrink-0">
+                                  Đang mở
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-600 uppercase">
+                                {m.badge || m.tier || 'VIP'}
+                              </span>
+                              <span className="text-[10px] font-medium text-stone-500">
+                                {m.price ? `${m.price.toLocaleString('vi-VN')} đ` : '50.000 đ'}
+                              </span>
+                            </div>
+                          </div>
+
+                          <button
+                            disabled={loadingTemplateSlug === m.slug}
+                            onClick={() => handleApplyTemplate(m.slug || m.id, null, m.name)}
+                            className={`px-2.5 py-1.5 rounded-lg text-white text-[10px] font-semibold transition-all flex-shrink-0 flex items-center gap-1 disabled:opacity-50 ${
+                              isCurrent
+                                ? 'bg-purple-600 hover:bg-purple-700'
+                                : 'bg-stone-900 hover:bg-black'
+                            }`}
+                          >
+                            {loadingTemplateSlug === m.slug ? (
+                              <Loader2 className="w-3 h-3 animate-spin text-rose-400" />
+                            ) : (
+                              <Check className="w-3 h-3" />
+                            )}
+                            <span>{isCurrent ? '✓ Đang mở' : 'Áp dụng'}</span>
+                          </button>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             )}
@@ -2039,55 +2128,77 @@ export default function StudioLeftRail() {
                     return matchCat && matchSearch;
                   })
                   .slice(0, 30)
-                  .map((m: any) => (
-                    <div
-                      key={m.id || m.slug}
-                      className="p-2.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/80 hover:border-blue-400 transition-all flex items-center justify-between gap-2"
-                    >
-                      <div className="w-12 h-16 rounded-lg bg-stone-200 overflow-hidden flex-shrink-0 relative">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={resolveStudioAssetUrl(m.coverImage || m.thumbnail)}
-                          alt={m.title}
-                          onError={(e) => {
-                            e.currentTarget.src = '/assets/wedding/samples/sample_01.jpg';
-                          }}
-                          referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-
-                      <div className="overflow-hidden flex-1 min-w-0">
-                        <h5 className="font-semibold text-xs text-stone-800 dark:text-stone-200 truncate">
-                          {m.title}
-                        </h5>
-                        <p className="text-[10px] text-stone-500 line-clamp-1 mt-0.5">
-                          {m.description || m.categoryLabel}
-                        </p>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300">
-                            {m.categoryLabel}
-                          </span>
-                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-600 uppercase">
-                            {m.tier}
-                          </span>
-                        </div>
-                      </div>
-
-                      <button
-                        disabled={loadingTemplateSlug === m.slug}
-                        onClick={() => handleApplyTemplate(m.slug, null, m.title)}
-                        className="px-2.5 py-1.5 rounded-lg bg-stone-900 hover:bg-black text-white text-[10px] font-semibold transition-all flex-shrink-0 flex items-center gap-1 disabled:opacity-50"
+                  .map((m: any) => {
+                    const isCurrent = currentTemplateSlug === m.slug || currentTemplateSlug === m.id;
+                    return (
+                      <div
+                        key={m.id || m.slug}
+                        className={`p-2.5 rounded-xl border ${
+                          isCurrent
+                            ? 'border-purple-600 dark:border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/25'
+                            : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/80'
+                        } hover:border-blue-400 transition-all flex items-center justify-between gap-2`}
                       >
-                        {loadingTemplateSlug === m.slug ? (
-                          <Loader2 className="w-3 h-3 animate-spin text-rose-400" />
-                        ) : (
-                          <Check className="w-3 h-3" />
-                        )}
-                        <span>Áp dụng</span>
-                      </button>
-                    </div>
-                  ))}
+                        <div className="w-12 h-16 rounded-lg bg-stone-200 overflow-hidden flex-shrink-0 relative">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={resolveStudioAssetUrl(m.coverImage || m.thumbnail) || '/assets/wedding/samples/sample_01.jpg'}
+                            alt={m.title}
+                            referrerPolicy="no-referrer"
+                            loading="lazy"
+                            onError={(e) => {
+                              const target = e.currentTarget;
+                              if (target.dataset.hasError === 'true') return;
+                              target.dataset.hasError = 'true';
+                              target.src = '/assets/wedding/samples/sample_01.jpg';
+                            }}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+
+                        <div className="overflow-hidden flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <h5 className="font-semibold text-xs text-stone-800 dark:text-stone-200 truncate">
+                              {m.title}
+                            </h5>
+                            {isCurrent && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-purple-600 text-white shrink-0">
+                                Đang mở
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-stone-500 line-clamp-1 mt-0.5">
+                            {m.description || m.categoryLabel}
+                          </p>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300">
+                              {m.categoryLabel}
+                            </span>
+                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-600 uppercase">
+                              {m.tier}
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          disabled={loadingTemplateSlug === m.slug}
+                          onClick={() => handleApplyTemplate(m.slug, null, m.title)}
+                          className={`px-2.5 py-1.5 rounded-lg text-white text-[10px] font-semibold transition-all flex-shrink-0 flex items-center gap-1 disabled:opacity-50 ${
+                            isCurrent
+                              ? 'bg-purple-600 hover:bg-purple-700'
+                              : 'bg-stone-900 hover:bg-black'
+                          }`}
+                        >
+                          {loadingTemplateSlug === m.slug ? (
+                            <Loader2 className="w-3 h-3 animate-spin text-rose-400" />
+                          ) : (
+                            <Check className="w-3 h-3" />
+                          )}
+                          <span>{isCurrent ? '✓ Đang mở' : 'Áp dụng'}</span>
+                        </button>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
 
@@ -2118,12 +2229,23 @@ export default function StudioLeftRail() {
                   .map((t: any, idx: number) => (
                     <div
                       key={t.slug || idx}
-                      className="p-2.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/80 hover:border-rose-400 transition-all flex items-center justify-between"
+                      className={`p-2.5 rounded-xl border ${
+                        currentTemplateSlug === t.slug
+                          ? 'border-purple-600 dark:border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/25'
+                          : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/80'
+                      } hover:border-rose-400 transition-all flex items-center justify-between`}
                     >
                       <div className="overflow-hidden mr-2">
-                        <h5 className="font-semibold text-xs text-stone-800 dark:text-stone-200 truncate">
-                          {t.title ? t.title.split('-')[0].trim() : t.slug}
-                        </h5>
+                        <div className="flex items-center gap-1.5">
+                          <h5 className="font-semibold text-xs text-stone-800 dark:text-stone-200 truncate">
+                            {t.title ? t.title.split('-')[0].trim() : t.slug}
+                          </h5>
+                          {currentTemplateSlug === t.slug && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-purple-600 text-white shrink-0">
+                              Đang mở
+                            </span>
+                          )}
+                        </div>
                         <p className="text-[10px] text-stone-400 font-mono">
                           Mã: {t.slug} • {t.imagesCount || 10} ảnh
                         </p>
@@ -2132,12 +2254,16 @@ export default function StudioLeftRail() {
                       <button
                         disabled={loadingTemplateSlug === t.slug}
                         onClick={() => handleApplyTemplate(t.slug, null, t.title ? t.title.split('-')[0].trim() : t.slug)}
-                        className="px-2.5 py-1 rounded-lg bg-stone-200 dark:bg-stone-700 hover:bg-stone-900 hover:text-white text-stone-700 dark:text-stone-300 text-[10px] font-semibold transition-colors flex-shrink-0 flex items-center gap-1 disabled:opacity-50"
+                        className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-colors flex-shrink-0 flex items-center gap-1 disabled:opacity-50 ${
+                          currentTemplateSlug === t.slug
+                            ? 'bg-purple-600 text-white hover:bg-purple-700'
+                            : 'bg-stone-200 dark:bg-stone-700 hover:bg-stone-900 hover:text-white text-stone-700 dark:text-stone-300'
+                        }`}
                       >
                         {loadingTemplateSlug === t.slug ? (
                           <Loader2 className="w-3 h-3 animate-spin text-rose-500" />
                         ) : null}
-                        <span>Nạp mẫu</span>
+                        <span>{currentTemplateSlug === t.slug ? '✓ Đang mở' : 'Nạp mẫu'}</span>
                       </button>
                     </div>
                   ))}

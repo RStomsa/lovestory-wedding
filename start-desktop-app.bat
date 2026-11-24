@@ -16,25 +16,33 @@ if %ERRORLEVEL% equ 0 (
 ) else (
     echo [..] Dang khoi dong may chu LoveStory tren cong 3000...
     start "LoveStory Server" /min cmd /c "npm run dev"
+    echo [..] Cho may chu san sang trong 5 giay...
     timeout /t 5 >nul
 )
 
-:: 2. Kiem tra va khoi chay Ung Dung Desktop Native Webview2
-echo [..] Dang khoi chay cua so Ung Dung Desktop LoveStory Studio...
+:: 2. Khoi chay Ung Dung Desktop Native .EXE (True Native Window, No Browser Tabs)
+echo [..] Dang khoi chay ung dung Desktop LoveStory Studio (.exe)...
 
-set EDGE_PATH="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-if not exist %EDGE_PATH% (
-    set EDGE_PATH="C:\Program Files\Microsoft\Edge\Application\msedge.exe"
+set TAURI_EXE="src-tauri\target\release\lovestory-studio-desktop.exe"
+set TAURI_DEV_EXE="src-tauri\target\debug\lovestory-studio-desktop.exe"
+
+if exist %TAURI_EXE% (
+    start "" %TAURI_EXE%
+    echo [OK] Da mo thanh cong Ung dung Desktop Native LoveStory (.exe)!
+    goto finish
 )
 
-if exist %EDGE_PATH% (
-    start "" %EDGE_PATH% --app="http://localhost:3000/admin/studio" --window-size=1440,920 --window-position=60,40 --enable-features=OverlayScrollbar
-    echo [OK] Da mo Ung Dung Desktop LoveStory Studio thanh cong!
-) else (
-    start "" "http://localhost:3000/admin/studio"
-    echo [OK] Da mo giao dien Studio tren trinh duyet mac dinh.
+if exist %TAURI_DEV_EXE% (
+    start "" %TAURI_DEV_EXE%
+    echo [OK] Da mo thanh cong Ung dung Desktop Native LoveStory (.exe)!
+    goto finish
 )
 
+:: Neu chua co file release thi chay qua cargo run hoac standalone app container
+echo [..] Dang khoi chay qua Cargo Tauri Native Runner...
+start "" cargo run --manifest-path src-tauri/Cargo.toml
+
+:finish
 echo.
 echo =====================================================================
 echo   DONG BO REALTIME: Luong SSE Web ^<-^> Desktop dang ket noi.

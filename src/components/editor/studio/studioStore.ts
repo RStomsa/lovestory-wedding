@@ -12,6 +12,8 @@ interface StudioState {
   elements: CanvasElement[];
   selectedId: string | null;
   selectedIds: string[];
+  isMultiSelectMode: boolean;
+  toggleMultiSelectMode: (force?: boolean) => void;
   activeTab: SidebarTab;
   zoom: number;
   hasUnsavedChanges: boolean;
@@ -42,6 +44,7 @@ interface StudioState {
   duplicateSelectedElements: () => void;
   updateElementsBatch: (updates: { id: string; updates: Partial<CanvasElement> }[], recordHistory?: boolean) => void;
   alignSelectedElements: (alignment: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => void;
+  pushSelectedElements: (dy: number) => void;
   addElement: (el: Omit<CanvasElement, 'id' | 'zIndex'>) => void;
   updateElement: (id: string, updates: Partial<CanvasElement>, recordHistory?: boolean) => void;
   removeElement: (id: string) => void;
@@ -52,7 +55,12 @@ interface StudioState {
   undo: () => void;
   redo: () => void;
   markSaved: () => void;
-  loadTemplateData: (elements: CanvasElement[], config?: Partial<CanvasConfig>) => void;
+  loadTemplateData: (
+    elements: CanvasElement[],
+    config?: Partial<CanvasConfig>,
+    templateName?: string,
+    templateSlug?: string
+  ) => void;
 
   // Mobile Bottom Sheet Action & Drawer
   activeMobileSheet: string | null;
@@ -160,9 +168,9 @@ const DEFAULT_ELEMENTS: CanvasElement[] = [
   {
     id: 'text-save',
     type: 'text',
-    x: 0,
+    x: 90,
     y: 40,
-    width: 500,
+    width: 320,
     height: 90,
     rotation: 0,
     zIndex: 10,
@@ -177,9 +185,9 @@ const DEFAULT_ELEMENTS: CanvasElement[] = [
   {
     id: 'text-the',
     type: 'text',
-    x: 0,
+    x: 150,
     y: 135,
-    width: 500,
+    width: 200,
     height: 30,
     rotation: 0,
     zIndex: 10,
@@ -194,9 +202,9 @@ const DEFAULT_ELEMENTS: CanvasElement[] = [
   {
     id: 'text-date',
     type: 'text',
-    x: 0,
+    x: 90,
     y: 170,
-    width: 500,
+    width: 320,
     height: 90,
     rotation: 0,
     zIndex: 10,
@@ -466,6 +474,11 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   elements: DEFAULT_ELEMENTS,
   selectedId: null,
   selectedIds: [],
+  isMultiSelectMode: false,
+  toggleMultiSelectMode: (force) =>
+    set((state) => ({
+      isMultiSelectMode: force !== undefined ? force : !state.isMultiSelectMode,
+    })),
   activeTab: 'text',
   zoom: 1,
   hasUnsavedChanges: false,
@@ -498,54 +511,172 @@ export const useStudioStore = create<StudioState>((set, get) => ({
         address: '489 Hoàng Quốc Việt, Cầu Giấy, Hà Nội',
       };
 
-    const groomName = profile.groom.shortName || profile.groom.fullName || 'Quốc Bảo';
-    const brideName = profile.bride.shortName || profile.bride.fullName || 'Thảo Vy';
-    const coupleNames = `${groomName} & ${brideName}`;
+    const groomShort = profile.groom.shortName || profile.groom.fullName || 'Quốc Bảo';
+    const brideShort = profile.bride.shortName || profile.bride.fullName || 'Thảo Vy';
+    const groomFull = profile.groom.fullName || groomShort;
+    const brideFull = profile.bride.fullName || brideShort;
+    const coupleNames = `${groomShort} & ${brideShort}`;
     const weddingTitle = profile.profileName || `Đám cưới ${coupleNames}`;
 
-    // Format wedding date: YYYY-MM-DD -> DD/MM/YYYY
-    let formattedDate = '28/11/2026';
+    // Parse wedding date parts: YYYY-MM-DD
+    let d = '28', m = '11', y = '2026';
     if (mainCeremony.date) {
       const parts = mainCeremony.date.split('-');
       if (parts.length === 3) {
-        formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
-      } else {
-        formattedDate = mainCeremony.date;
+        y = parts[0];
+        m = parts[1];
+        d = parts[2];
       }
     }
+    const slashDate = `${d}/${m}/${y}`;
+    const dotDate = `${d}.${m}.${y}`;
+    const spacedDotDate = `${d} . ${m} . ${y}`;
 
     const nextElements = elements.map((el) => {
       // 1. Text elements
       if (el.type === 'text' && el.text) {
         let text = el.text;
-        // Couple names replacement
-        if (
-          text.includes('&') &&
-          (text.includes('Long') ||
-            text.includes('Chi') ||
-            text.includes('Bảo') ||
-            text.includes('Vy') ||
-            text.includes('Tiểu Mai') ||
-            text.includes('Mạn'))
+        const trimmed = text.trim();
+        const idLower = el.id.toLowerCase();
+
+        // 1. COUPLE NAMES: Detect couple name texts (contains '&', '♥', '❤', 'and' or ID matches)
+        const isCoupleName =
+          idLower.includes('name') ||
+          idLower.includes('couple') ||
+          (trimmed.includes('&') &&
+            trimmed.length < 55 &&
+            !trimmed.includes('Ông') &&
+            !trimmed.includes('Bà') &&
+            !trimmed.includes('Lễ') &&
+            !trimmed.includes('lễ') &&
+            !trimmed.includes('Kính') &&
+            !trimmed.includes('Designed'));
+
+        if (isCoupleName) {
+          if (trimmed === trimmed.toUpperCase()) {
+            text = `${groomShort.toUpperCase()} & ${brideShort.toUpperCase()}`;
+          } else {
+            text = coupleNames;
+          }
+        }
+        // 2. GROOM NAME ONLY
+        else if (
+          idLower.includes('groom') ||
+          trimmed === 'Hoàng Long' ||
+          trimmed === 'Vĩnh Tài' ||
+          trimmed === 'Phạm Công Vinh' ||
+          trimmed === 'Văn Minh' ||
+          trimmed === 'Minh Thành' ||
+          trimmed === 'Đặng Quốc Bảo' ||
+          trimmed === 'Quốc Bảo' ||
+          trimmed === 'Chú rể' ||
+          trimmed === 'CHÚ RỂ'
         ) {
-          text = coupleNames;
-        } else if (text === 'Hoàng Long' || text === 'Chú rể' || text === 'Đặng Quốc Bảo') {
-          text = profile.groom.fullName || groomName;
-        } else if (text === 'Mai Chi' || text === 'Cô dâu' || text === 'Nguyễn Thảo Vy') {
-          text = profile.bride.fullName || brideName;
+          if (trimmed === 'Chú rể' || trimmed === 'CHÚ RỂ') {
+            text = trimmed;
+          } else if (trimmed === trimmed.toUpperCase()) {
+            text = groomShort.toUpperCase();
+          } else {
+            text = groomShort;
+          }
         }
-        // Date replacement
-        if (/\b\d{1,2}[\/\.]\d{1,2}[\/\.]\d{2,4}\b/.test(text)) {
-          text = text.replace(/\b\d{1,2}[\/\.]\d{1,2}[\/\.]\d{2,4}\b/, formattedDate);
+        // 3. BRIDE NAME ONLY
+        else if (
+          idLower.includes('bride') ||
+          trimmed === 'Mai Chi' ||
+          trimmed === 'Hiếu Ngân' ||
+          trimmed === 'Nguyễn Hải Yến' ||
+          trimmed === 'Minh An' ||
+          trimmed === 'Bảo Ngọc' ||
+          trimmed === 'Nguyễn Thảo Vy' ||
+          trimmed === 'Thảo Vy' ||
+          trimmed === 'Cô dâu' ||
+          trimmed === 'CÔ DÂU'
+        ) {
+          if (trimmed === 'Cô dâu' || trimmed === 'CÔ DÂU') {
+            text = trimmed;
+          } else if (trimmed === trimmed.toUpperCase()) {
+            text = brideShort.toUpperCase();
+          } else {
+            text = brideShort;
+          }
         }
-        // Venue replacement
-        if (
-          text.toLowerCase().includes('trống đồng') ||
-          text.toLowerCase().includes('palace') ||
-          text.toLowerCase().includes('tiệc cưới')
+        // 4. Order In Family Patterns: e.g. "Trưởng nam : Nguyễn Văn A", "Út nữ : Trần Thị B"
+        else if (/^(Trưởng nam|Thứ nam|Quý nam|Út nam|Chú rể)\s*[:：]/i.test(trimmed)) {
+          const prefix = trimmed.match(/^(Trưởng nam|Thứ nam|Quý nam|Út nam|Chú rể)\s*[:：]/i)![0];
+          text = `${prefix} ${groomFull}`;
+        } else if (/^(Trưởng nữ|Thứ nữ|Ái nữ|Út nữ|Cô dâu)\s*[:：]/i.test(trimmed)) {
+          const prefix = trimmed.match(/^(Trưởng nữ|Thứ nữ|Ái nữ|Út nữ|Cô dâu)\s*[:：]/i)![0];
+          text = `${prefix} ${brideFull}`;
+        }
+        // 5. Parents Patterns:
+        else if (trimmed.includes('Nhà Trai') || trimmed.includes('Họ Nhà Trai') || trimmed.includes('NHÀ TRAI')) {
+          if (profile.groom.fatherName && profile.groom.motherName) {
+            text = `Nhà Trai\nÔng: ${profile.groom.fatherName}\nBà: ${profile.groom.motherName}`;
+          }
+        } else if (trimmed.includes('Nhà Gái') || trimmed.includes('Họ Nhà Gái') || trimmed.includes('NHÀ GÁI')) {
+          if (profile.bride.fatherName && profile.bride.motherName) {
+            text = `Nhà Gái\nÔng: ${profile.bride.fatherName}\nBà: ${profile.bride.motherName}`;
+          }
+        } else if (/^Ông\s*[:：].*Bà\s*[:：]/i.test(trimmed.replace(/\s+/g, ' '))) {
+          if (profile.bride.fatherName && profile.bride.motherName) {
+            text = `Ông: ${profile.bride.fatherName} - Bà: ${profile.bride.motherName}`;
+          } else if (profile.groom.fatherName && profile.groom.motherName) {
+            text = `Ông: ${profile.groom.fatherName} - Bà: ${profile.groom.motherName}`;
+          }
+        } else if (/^Bà\s*[:：]/i.test(trimmed)) {
+          if (profile.groom.motherName) {
+            text = `Bà: ${profile.groom.motherName}`;
+          }
+        } else if (/^Ông\s*[:：]/i.test(trimmed)) {
+          if (profile.groom.fatherName) {
+            text = `Ông: ${profile.groom.fatherName}`;
+          }
+        }
+
+        // 6. DATE & TIME PATTERNS
+        // Spaced date: "27 . 12 . 2026"
+        if (/\b\d{1,2}\s*\.\s*\d{1,2}\s*\.\s*\d{4}\b/.test(text)) {
+          text = text.replace(/\b\d{1,2}\s*\.\s*\d{1,2}\s*\.\s*\d{4}\b/, spacedDotDate);
+        }
+        // Dot date: "28.12.2025"
+        else if (/\b\d{1,2}\.\d{1,2}\.\d{4}\b/.test(text)) {
+          text = text.replace(/\b\d{1,2}\.\d{1,2}\.\d{4}\b/, dotDate);
+        }
+        // Slash date: "28/11/2026"
+        else if (/\b\d{1,2}\/\d{1,2}\/\d{4}\b/.test(text)) {
+          text = text.replace(/\b\d{1,2}\/\d{1,2}\/\d{4}\b/, slashDate);
+        }
+
+        // Month: "THÁNG 11" or "THÁNG 06"
+        if (/THÁNG\s+\d{1,2}/.test(text)) {
+          text = text.replace(/THÁNG\s+\d{1,2}/, `THÁNG ${m}`);
+        } else if (/Tháng\s+\d{1,2}/i.test(text)) {
+          text = text.replace(/Tháng\s+\d{1,2}/i, `Tháng ${m}`);
+        }
+
+        // Time: "VÀO LÚC 07:39" or "VÀO LÚC 08:00"
+        if (/VÀO LÚC\s+\d{1,2}[:h]\d{2}/i.test(text)) {
+          text = text.replace(/VÀO LÚC\s+\d{1,2}[:h]\d{2}/i, `VÀO LÚC ${mainCeremony.time || '11:00'}`);
+        } else if (/^\d{1,2}:\d{2}$/.test(trimmed)) {
+          text = mainCeremony.time || '11:00';
+        }
+
+        // 7. VENUE & ADDRESS PATTERNS
+        if (/^Địa chỉ\s*[:：]/i.test(trimmed)) {
+          text = `Địa chỉ: ${mainCeremony.address || 'Hà Nội'}`;
+        } else if (
+          trimmed.includes('Trống Đồng') ||
+          trimmed.includes('Palace') ||
+          trimmed.includes('Tiệc cưới') ||
+          trimmed.includes('tiệc cưới') ||
+          trimmed.includes('Trung tâm tiệc cưới')
         ) {
           text = mainCeremony.venue || text;
+        } else if (trimmed === 'Hoàng Mai - Hà Nội' || trimmed === '171 Nguyễn Trãi, Hà Nội') {
+          text = mainCeremony.address || text;
         }
+
         return { ...el, text };
       }
 
@@ -563,8 +694,8 @@ export const useStudioStore = create<StudioState>((set, get) => ({
         } else if (el.widgetType === 'call') {
           nextCfg.groomPhone = profile.groom.phone;
           nextCfg.bridePhone = profile.bride.phone;
-          nextCfg.groomName = groomName;
-          nextCfg.brideName = brideName;
+          nextCfg.groomName = groomShort;
+          nextCfg.brideName = brideShort;
         } else if (el.widgetType === 'giftbox') {
           nextCfg.groomBank = {
             bankName: profile.groom.bankName,
@@ -769,6 +900,32 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       past: [...get().past, elements],
       future: [],
       elements: nextElements,
+      hasUnsavedChanges: true,
+    });
+  },
+
+  pushSelectedElements: (dy) => {
+    const { elements, selectedIds, canvas, past } = get();
+    if (!selectedIds.length) return;
+    const idsSet = new Set(selectedIds);
+    let maxBottom = 0;
+    const nextElements = elements.map((e) => {
+      if (idsSet.has(e.id)) {
+        const nextY = Math.max(0, Math.round(e.y + dy));
+        const bottom = nextY + (e.height || 0);
+        if (bottom > maxBottom) maxBottom = bottom;
+        return { ...e, y: nextY };
+      }
+      const bottom = e.y + (e.height || 0);
+      if (bottom > maxBottom) maxBottom = bottom;
+      return e;
+    });
+    const requiredHeight = Math.max(canvas.height, maxBottom + 200);
+    set({
+      past: [...past, elements],
+      future: [],
+      elements: nextElements,
+      canvas: { ...canvas, height: requiredHeight },
       hasUnsavedChanges: true,
     });
   },
@@ -982,12 +1139,17 @@ export const useStudioStore = create<StudioState>((set, get) => ({
 
   markSaved: () => set({ hasUnsavedChanges: false }),
 
-  loadTemplateData: (elements, config) => {
+  loadTemplateData: (elements, config, templateName, templateSlug) => {
     set((state) => ({
       past: [],
       future: [],
       elements,
-      canvas: { ...state.canvas, ...config },
+      canvas: {
+        ...state.canvas,
+        ...config,
+        title: templateName || config?.title || state.canvas.title,
+      },
+      currentTemplateSlug: templateSlug || state.currentTemplateSlug,
       selectedId: null,
       selectedIds: [],
       hasUnsavedChanges: false,

@@ -77,8 +77,14 @@ function StudioEditorInner({ mode = 'user' }: StudioEditorProps) {
       .then((data) => {
         if (isCancelled) return;
         if (data.success && data.preset) {
-          loadTemplateData(data.preset.elements, data.preset.config);
-          setLoadedNotification(`Đã nạp mẫu: ${data.preset.name}`);
+          loadTemplateData(
+            data.preset.elements,
+            data.preset.config,
+            data.preset.name,
+            data.preset.slug || templateSlug
+          );
+          setCurrentTemplateSlug(data.preset.slug || templateSlug);
+          setLoadedNotification(`✓ Đang mở mẫu: "${data.preset.name}" (${data.preset.slug || templateSlug})`);
           setTimeout(() => setLoadedNotification(null), 4000);
         } else {
           console.warn('Could not load requested template:', templateSlug);

@@ -92,9 +92,10 @@ export async function POST(request: NextRequest) {
     // Comply with project pricing: FREE = 0, BASIC = 50000, PREMIUM (VIP) = 30000 single
     const safePrice = safeTier === 'FREE' ? 0 : Number(price) || (safeTier === 'BASIC' ? 50000 : 30000);
     const safeBadge = badge?.trim() || (safeTier === 'PREMIUM' ? 'VIP' : safeTier === 'BASIC' ? '50k' : 'Miễn Phí');
-    const rawThumbnail =
-      thumbnail?.trim() ||
-      'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80';
+    let rawThumbnail = thumbnail?.trim();
+    if (!rawThumbnail || rawThumbnail.startsWith('[') || (!rawThumbnail.startsWith('http') && !rawThumbnail.startsWith('/') && !rawThumbnail.startsWith('data:'))) {
+      rawThumbnail = '/assets/wedding/samples/sample_01.jpg';
+    }
     const safeThumbnail = await persistThumbnailToDisk(rawThumbnail, cleanSlug);
     const safeDesc = description?.trim() || 'Mẫu thiệp cao cấp được thiết kế bởi LoveStory Studio.';
 

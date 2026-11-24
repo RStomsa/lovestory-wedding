@@ -38,6 +38,8 @@ import {
   Square,
   LayoutGrid,
   Sparkles,
+  CheckSquare,
+  X,
 } from 'lucide-react';
 
 // Dynamically import react-moveable to ensure SSR safe
@@ -50,6 +52,8 @@ export default function StudioCanvas() {
     elements,
     selectedId,
     selectedIds,
+    isMultiSelectMode,
+    toggleMultiSelectMode,
     selectElement,
     toggleSelectElement,
     selectMultipleElements,
@@ -57,6 +61,7 @@ export default function StudioCanvas() {
     duplicateSelectedElements,
     updateElementsBatch,
     alignSelectedElements,
+    pushSelectedElements,
     addElement,
     pushElementsBelow,
     updateElement,
@@ -82,12 +87,28 @@ export default function StudioCanvas() {
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const moveableRef = useRef<any>(null);
+  const isMarqueeDraggingRef = useRef<boolean>(false);
   const [moveableTarget, setMoveableTarget] = useState<HTMLElement | null>(null);
   const [showLayerMenu, setShowLayerMenu] = useState(false);
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
   const [showScreenGuides, setShowScreenGuides] = useState(true);
   const [marquee, setMarquee] = useState<{ startX: number; startY: number; currentX: number; currentY: number } | null>(null);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; elements: CanvasElement[] } | null>(null);
+
+  const moveableTargets = selectedIds
+    .map((id) => (typeof document !== 'undefined' ? document.getElementById(`canvas-node-${id}`) : null))
+    .filter((node): node is HTMLElement => Boolean(node));
+
+  const groupBounds = React.useMemo(() => {
+    if (selectedIds.length <= 1) return null;
+    const selEls = elements.filter((e) => selectedIds.includes(e.id));
+    if (selEls.length === 0) return null;
+    const minX = Math.min(...selEls.map((e) => e.x));
+    const maxX = Math.max(...selEls.map((e) => e.x + e.width));
+    const minY = Math.min(...selEls.map((e) => e.y));
+    const maxY = Math.max(...selEls.map((e) => e.y + e.height));
+    return { minX, maxX, minY, maxY, width: maxX - minX, height: maxY - minY };
+  }, [selectedIds, elements]);
 
   // Auto-close layer options menu and context menu when clicking outside
   useEffect(() => {
@@ -304,13 +325,22 @@ export default function StudioCanvas() {
   }, [selectedId, selectedIds, editingTextId]);
 
   const handleCanvasClick = (e: React.MouseEvent) => {
-    // If clicked on canvas background, deselect
-    if (e.target === canvasRef.current) {
-      selectElement(null);
-      setMoveableTarget(null);
-      setShowLayerMenu(false);
-      setContextMenu(null);
-      setEditingTextId(null);
+    // If user just dragged a marquee selection, ignore the subsequent click event
+    if (isMarqueeDraggingRef.current) {
+      isMarqueeDraggingRef.current = false;
+      e.stopPropagation();
+      return;
+    }
+    // If clicked on canvas background or outer scroll container, deselect
+    const target = e.target as HTMLElement;
+    if (target === canvasRef.current || target.id === 'studio-canvas-scroll-container') {
+      if (!e.shiftKey && !isMultiSelectMode) {
+        selectElement(null);
+        setMoveableTarget(null);
+        setShowLayerMenu(false);
+        setContextMenu(null);
+        setEditingTextId(null);
+      }
     }
   };
 
@@ -343,35 +373,55 @@ export default function StudioCanvas() {
   const handleCanvasPointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0) return; // Only primary mouse button
 
+    const target = e.target as HTMLElement;
+    // Don't start marquee if interacting with UI buttons, inputs or handles
+    if (
+      target.closest('.moveable-control-box') ||
+      target.closest('button') ||
+      target.closest('input') ||
+      target.closest('textarea') ||
+      target.closest('[data-export-ignore="true"]')
+    ) {
+      return;
+    }
+
     const canvasNode = canvasRef.current;
     if (!canvasNode) return;
     const rect = canvasNode.getBoundingClientRect();
     const startX = (e.clientX - rect.left) / zoom;
     const startY = (e.clientY - rect.top) / zoom;
-
-    setMarquee({ startX, startY, currentX: startX, currentY: startY });
+    let hasDragged = false;
 
     const onPointerMove = (moveEvt: PointerEvent) => {
       const curX = (moveEvt.clientX - rect.left) / zoom;
       const curY = (moveEvt.clientY - rect.top) / zoom;
-      setMarquee((prev) => (prev ? { ...prev, currentX: curX, currentY: curY } : null));
+      if (!hasDragged && Math.hypot(curX - startX, curY - startY) > 5) {
+        hasDragged = true;
+      }
+      if (hasDragged) {
+        setMarquee({ startX, startY, currentX: curX, currentY: curY });
+      }
     };
 
     const onPointerUp = (upEvt: PointerEvent) => {
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
 
-      const endX = (upEvt.clientX - rect.left) / zoom;
-      const endY = (upEvt.clientY - rect.top) / zoom;
-      const dist = Math.hypot(endX - startX, endY - startY);
+      if (hasDragged) {
+        isMarqueeDraggingRef.current = true;
+        setTimeout(() => {
+          isMarqueeDraggingRef.current = false;
+        }, 300);
 
-      if (dist > 8) {
-        // Multi-selection box
+        const endX = (upEvt.clientX - rect.left) / zoom;
+        const endY = (upEvt.clientY - rect.top) / zoom;
+
         const minX = Math.min(startX, endX);
         const maxX = Math.max(startX, endX);
         const minY = Math.min(startY, endY);
         const maxY = Math.max(startY, endY);
 
+        // Multi-selection box check
         const matched = elements.filter(
           (el) =>
             !el.isLocked &&
@@ -383,16 +433,26 @@ export default function StudioCanvas() {
         );
 
         if (matched.length > 0) {
-          selectMultipleElements(matched.map((m) => m.id));
+          const matchedIds = matched.map((m) => m.id);
+          if (upEvt.shiftKey || isMultiSelectMode) {
+            const combined = Array.from(new Set([...selectedIds, ...matchedIds]));
+            selectMultipleElements(combined);
+          } else {
+            selectMultipleElements(matchedIds);
+          }
         } else {
-          selectElement(null);
+          if (!upEvt.shiftKey && !isMultiSelectMode) {
+            selectElement(null);
+          }
         }
       } else {
-        // Simple click on canvas background
-        selectElement(null);
-        setEditingTextId(null);
-        setShowLayerMenu(false);
-        setContextMenu(null);
+        // Simple click on canvas background without dragging
+        if (!upEvt.shiftKey && !isMultiSelectMode) {
+          selectElement(null);
+          setEditingTextId(null);
+          setShowLayerMenu(false);
+          setContextMenu(null);
+        }
       }
       setMarquee(null);
     };
@@ -834,11 +894,18 @@ export default function StudioCanvas() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={resolveStudioAssetUrl(el.src)}
-              alt={el.alt || 'Ảnh cưới LoveStory'}
+              src={
+                resolveStudioAssetUrl(el.src) ||
+                (el.type === 'graphic'
+                  ? '/assets/m-invite/stock/6964ecd375dc09b0bdcfa023.svg'
+                  : '/assets/wedding/samples/sample_01.jpg')
+              }
+              alt={el.alt || (el.type === 'graphic' ? 'Họa tiết trang trí' : 'Ảnh thiệp cưới')}
               referrerPolicy="no-referrer"
               onError={(e) => {
                 const target = e.currentTarget;
+                if (target.dataset.hasFallback === 'true') return;
+                target.dataset.hasFallback = 'true';
                 if (target.src.includes('/stock/')) {
                   const fn = target.src.split('/stock/').pop()?.split('?')[0];
                   if (fn) {
@@ -846,8 +913,9 @@ export default function StudioCanvas() {
                     return;
                   }
                 }
-                // Fallback to local wedding sample if image fails
-                if (!target.src.endsWith('/sample_01.jpg')) {
+                if (el.type === 'graphic') {
+                  target.src = '/assets/m-invite/stock/6964ecd375dc09b0bdcfa023.svg';
+                } else {
                   target.src = '/assets/wedding/samples/sample_01.jpg';
                 }
               }}
@@ -952,6 +1020,7 @@ export default function StudioCanvas() {
       id="studio-canvas-scroll-container"
       className="relative flex-1 overflow-auto bg-stone-100 dark:bg-stone-950 flex flex-col items-center p-2 sm:p-4 md:p-8 select-none touch-pan-y"
       style={{ minHeight: 'calc(100vh - 4rem)' }}
+      onPointerDown={handleCanvasPointerDown}
       onClick={handleCanvasClick}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -960,6 +1029,24 @@ export default function StudioCanvas() {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
+      {/* Sticky Banner when Multi-Select Mode is Active */}
+      {isMultiSelectMode && (
+        <div
+          data-export-ignore="true"
+          className="sticky top-4 z-50 bg-blue-600 text-white px-4 py-2 rounded-full shadow-2xl flex items-center gap-2.5 text-xs font-semibold animate-in fade-in slide-in-from-top-2 duration-200"
+        >
+          <CheckSquare className="w-4 h-4" />
+          <span>
+            Chế độ chọn nhiều đang BẬT: Nhấp vào từng khối để thêm/bớt khỏi nhóm ({selectedIds.length} khối đã chọn)
+          </span>
+          <button
+            onClick={() => toggleMultiSelectMode(false)}
+            className="ml-2 px-2.5 py-0.5 bg-white text-blue-700 hover:bg-blue-50 rounded-full text-[11px] font-bold shadow-xs cursor-pointer"
+          >
+            Hoàn tất
+          </button>
+        </div>
+      )}
       {/* Scaled Canvas Container */}
       <div
         style={{
@@ -1150,8 +1237,8 @@ export default function StudioCanvas() {
                     return;
                   }
 
-                  // 1. Shift or Ctrl/Cmd multi-selection
-                  if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                  // 1. Shift or Ctrl/Cmd multi-selection or isMultiSelectMode
+                  if (e.shiftKey || e.ctrlKey || e.metaKey || isMultiSelectMode) {
                     e.stopPropagation();
                     toggleSelectElement(el.id);
                     return;
@@ -1273,7 +1360,9 @@ export default function StudioCanvas() {
                         : 'ring-2 ring-amber-500 shadow-lg'
                       : 'hover:ring-1 hover:ring-rose-200'
                     : isSelected
-                    ? 'ring-2 ring-blue-500 shadow-lg cursor-move'
+                    ? selectedIds.length > 1
+                      ? 'ring-2 ring-blue-600 ring-offset-2 ring-offset-white dark:ring-offset-stone-900 shadow-xl cursor-move'
+                      : 'ring-2 ring-blue-500 shadow-lg cursor-move'
                     : 'hover:ring-1 hover:ring-blue-300/70 cursor-move'
                 }`}
                 style={{
@@ -1288,6 +1377,15 @@ export default function StudioCanvas() {
                   pointerEvents: el.isLocked ? 'none' : undefined,
                 }}
               >
+                {/* Multi-Selection Checkmark Badge */}
+                {selectedIds.length > 1 && isSelected && (
+                  <div
+                    data-export-ignore="true"
+                    className="absolute -top-3 -left-3 bg-blue-600 text-white text-[11px] font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-stone-900 z-40 pointer-events-none animate-in zoom-in-75 duration-150"
+                  >
+                    ✓
+                  </div>
+                )}
                 {/* In-Place Floating Image Toolbar on Mobile when Selected */}
                 {isTouchFriendly && isSelected && el.type === 'image' && (
                   <div
@@ -1569,12 +1667,10 @@ export default function StudioCanvas() {
           )}
 
           {/* Moveable Controller for Multiple Elements Selection Group */}
-          {!isTouchFriendly && selectedIds.length > 1 && (
+          {!isTouchFriendly && selectedIds.length > 1 && moveableTargets.length > 0 && (
             <DynamicMoveable
               ref={moveableRef}
-              targets={selectedIds
-                .map((id) => (typeof document !== 'undefined' ? document.getElementById(`canvas-node-${id}`) : null))
-                .filter((node): node is HTMLElement => Boolean(node))}
+              target={moveableTargets}
               container={typeof document !== 'undefined' ? (document.getElementById('studio-main-canvas') as HTMLElement | null) : null}
               draggable={true}
               resizable={false}
@@ -1605,6 +1701,107 @@ export default function StudioCanvas() {
                 updateElementsBatch(batchUpdates, true);
               }}
             />
+          )}
+
+          {/* FLOATING GROUP ACTION TOOLBAR FOR MULTI-SELECTION */}
+          {!isTouchFriendly && selectedIds.length > 1 && groupBounds && (
+            <div
+              data-export-ignore="true"
+              className="absolute z-50 flex items-center bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 shadow-2xl rounded-2xl px-3 py-1.5 gap-1.5 text-stone-700 dark:text-stone-200 animate-in fade-in zoom-in-95 duration-150"
+              style={{
+                left: `${Math.max(10, Math.min(canvas.width - 340, groupBounds.minX + groupBounds.width / 2 - 170))}px`,
+                top: `${groupBounds.minY > 60 ? groupBounds.minY - 56 : groupBounds.maxY + 16}px`,
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 mr-1 shrink-0">
+                ✓ {selectedIds.length} khối
+              </span>
+
+              {/* Align Left */}
+              <button
+                type="button"
+                onClick={() => alignSelectedElements('left')}
+                className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors text-stone-600 dark:text-stone-300"
+                title="Căn lề trái toàn bộ nhóm"
+              >
+                <AlignLeft className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Align Center */}
+              <button
+                type="button"
+                onClick={() => alignSelectedElements('center')}
+                className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors text-stone-600 dark:text-stone-300"
+                title="Căn giữa ngang toàn bộ nhóm"
+              >
+                <AlignCenter className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Align Right */}
+              <button
+                type="button"
+                onClick={() => alignSelectedElements('right')}
+                className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors text-stone-600 dark:text-stone-300"
+                title="Căn lề phải toàn bộ nhóm"
+              >
+                <AlignRight className="w-3.5 h-3.5" />
+              </button>
+
+              <div className="w-[1px] h-4 bg-stone-200 dark:bg-stone-700 mx-0.5" />
+
+              {/* Shift Down +50px */}
+              <button
+                type="button"
+                onClick={() => pushSelectedElements(50)}
+                className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors text-stone-600 dark:text-stone-300"
+                title="Đẩy cả nhóm xuống +50px"
+              >
+                <ArrowDownToLine className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Shift Up -50px */}
+              <button
+                type="button"
+                onClick={() => pushSelectedElements(-50)}
+                className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors text-stone-600 dark:text-stone-300"
+                title="Kéo cả nhóm lên -50px"
+              >
+                <ArrowUpToLine className="w-3.5 h-3.5" />
+              </button>
+
+              <div className="w-[1px] h-4 bg-stone-200 dark:bg-stone-700 mx-0.5" />
+
+              {/* Duplicate Group */}
+              <button
+                type="button"
+                onClick={() => duplicateSelectedElements()}
+                className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors text-stone-600 dark:text-stone-300"
+                title="Nhân bản cả nhóm"
+              >
+                <Copy className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Delete Group */}
+              <button
+                type="button"
+                onClick={() => removeSelectedElements()}
+                className="p-1.5 hover:bg-rose-50 text-rose-500 rounded-lg transition-colors"
+                title="Xóa cả nhóm"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Deselect */}
+              <button
+                type="button"
+                onClick={() => selectElement(null)}
+                className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-700 rounded-lg transition-colors"
+                title="Bỏ chọn"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
           )}
 
           {/* FLOATING MINI ACTION TOOLBAR DIRECTLY ABOVE THE SELECTED ELEMENT (Desktop only) */}
@@ -2030,6 +2227,23 @@ export default function StudioCanvas() {
 
       {/* FLOATING ZOOM & SCREEN GUIDES CONTROLLER */}
       <div className="fixed right-3 md:right-84 bottom-20 md:bottom-28 z-30 flex flex-col items-center bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-full shadow-lg p-1.5 text-stone-600 dark:text-stone-300 gap-1">
+        {/* Toggle Multi-Select Mode Button */}
+        <button
+          onClick={() => toggleMultiSelectMode()}
+          className={`p-1.5 rounded-full transition-all ${
+            isMultiSelectMode
+              ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-400 animate-pulse'
+              : 'hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500'
+          }`}
+          title={
+            isMultiSelectMode
+              ? 'Đang bật chế độ chọn nhiều khối (Bấm để tắt)'
+              : 'Bật chế độ chọn nhiều khối (Click từng khối để chọn nhiều)'
+          }
+        >
+          <CheckSquare className="w-4 h-4" />
+        </button>
+        <div className="w-3.5 h-[1px] bg-stone-200 dark:bg-stone-700 my-0.5" />
         <button
           onClick={() => setShowScreenGuides(!showScreenGuides)}
           className={`p-1.5 rounded-full transition-all ${

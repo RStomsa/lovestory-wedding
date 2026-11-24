@@ -61,15 +61,30 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
     lastSyncedFrom,
     lastSyncedAt,
     dispatchRealtimeUpdate,
+    currentTemplateSlug,
+    setCurrentTemplateSlug,
+    setCanvasTitle,
   } = useStudioStore();
 
   const [isExporting, setIsExporting] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
 
+  // Helper function to turn a human title into a clean SEO-friendly slug
+  const slugify = (text: string) => {
+    return text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
+  };
+
   // ==========================================
   // ADMIN SAVE TO TEMPLATE WAREHOUSE STATE
   // ==========================================
   const [showSavePresetModal, setShowSavePresetModal] = useState(false);
+  const [saveMode, setSaveMode] = useState<'overwrite' | 'new'>('overwrite');
   const [tplName, setTplName] = useState('Thiệp Cưới Hoàng Gia LoveStory');
   const [tplSlug, setTplSlug] = useState('thiep-cuoi-hoang-gia');
   const [tplCategory, setTplCategory] = useState<'wedding' | 'birthday' | 'event' | 'graduation'>('wedding');
@@ -85,41 +100,34 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
   const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error'; message: string; savedSlug?: string } | null>(null);
 
   const SAMPLE_THUMBS = [
-    { label: 'Váy Cưới Trắng', url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80' },
-    { label: 'Hoàng Hôn Biển', url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80' },
-    { label: 'Cổ Điển Đèn Lồng', url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80' },
-    { label: 'Hoa Hồng & Rượu Vang', url: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=800&q=80' },
+    { label: 'Váy Cưới Trắng', url: '/assets/wedding/samples/sample_01.jpg' },
+    { label: 'Hoàng Hôn Biển', url: '/assets/wedding/samples/sample_02.jpg' },
+    { label: 'Cổ Điển Đèn Lồng', url: '/assets/wedding/samples/sample_03.jpg' },
+    { label: 'Hoa Hồng & Rượu Vang', url: '/assets/wedding/samples/sample_04.jpg' },
   ];
 
-  const searchParams = useSearchParams();
-  const templateParam = searchParams.get('template') || searchParams.get('preset');
+  // Open Save Modal with strictly synchronized Name and Slug
+  const handleOpenSavePresetModal = () => {
+    setSaveStatus(null);
+    const activeName = canvas?.title || 'Mẫu Thiệp Cưới LoveStory';
+    setTplName(activeName);
 
-  useEffect(() => {
-    if (canvas?.title) {
-      setTplName(canvas.title);
-      if (templateParam) {
-        setTplSlug(templateParam);
-      } else {
-        const generated = canvas.title
-          .toLowerCase()
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)+/g, '');
-        setTplSlug(generated);
-      }
+    if (currentTemplateSlug) {
+      setSaveMode('overwrite');
+      setTplSlug(currentTemplateSlug);
+    } else {
+      setSaveMode('new');
+      setTplSlug(slugify(activeName) || `mau-thiep-${Date.now().toString(36)}`);
     }
-  }, [canvas?.title, templateParam]);
+    setShowSavePresetModal(true);
+  };
 
   const handleNameChange = (val: string) => {
     setTplName(val);
-    const generated = val
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)+/g, '');
-    setTplSlug(generated);
+    // When creating a new template, automatically sync slug from title
+    if (saveMode === 'new') {
+      setTplSlug(slugify(val));
+    }
   };
 
   const handleCaptureThumbnail = async () => {
@@ -239,7 +247,17 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
         throw new Error(data.error || 'Lưu mẫu thiệp thất bại');
       }
 
+      const savedSlug = data.preset?.slug || tplSlug.trim();
       markSaved();
+      setCurrentTemplateSlug(savedSlug);
+      setCanvasTitle(tplName.trim());
+
+      // Update browser URL query string without reloading
+      if (typeof window !== 'undefined') {
+        const newUrl = `${window.location.pathname}?template=${encodeURIComponent(savedSlug)}`;
+        window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
+      }
+
       if (data.preset?.thumbnail) {
         setTplThumbnail(data.preset.thumbnail);
       }
@@ -247,7 +265,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
       // Broadcast realtime event
       dispatchRealtimeUpdate('create', {
         name: tplName.trim(),
-        slug: data.preset?.slug || tplSlug,
+        slug: savedSlug,
         category: tplCategory,
         tier: tplTier,
         price: tplTier === 'FREE' ? 0 : Number(tplPrice) || 30000,
@@ -259,7 +277,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
       setSaveStatus({
         type: 'success',
         message: data.message || `Đã lưu mẫu "${tplName}" vào kho mẫu thiệp thành công!`,
-        savedSlug: data.preset?.slug || tplSlug,
+        savedSlug,
       });
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : 'Lỗi khi lưu mẫu thiệp vào hệ thống';
@@ -375,7 +393,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
         body: JSON.stringify({
           slug: userSiteSlug.trim(),
           title: userSiteTitle.trim() || 'Thiệp Cưới LoveStory',
-          templateId: templateParam || 'thiep-cuoi-165',
+          templateId: currentTemplateSlug || 'thiep-cuoi-165',
           data: {
             elements,
             canvas,
@@ -519,12 +537,30 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
         </div>
 
         {/* Center: Contextual Status Indicator */}
-        <div className="hidden lg:flex items-center gap-5 text-xs">
+        <div className="hidden lg:flex items-center gap-3 text-xs">
+          {/* Active Loaded Template Badge */}
+          {currentTemplateSlug ? (
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/30 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse shrink-0" />
+              <span className="text-[11px] font-medium text-stone-500 dark:text-stone-400">Đang mở:</span>
+              <span className="font-bold truncate max-w-[200px]" title={canvas.title || currentTemplateSlug}>
+                {canvas.title || currentTemplateSlug}
+              </span>
+              <span className="text-[10px] font-mono bg-purple-200/60 dark:bg-purple-950 px-1.5 py-0.5 rounded text-purple-800 dark:text-purple-300">
+                /{currentTemplateSlug}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs text-stone-400 border border-dashed border-stone-300 dark:border-stone-700">
+              <span>Chưa nạp mẫu từ kho</span>
+            </div>
+          )}
+
           {mode === 'admin' ? (
-            <div className="flex items-center gap-3">
-              <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                <span>Chế độ Soạn Mẫu Hệ Thống</span>
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+                <span>Soạn Mẫu</span>
               </span>
 
               {/* Admin test profile button */}
@@ -663,10 +699,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
           {mode === 'admin' ? (
             /* ADMIN: Save To Master Template Warehouse Button */
             <button
-              onClick={() => {
-                setSaveStatus(null);
-                setShowSavePresetModal(true);
-              }}
+              onClick={handleOpenSavePresetModal}
               className="px-3 sm:px-4 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-purple-600/25 transition-transform active:scale-95 whitespace-nowrap shrink-0"
             >
               <FolderPlus className="w-3.5 h-3.5 text-white shrink-0" />
@@ -770,12 +803,73 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
             )}
 
             <form onSubmit={handleSaveToWarehouse} className="space-y-4 text-xs">
+              {/* Hình thức lưu: Cập nhật đè mẫu hiện tại hay Tạo mẫu mới */}
+              <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200/90 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-stone-700 uppercase tracking-wide flex items-center gap-1.5">
+                    <span>Chọn hình thức lưu kho</span>
+                  </span>
+                  {currentTemplateSlug && (
+                    <span className="text-[10px] text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full font-mono border border-purple-200 font-semibold">
+                      Đang mở: {currentTemplateSlug}
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSaveMode('overwrite');
+                      if (currentTemplateSlug) {
+                        setTplSlug(currentTemplateSlug);
+                      }
+                    }}
+                    className={`p-2.5 rounded-xl border text-left transition-all ${
+                      saveMode === 'overwrite'
+                        ? 'border-purple-600 bg-purple-50/80 text-purple-900 font-semibold ring-2 ring-purple-500/20 shadow-xs'
+                        : 'border-stone-200 bg-white hover:bg-stone-50 text-stone-600'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-purple-900">
+                      <span>🔄 Cập nhật mẫu đang mở</span>
+                    </div>
+                    <p className="text-[10px] text-stone-500 mt-1 leading-snug">
+                      Ghi đè thay đổi trực tiếp lên slug: <strong className="font-mono text-purple-700">{currentTemplateSlug || tplSlug}</strong>
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSaveMode('new');
+                      const newSlug = slugify(tplName) || `mau-thiep-${Date.now().toString(36)}`;
+                      setTplSlug(newSlug);
+                    }}
+                    className={`p-2.5 rounded-xl border text-left transition-all ${
+                      saveMode === 'new'
+                        ? 'border-purple-600 bg-purple-50/80 text-purple-900 font-semibold ring-2 ring-purple-500/20 shadow-xs'
+                        : 'border-stone-200 bg-white hover:bg-stone-50 text-stone-600'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-stone-900">
+                      <span>✨ Lưu thành MẪU MỚI</span>
+                    </div>
+                    <p className="text-[10px] text-stone-500 mt-1 leading-snug">
+                      Tạo bản ghi mới độc lập, tự động sinh slug theo tên mẫu
+                    </p>
+                  </button>
+                </div>
+              </div>
+
               {/* Tên mẫu thiệp & Slug */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-stone-700 block">
-                    Tên Mẫu Thiệp <span className="text-rose-500">*</span>
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="font-semibold text-stone-700 block">
+                      Tên Mẫu Thiệp <span className="text-rose-500">*</span>
+                    </label>
+                  </div>
                   <input
                     type="text"
                     required
@@ -784,11 +878,26 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                     className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 font-medium transition-colors"
                     placeholder="VD: Thiệp Cưới Burgundy Cinema"
                   />
+                  <span className="text-[10px] text-stone-400 block">
+                    Tên hiển thị công khai trên danh mục cho khách hàng.
+                  </span>
                 </div>
+
                 <div className="space-y-1">
-                  <label className="font-semibold text-stone-700 block">
-                    Đường dẫn mẫu (Slug) <span className="text-rose-500">*</span>
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="font-semibold text-stone-700 block">
+                      Đường dẫn mẫu (Slug) <span className="text-rose-500">*</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setTplSlug(slugify(tplName))}
+                      className="text-[10px] text-purple-600 hover:text-purple-800 font-semibold flex items-center gap-1"
+                      title="Tự động đồng bộ Slug khớp 100% với Tên mẫu"
+                    >
+                      <Sparkles className="w-3 h-3 text-purple-500" />
+                      <span>Đồng bộ theo Tên</span>
+                    </button>
+                  </div>
                   <input
                     type="text"
                     required
@@ -797,8 +906,27 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                     className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 font-mono transition-colors"
                     placeholder="thiep-cuoi-burgundy-cinema"
                   />
+                  <span className="text-[10px] text-stone-500 block truncate">
+                    URL: <code className="text-purple-700 font-mono font-medium">/mau-thiep/{tplSlug || '...'}</code>
+                  </span>
                 </div>
               </div>
+
+              {/* Cảnh báo nếu Tên và Slug bị lệch nhau khi lưu mẫu mới */}
+              {saveMode === 'new' && tplSlug && slugify(tplName) !== tplSlug && (
+                <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[11px] flex items-center justify-between gap-2">
+                  <span>
+                    💡 Tên mẫu và Slug đang khác nhau (Tên: <code className="font-mono font-semibold">{slugify(tplName)}</code> ≠ Slug: <code className="font-mono font-semibold">{tplSlug}</code>).
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setTplSlug(slugify(tplName))}
+                    className="px-2 py-0.5 rounded-lg bg-amber-200/80 hover:bg-amber-300 font-bold shrink-0 text-amber-900"
+                  >
+                    Khớp ngay
+                  </button>
+                </div>
+              )}
 
               {/* Thể loại & Hạng mẫu (Tier) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -878,14 +1006,26 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                       type="text"
                       required
                       value={tplThumbnail.startsWith('data:image/') ? '[Ảnh chụp Màn 1 từ Canvas - Sẽ lưu vào public/assets/uploads/thumbnails/]' : tplThumbnail}
-                      onChange={(e) => setTplThumbnail(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (!val.startsWith('[')) {
+                          setTplThumbnail(val);
+                        }
+                      }}
                       className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-stone-900 outline-none focus:bg-white focus:border-stone-900 font-mono truncate transition-colors"
                       placeholder="https://... hoặc bấm nút chụp Màn 1"
                     />
                     {tplThumbnail && (
                       <div className="w-12 h-18 rounded-xl border-2 border-purple-200 overflow-hidden shrink-0 bg-stone-50 flex flex-col items-center justify-center shadow-xs relative group">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={tplThumbnail} alt="Thumbnail preview" className="w-full h-full object-cover" />
+                        <img
+                          src={tplThumbnail}
+                          alt="Thumbnail preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/assets/wedding/samples/sample_01.jpg';
+                          }}
+                        />
                         <span className="absolute bottom-0 inset-x-0 bg-stone-900/80 text-[8px] text-white font-medium text-center py-0.5 leading-none">
                           Màn 1
                         </span>
@@ -945,17 +1085,17 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                 <button
                   type="submit"
                   disabled={isSavingPreset}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs shadow-md shadow-purple-600/25 flex items-center gap-2 active:scale-95 disabled:opacity-50 transition-all"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs shadow-md shadow-purple-600/25 flex items-center gap-2 active:scale-95 disabled:opacity-50 transition-all cursor-pointer"
                 >
                   {isSavingPreset ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin text-white" />
-                      <span>Đang lưu vào kho mẫu...</span>
+                      <span>{saveMode === 'overwrite' ? 'Đang cập nhật mẫu...' : 'Đang tạo mẫu mới...'}</span>
                     </>
                   ) : (
                     <>
                       <Save className="w-4 h-4 text-white" />
-                      <span>Xác Nhận Lưu Vào Kho Mẫu</span>
+                      <span>{saveMode === 'overwrite' ? 'Ghi Đè & Cập Nhật Mẫu Này' : 'Xác Nhận Lưu Thành Mẫu Mới'}</span>
                     </>
                   )}
                 </button>
