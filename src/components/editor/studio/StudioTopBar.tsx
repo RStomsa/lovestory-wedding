@@ -57,6 +57,10 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
     weddingProfile,
     setProfileModalOpen,
     setMobileDrawerOpen,
+    realtimeStatus,
+    lastSyncedFrom,
+    lastSyncedAt,
+    dispatchRealtimeUpdate,
   } = useStudioStore();
 
   const [isExporting, setIsExporting] = useState(false);
@@ -239,6 +243,19 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
       if (data.preset?.thumbnail) {
         setTplThumbnail(data.preset.thumbnail);
       }
+
+      // Broadcast realtime event
+      dispatchRealtimeUpdate('create', {
+        name: tplName.trim(),
+        slug: data.preset?.slug || tplSlug,
+        category: tplCategory,
+        tier: tplTier,
+        price: tplTier === 'FREE' ? 0 : Number(tplPrice) || 30000,
+        badge: tplBadge.trim() || undefined,
+        description: tplDescription.trim(),
+        thumbnail: data.preset?.thumbnail || tplThumbnail.trim(),
+      }).catch((e) => console.warn('Realtime update broadcast error:', e));
+
       setSaveStatus({
         type: 'success',
         message: data.message || `Đã lưu mẫu "${tplName}" vào kho mẫu thiệp thành công!`,
@@ -572,6 +589,44 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
 
         {/* Right: Actions */}
         <div className="flex items-center gap-2">
+          {/* Realtime Sync Status Indicator */}
+          <div
+            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+              realtimeStatus === 'connected'
+                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                : realtimeStatus === 'syncing'
+                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                : 'bg-stone-500/10 text-stone-500 border-stone-500/20'
+            }`}
+            title="Tự động đồng bộ 2 chiều thời gian thực giữa Web và Desktop App"
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${
+                realtimeStatus === 'connected'
+                  ? 'bg-emerald-500 animate-pulse'
+                  : realtimeStatus === 'syncing'
+                  ? 'bg-amber-500 animate-ping'
+                  : 'bg-stone-400'
+              }`}
+            />
+            <span className="hidden md:inline text-[11px]">
+              {realtimeStatus === 'connected'
+                ? lastSyncedFrom === 'desktop'
+                  ? 'Realtime: Web ↔ Desktop'
+                  : 'Realtime: Đã kết nối'
+                : realtimeStatus === 'syncing'
+                ? 'Đang đồng bộ...'
+                : 'Offline'}
+            </span>
+            <button
+              onClick={() => dispatchRealtimeUpdate('update')}
+              className="ml-0.5 hover:opacity-80 transition-opacity p-0.5 cursor-pointer"
+              title="Bấm để đồng bộ tức thì sang các thiết bị khác"
+            >
+              <Sparkles className="w-3 h-3 text-emerald-500" />
+            </button>
+          </div>
+
           {/* Toggle Inspector Button */}
           <button
             onClick={toggleInspector}

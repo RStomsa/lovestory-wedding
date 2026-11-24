@@ -85,6 +85,44 @@ export default function TemplatesManagerClient({
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [realtimeNotice, setRealtimeNotice] = useState<string | null>(null);
+
+  // Realtime SSE Listener (Auto-sync catalog when Web Studio or Desktop App edits/creates templates)
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const clientId = `admin_catalog_${Math.random().toString(36).slice(2, 9)}`;
+    const eventSource = new EventSource(`/api/realtime/events?clientId=${clientId}&source=web`);
+
+    eventSource.addEventListener('sync', (e: MessageEvent) => {
+      try {
+        const payload = JSON.parse(e.data);
+        if (payload && payload.entityType === 'template') {
+          const tplData = payload.data;
+          if (tplData) {
+            setCatalogTemplates((prev) => {
+              const idx = prev.findIndex((t) => t.slug === payload.id || t.id === payload.id);
+              if (idx >= 0) {
+                const updated = [...prev];
+                updated[idx] = { ...updated[idx], ...tplData };
+                return updated;
+              } else {
+                return [tplData, ...prev];
+              }
+            });
+            const sourceName = payload.source === 'desktop' ? 'Desktop App' : 'Web Studio';
+            setRealtimeNotice(`⚡ Realtime Sync: Đã tự động cập nhật mẫu "${tplData.name || payload.id}" từ ${sourceName}!`);
+            setTimeout(() => setRealtimeNotice(null), 5000);
+          }
+        }
+      } catch (err) {
+        console.error('Error handling realtime event in TemplatesManager:', err);
+      }
+    });
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
 
   // Modal State for Editing Existing Template
   const [editingCatalogTemplate, setEditingCatalogTemplate] = useState<CatalogTemplate | null>(null);
@@ -445,6 +483,22 @@ export default function TemplatesManagerClient({
           </button>
         </div>
       </div>
+
+      {/* Realtime Sync Live Banner */}
+      {realtimeNotice && (
+        <div className="p-4 rounded-2xl text-xs flex items-center justify-between gap-3 bg-emerald-500/15 border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 animate-in fade-in slide-in-from-top-2 duration-300 shadow-md">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+            <span className="font-semibold">{realtimeNotice}</span>
+          </div>
+          <button
+            onClick={() => setRealtimeNotice(null)}
+            className="p-1 rounded-lg hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Global Alert Notification */}
       {message && (

@@ -103,7 +103,7 @@ export interface CanvasElement {
   fillColor?: string;
   borderColor?: string;
   borderWidth?: number;
-  shapeType?: 'line' | 'square' | 'rectangle' | 'circle' | 'triangle';
+  shapeType?: 'line' | 'square' | 'rectangle' | 'circle' | 'triangle' | 'custom_svg';
   // Flip / Mirror
   flipX?: boolean;
   flipY?: boolean;
@@ -133,6 +133,7 @@ export interface CanvasElement {
   widgetConfig?: Record<string, any>;
   // Grouping & animations
   groupId?: string;
+  isLocked?: boolean;
   animation?: EntranceAnimation;
   continuousAnimation?: ContinuousAnimation;
 }

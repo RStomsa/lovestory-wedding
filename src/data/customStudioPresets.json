@@ -37,7 +37,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_image_du6poz0yi74",
@@ -111,7 +112,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_shape_55t0q71b665",
@@ -170,7 +172,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_image_s61mm32d2tw",
@@ -200,7 +203,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_image_2622ctnf4e3",
@@ -215,7 +219,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/ndaskjdaskjdk34234.webp",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_image_1powtejfc0l",
@@ -230,7 +235,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_text_hdm0xntivid",
@@ -829,14 +835,14 @@
         "type": "text",
         "x": 46.6,
         "y": 4357.7,
-        "width": 475.6,
-        "height": 37,
+        "width": 480,
+        "height": 45,
         "rotation": 0,
         "zIndex": 50,
         "opacity": 1,
         "text": "LỊCH TRÌNH NGÀY CƯỚI",
         "fontFamily": "Playfair Display",
-        "fontSize": 28,
+        "fontSize": 26,
         "fontWeight": "700",
         "color": "#6d0208",
         "textAlign": "center",
@@ -1306,13 +1312,13 @@
         "id": "elem-element_text_zebo7n3g7br",
         "type": "text",
         "x": 48.3,
-        "y": 4798.3,
+        "y": 4755,
         "width": 475.6,
-        "height": 37,
+        "height": 40,
         "rotation": 0,
         "zIndex": 8,
         "opacity": 1,
-        "text": "countdown",
+        "text": "CÙNG ĐẾM NGƯỢC",
         "fontFamily": "Playfair Display",
         "fontSize": 28,
         "fontWeight": "700",
@@ -1522,7 +1528,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_image_du6poz0yi74",
@@ -1596,7 +1603,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_shape_55t0q71b665",
@@ -1655,7 +1663,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_image_s61mm32d2tw",
@@ -1685,7 +1694,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_image_2622ctnf4e3",
@@ -1700,7 +1710,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/ndaskjdaskjdk34234.webp",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_image_1powtejfc0l",
@@ -1715,7 +1726,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_text_hdm0xntivid",
@@ -2314,14 +2326,14 @@
         "type": "text",
         "x": 46.6,
         "y": 4357.7,
-        "width": 475.6,
-        "height": 37,
+        "width": 480,
+        "height": 45,
         "rotation": 0,
         "zIndex": 50,
         "opacity": 1,
         "text": "LỊCH TRÌNH NGÀY CƯỚI",
         "fontFamily": "Playfair Display",
-        "fontSize": 28,
+        "fontSize": 26,
         "fontWeight": "700",
         "color": "#6d0208",
         "textAlign": "center",
@@ -2791,13 +2803,13 @@
         "id": "elem-element_text_zebo7n3g7br",
         "type": "text",
         "x": 48.3,
-        "y": 4798.3,
+        "y": 4755,
         "width": 475.6,
-        "height": 37,
+        "height": 40,
         "rotation": 0,
         "zIndex": 8,
         "opacity": 1,
-        "text": "countdown",
+        "text": "CÙNG ĐẾM NGƯỢC",
         "fontFamily": "Playfair Display",
         "fontSize": 28,
         "fontWeight": "700",
@@ -3054,7 +3066,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_image_du6poz0yi74",
@@ -3128,7 +3141,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_shape_55t0q71b665",
@@ -3187,7 +3201,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_image_s61mm32d2tw",
@@ -3217,7 +3232,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_image_2622ctnf4e3",
@@ -3232,7 +3248,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/ndaskjdaskjdk34234.webp",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_image_1powtejfc0l",
@@ -3247,7 +3264,8 @@
         "src": "/templates/assets/tai-ngan-do-ruou/jhdaskjdsadnasdsad21.png",
         "alt": "image",
         "objectFit": "contain",
-        "borderRadius": 0
+        "borderRadius": 0,
+        "isLocked": true
       },
       {
         "id": "elem-element_text_gbttv3yh5s3",
@@ -3882,14 +3900,14 @@
         "type": "text",
         "x": 46.6,
         "y": 4357.7,
-        "width": 475.6,
-        "height": 37,
+        "width": 480,
+        "height": 45,
         "rotation": 0,
         "zIndex": 50,
         "opacity": 1,
         "text": "LỊCH TRÌNH NGÀY CƯỚI",
         "fontFamily": "Playfair Display",
-        "fontSize": 28,
+        "fontSize": 26,
         "fontWeight": "700",
         "color": "#6d0208",
         "textAlign": "center",
@@ -4359,13 +4377,13 @@
         "id": "elem-element_text_zebo7n3g7br",
         "type": "text",
         "x": 48.3,
-        "y": 4798.3,
+        "y": 4755,
         "width": 475.6,
-        "height": 37,
+        "height": 40,
         "rotation": 0,
         "zIndex": 8,
         "opacity": 1,
-        "text": "countdown",
+        "text": "CÙNG ĐẾM NGƯỢC",
         "fontFamily": "Playfair Display",
         "fontSize": 28,
         "fontWeight": "700",
@@ -6776,15 +6794,15 @@
         "type": "text",
         "text": "LỊCH TRÌNH NGÀY CƯỚI",
         "fontFamily": "Cinzel Decorative",
-        "fontSize": 15,
+        "fontSize": 26,
         "fontWeight": "bold",
         "color": "#5A4535",
         "letterSpacing": 2,
         "textAlign": "center",
         "x": 50,
         "y": 2355,
-        "width": 400,
-        "height": 30,
+        "width": 480,
+        "height": 45,
         "rotation": 0,
         "zIndex": 3,
         "opacity": 1
@@ -7165,7 +7183,7 @@
     "name": "Thiệp Cưới Kem Chữ Vàng Save The Date (C165)",
     "category": "wedding",
     "tier": "PREMIUM",
-    "thumbnail": "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80",
+    "thumbnail": "/assets/uploads/thumbnails/mau-thiep-cuoi-tap-chi-our-love-begins-1795492042553.png",
     "imagesCount": 14,
     "description": "Mẫu thiệp cưới scrollytelling hoàng gia sang trọng được thiết kế bởi LoveStory Studio.",
     "config": {
@@ -7174,21 +7192,23 @@
       "background": "#FAF7F2",
       "audioTitle": "Until You",
       "audioUrl": "/assets/wedding/mp3/ee11a985-5e0e-4eb0-b6da-28fa39c9946f.mp3",
-      "fallingEffect": {
+      "envelopeCover": {
         "enabled": true,
-        "type": "hearts"
+        "coverId": "default",
+        "rememberOpened": false,
+        "autoOpen": false
       }
     },
     "elements": [
       {
         "id": "photo-01-cover",
         "type": "image",
-        "x": 0,
-        "y": 0,
-        "width": 500,
-        "height": 933,
+        "x": 40,
+        "y": 280,
+        "width": 420,
+        "height": 520,
         "rotation": 0,
-        "zIndex": 0,
+        "zIndex": 2,
         "opacity": 1,
         "src": "/assets/wedding/templates/c165/photo_01.webp",
         "borderRadius": 24,
@@ -7197,15 +7217,15 @@
       {
         "id": "text-save",
         "type": "text",
-        "x": 65,
-        "y": 66,
-        "width": 240,
+        "x": 0,
+        "y": 40,
+        "width": 500,
         "height": 90,
         "rotation": 0,
         "zIndex": 10,
         "opacity": 1,
         "text": "Save",
-        "fontFamily": "Cinzel Decorative",
+        "fontFamily": "Pinyon Script",
         "fontSize": 90,
         "color": "#8C7355",
         "textAlign": "center",
@@ -7213,8 +7233,7 @@
           "type": "floating",
           "duration": 2,
           "delay": 0
-        },
-        "fontWeight": "bold"
+        }
       },
       {
         "id": "text-the",
@@ -7236,19 +7255,18 @@
       {
         "id": "text-date",
         "type": "text",
-        "x": 130,
+        "x": 0,
         "y": 170,
-        "width": 260,
+        "width": 500,
         "height": 90,
         "rotation": 0,
         "zIndex": 10,
         "opacity": 1,
         "text": "Date",
-        "fontFamily": "Cinzel Decorative",
+        "fontFamily": "Pinyon Script",
         "fontSize": 90,
         "color": "#8C7355",
-        "textAlign": "center",
-        "fontWeight": "bold"
+        "textAlign": "center"
       },
       {
         "id": "countdown-box",

@@ -5,6 +5,7 @@ import {
   SidebarTab,
   WeddingProfileData,
 } from './studioTypes';
+import { mergeTemplateElements } from '@/lib/realtimeSync';
 
 interface StudioState {
   canvas: CanvasConfig;
@@ -83,6 +84,16 @@ interface StudioState {
   setShowOnboardingGuide: (show: boolean) => void;
   hiddenElementIds: string[];
   toggleElementVisibility: (id: string) => void;
+
+  // Realtime Sync Engine (Web <-> Desktop App)
+  realtimeStatus: 'connected' | 'syncing' | 'offline';
+  lastSyncedFrom: 'web' | 'desktop' | null;
+  lastSyncedAt: number | null;
+  clientId: string;
+  currentTemplateSlug: string | null;
+  setCurrentTemplateSlug: (slug: string | null) => void;
+  initRealtimeSync: (templateSlug?: string) => () => void;
+  dispatchRealtimeUpdate: (action?: 'update' | 'create', extraData?: any) => Promise<void>;
 }
 
 export const DEFAULT_WEDDING_PROFILE: WeddingProfileData = {
@@ -856,4 +867,122 @@ export const useStudioStore = create<StudioState>((set, get) => ({
         ? state.hiddenElementIds.filter((item) => item !== id)
         : [...state.hiddenElementIds, id],
     })),
+
+  // Realtime Sync Engine (Web <-> Desktop App)
+  realtimeStatus: 'offline',
+  lastSyncedFrom: null,
+  lastSyncedAt: null,
+  clientId: typeof window !== 'undefined'
+    ? (window as any).__TAURI__ ? `client_desktop_${Math.random().toString(36).slice(2, 8)}` : `client_web_${Math.random().toString(36).slice(2, 8)}`
+    : 'client_init',
+  currentTemplateSlug: null,
+  setCurrentTemplateSlug: (slug) => set({ currentTemplateSlug: slug }),
+
+  initRealtimeSync: (templateSlug) => {
+    if (typeof window === 'undefined') return () => {};
+
+    if (templateSlug) {
+      set({ currentTemplateSlug: templateSlug });
+    }
+
+    const { clientId } = get();
+    const isDesktop = typeof window !== 'undefined' && Boolean((window as any).__TAURI__);
+    const source = isDesktop ? 'desktop' : 'web';
+
+    const sseUrl = `/api/realtime/events?clientId=${encodeURIComponent(clientId)}&source=${source}`;
+    let eventSource: EventSource | null = null;
+
+    try {
+      eventSource = new EventSource(sseUrl);
+
+      eventSource.onopen = () => {
+        set({ realtimeStatus: 'connected' });
+      };
+
+      eventSource.onerror = () => {
+        set({ realtimeStatus: 'offline' });
+      };
+
+      eventSource.addEventListener('connected', () => {
+        set({ realtimeStatus: 'connected' });
+      });
+
+      eventSource.addEventListener('sync', (e: MessageEvent) => {
+        try {
+          const payload = JSON.parse(e.data);
+          // If update came from another client and relates to templates
+          if (payload && payload.clientId !== clientId && payload.entityType === 'template') {
+            const currentSlug = get().currentTemplateSlug;
+            if (!currentSlug || payload.id === currentSlug || payload.id === currentSlug.toLowerCase()) {
+              if (payload.data && Array.isArray(payload.data.elements)) {
+                const currentElements = get().elements;
+                const mergedElements = mergeTemplateElements(currentElements, payload.data.elements);
+
+                set((state) => ({
+                  elements: mergedElements,
+                  canvas: payload.data.canvasConfig ? { ...state.canvas, ...payload.data.canvasConfig } : state.canvas,
+                  lastSyncedFrom: payload.source || 'desktop',
+                  lastSyncedAt: Date.now(),
+                  realtimeStatus: 'connected',
+                  hasUnsavedChanges: false,
+                }));
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Failed to parse realtime sync event:', err);
+        }
+      });
+    } catch (err) {
+      console.error('Failed to initialize EventSource:', err);
+      set({ realtimeStatus: 'offline' });
+    }
+
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
+  },
+
+  dispatchRealtimeUpdate: async (action = 'update', extraData = {}) => {
+    const { clientId, currentTemplateSlug, elements, canvas } = get();
+    const slug = currentTemplateSlug || 'custom-template';
+    const isDesktop = typeof window !== 'undefined' && Boolean((window as any).__TAURI__);
+    const source = isDesktop ? 'desktop' : 'web';
+
+    set({ realtimeStatus: 'syncing' });
+
+    try {
+      await fetch('/api/realtime/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source,
+          clientId,
+          entityType: 'template',
+          action,
+          id: slug,
+          data: {
+            id: slug,
+            slug,
+            name: canvas.title || `Mẫu thiệp ${slug}`,
+            elements,
+            canvasConfig: canvas,
+            ...extraData,
+          },
+          timestamp: Date.now(),
+        }),
+      });
+
+      set({
+        realtimeStatus: 'connected',
+        lastSyncedAt: Date.now(),
+        hasUnsavedChanges: false,
+      });
+    } catch (err) {
+      console.error('Failed to dispatch realtime sync update:', err);
+      set({ realtimeStatus: 'offline' });
+    }
+  },
 }));

@@ -39,6 +39,8 @@ import minviteTemplates from '@/data/minvite_templates.json';
 import { resolveFontFamily } from '@/lib/studioFonts';
 import { resolveStudioAssetUrl } from '@/lib/studioUtils';
 import { WEDDING_TEXT_TEMPLATES } from '@/data/weddingTextTemplates';
+import { WEDDING_SHAPES_CATALOG, WeddingShapeItem } from '@/data/shapesCatalog';
+import initialComponentBlocks from '@/data/componentBlocks.json';
 import { Skeleton } from '@/components/common/Skeleton';
 import { compressWeddingPhoto } from '@/lib/imageCompressor';
 import {
@@ -115,6 +117,35 @@ export default function StudioLeftRail() {
   const [musicCatalog, setMusicCatalog] = useState<any[]>(weddingMusicCatalog as any[]);
   const [isUploadingGfx, setIsUploadingGfx] = useState(false);
   const gfxFileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Component Blocks & Shapes Catalog State
+  const [componentBlocksList, setComponentBlocksList] = useState<any[]>(initialComponentBlocks);
+  const [selectedBlockCategory, setSelectedBlockCategory] = useState<string>('all');
+  const [shapeSubCategory, setShapeSubCategory] = useState<'all' | 'frames' | 'dividers' | 'geometry'>('all');
+
+  const filteredComponentBlocks = React.useMemo(() => {
+    if (selectedBlockCategory === 'all') return componentBlocksList;
+    return componentBlocksList.filter((b) => b.category === selectedBlockCategory);
+  }, [componentBlocksList, selectedBlockCategory]);
+
+  const handleInsertBlock = (block: any) => {
+    if (!block || !Array.isArray(block.elements) || block.elements.length === 0) return;
+    const insertBaseY = getSmartInsertY(block.height || 160);
+
+    block.elements.forEach((el: any) => {
+      const newId = `blk-item-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+      const newElement = {
+        ...el,
+        id: newId,
+        y: insertBaseY + (el.y || 0),
+      };
+      if (autoPushDown) {
+        addElementWithPush(newElement, { push: true, gap: 15 });
+      } else {
+        addElement(newElement);
+      }
+    });
+  };
 
   // Helper to place newly inserted elements in the user's visible viewport
   const getSmartInsertY = (_elemHeight: number = 120) => {

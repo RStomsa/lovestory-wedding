@@ -505,6 +505,17 @@ export default function StudioRightInspector() {
 
             <div className="flex items-center gap-1">
               <button
+                onClick={() => updateElement(selectedElement.id, { isLocked: !selectedElement.isLocked }, true)}
+                className={`p-1.5 rounded-lg transition-colors ${
+                  selectedElement.isLocked
+                    ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                    : 'hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 hover:text-stone-900'
+                }`}
+                title={selectedElement.isLocked ? 'Mở khóa đối tượng' : 'Khóa đối tượng (chống click nhầm)'}
+              >
+                {selectedElement.isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+              </button>
+              <button
                 onClick={() => duplicateElement(selectedElement.id)}
                 className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 hover:text-stone-900"
                 title="Nhân bản"

@@ -6,6 +6,7 @@ import prisma from '@/lib/prisma';
 import { saveCustomStudioPreset } from '@/lib/studioPresetsService';
 import { addCustomTemplate } from '@/lib/templatesService';
 import { StudioTemplatePreset } from '@/data/studioTemplatePresets';
+import { broadcastSyncEvent } from '@/lib/realtimeSync';
 
 export const dynamic = 'force-dynamic';
 
@@ -163,6 +164,34 @@ export async function POST(request: NextRequest) {
       });
     } catch (dbErr) {
       console.warn('Prisma template sync note:', dbErr);
+    }
+
+    // Broadcast realtime sync event to Desktop App and all Web clients
+    try {
+      broadcastSyncEvent({
+        source: 'web',
+        clientId: 'admin_server',
+        entityType: 'template',
+        action: 'create',
+        id: cleanSlug,
+        data: {
+          id: cleanSlug,
+          slug: cleanSlug,
+          name: name.trim(),
+          category: category || 'wedding',
+          tier: safeTier,
+          price: safePrice,
+          badge: safeBadge,
+          thumbnail: safeThumbnail,
+          description: safeDesc,
+          elements: presetData.elements,
+          config: presetData.config,
+          updatedAt: new Date().toISOString(),
+        },
+        timestamp: Date.now(),
+      });
+    } catch (broadcastErr) {
+      console.warn('Realtime broadcast error on save preset:', broadcastErr);
     }
 
     return NextResponse.json({

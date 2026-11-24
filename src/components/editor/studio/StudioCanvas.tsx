@@ -28,6 +28,8 @@ import {
   Edit3,
   Check,
   Smartphone,
+  Lock,
+  Unlock,
 } from 'lucide-react';
 
 // Dynamically import react-moveable to ensure SSR safe
@@ -70,6 +72,52 @@ export default function StudioCanvas() {
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
   const [showScreenGuides, setShowScreenGuides] = useState(true);
 
+  // Auto-close layer options menu when clicking outside
+  useEffect(() => {
+    if (!showLayerMenu) return;
+    const handleOutside = () => setShowLayerMenu(false);
+    window.addEventListener('pointerdown', handleOutside);
+    return () => window.removeEventListener('pointerdown', handleOutside);
+  }, [showLayerMenu]);
+
+  // Dynamic Fold Label inspector based on real elements positioned in each fold
+  const getFoldLabel = (foldIndex: number, foldTop: number, foldBottom: number) => {
+    if (foldIndex === 0) return 'Trang bìa & Mở đầu';
+
+    const foldEls = elements.filter(
+      (e) => (e.y >= foldTop - 80 && e.y < foldBottom - 80) ||
+             (e.y <= foldTop && e.y + e.height >= foldTop + 250)
+    );
+
+    const hasTimeline = foldEls.some(
+      (e) => (e.text && (e.text.includes('LỊCH TRÌNH') || e.text.includes('Đón khách') || e.text.includes('Lễ Vu Quy') || e.text.includes('Lễ Thành Hôn'))) ||
+             e.widgetType === 'story_timeline'
+    );
+    const hasCountdown = foldEls.some((e) => e.widgetType === 'countdown');
+    const hasCalendar = foldEls.some((e) => e.widgetType === 'calendar');
+    const hasAlbum = foldEls.some((e) => e.widgetType === 'album' || e.widgetType === 'slideshow');
+    const hasWishes = foldEls.some((e) => e.widgetType === 'wishes');
+    const hasRsvp = foldEls.some((e) => e.widgetType === 'rsvp');
+    const hasMap = foldEls.some((e) => e.widgetType === 'map' || e.widgetType === 'giftbox');
+    const hasFamily = foldEls.some(
+      (e) => (e.text && (e.text.includes('Nhà Trai') || e.text.includes('Nhà Gái') || e.text.includes('Cô Dâu') || e.text.includes('Chú Rể') || e.text.includes('Trân trọng'))) ||
+             e.widgetType === 'family_info'
+    );
+
+    if (hasTimeline && hasCountdown) return 'Lịch trình & Đếm ngược ngày cưới';
+    if (hasTimeline) return 'Lịch trình ngày cưới';
+    if (hasCountdown && hasCalendar) return 'Lịch cưới & Đếm ngược';
+    if (hasCountdown) return 'Đếm ngược ngày cưới';
+    if (hasCalendar) return 'Lịch cưới Save The Date';
+    if (hasAlbum) return 'Album ảnh cưới';
+    if (hasWishes) return 'Sổ lưu bút & Lời chúc';
+    if (hasRsvp) return 'Xác nhận tham dự (RSVP)';
+    if (hasMap) return 'Bản đồ & Hộp mừng cưới';
+    if (hasFamily) return 'Thông tin hai bên gia đình';
+
+    return `Khu vực nội dung thiệp`;
+  };
+
   // Helper to center selected element inside a specific screen fold
   const centerInScreenFold = (foldIndex: number) => {
     if (!selectedId) {
@@ -80,7 +128,14 @@ export default function StudioCanvas() {
     if (!el) return;
     const FOLD_H = 850;
     const targetX = Math.round((canvas.width - el.width) / 2);
-    const targetY = Math.round(foldIndex * FOLD_H + (FOLD_H - el.height) / 2);
+    // If element is a header/short text, place it at top of the fold with 50px padding
+    // If element is large, center it vertically with safe margin
+    let targetY: number;
+    if (el.height < 60) {
+      targetY = foldIndex * FOLD_H + 50;
+    } else {
+      targetY = Math.round(foldIndex * FOLD_H + Math.max(30, (FOLD_H - el.height) / 2));
+    }
     updateElement(selectedId, { x: targetX, y: targetY }, true);
   };
 
@@ -664,6 +719,29 @@ export default function StudioCanvas() {
         );
 
       case 'shape':
+        if (el.shapeType === 'custom_svg' || (el as any).svgPath) {
+          return (
+            <div
+              className={`w-full h-full flex items-center justify-center ${animClass}`}
+              style={{
+                boxShadow: boxShadow !== 'none' ? boxShadow : undefined,
+                transform: flipStyle || undefined,
+              }}
+            >
+              <svg
+                viewBox={(el as any).viewBox || '0 0 100 100'}
+                className="w-full h-full"
+                fill={el.fillColor || 'none'}
+                stroke={(el as any).strokeColor || el.borderColor || '#8B1E2D'}
+                strokeWidth={el.borderWidth || 2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d={(el as any).svgPath} />
+              </svg>
+            </div>
+          );
+        }
         if (el.shapeType === 'circle') {
           return (
             <div
@@ -795,17 +873,7 @@ export default function StudioCanvas() {
               {Array.from({ length: Math.ceil(canvas.height / 850) }).map((_, i) => {
                 const foldTop = i * 850;
                 const foldBottom = Math.min(canvas.height, (i + 1) * 850);
-                const foldLabels = [
-                  'Màn 1: Trang bìa & Save The Date',
-                  'Màn 2: Gia đình & Tiệc cưới',
-                  'Màn 3: Album ảnh cưới',
-                  'Màn 4: Lịch cưới & Đếm ngược',
-                  'Màn 5: Lời chúc & RSVP',
-                  'Màn 6: Bản đồ & Cảm ơn',
-                  'Màn 7: Thông tin phụ',
-                  'Màn 8: Cuối thiệp',
-                ];
-                const label = foldLabels[i] || `Màn ${i + 1}: Khu vực thiệp`;
+                const label = `Màn ${i + 1}: ${getFoldLabel(i, foldTop, foldBottom)}`;
 
                 return (
                   <div key={`screen-fold-${i}`}>
@@ -905,8 +973,8 @@ export default function StudioCanvas() {
                 key={el.id}
                 id={`canvas-node-${el.id}`}
                 onPointerDown={(e) => {
-                  // Do not intercept if currently inline-editing text
-                  if (editingTextId === el.id) return;
+                  // Do not intercept if currently inline-editing text or locked
+                  if (editingTextId === el.id || el.isLocked) return;
 
                   if (isTouchFriendly) {
                     // Mobile Touch Friendly Mode:
@@ -967,7 +1035,9 @@ export default function StudioCanvas() {
                   window.addEventListener('pointerup', onPointerUp);
                 }}
                 className={`absolute transition-all ${
-                  isTouchFriendly
+                  el.isLocked
+                    ? 'pointer-events-none opacity-80'
+                    : isTouchFriendly
                     ? isSelected
                       ? el.type === 'image'
                         ? 'ring-2 ring-red-500 shadow-2xl rounded-2xl'
@@ -986,6 +1056,7 @@ export default function StudioCanvas() {
                   zIndex: el.zIndex,
                   opacity: el.opacity,
                   boxSizing: 'border-box',
+                  pointerEvents: el.isLocked ? 'none' : undefined,
                 }}
               >
                 {/* In-Place Floating Image Toolbar on Mobile when Selected */}
@@ -1133,8 +1204,8 @@ export default function StudioCanvas() {
                   {renderElementContent(el)}
                 </div>
 
-                {/* Direct Native Resize Handles for Selected Element */}
-                {isSelected && (
+                {/* Direct Native Resize Handles for Selected Element (Touch Mobile only) */}
+                {isTouchFriendly && isSelected && !el.isLocked && (
                   <div data-export-ignore="true">
                     {/* 4 Corners */}
                     <div
@@ -1186,7 +1257,7 @@ export default function StudioCanvas() {
           })}
 
           {/* Moveable Bounding Box Controller with Smart Snapping Guidelines (Desktop only) */}
-          {!isTouchFriendly && selectedId && moveableTarget && (
+          {!isTouchFriendly && selectedId && moveableTarget && !selectedEl?.isLocked && (
             <DynamicMoveable
               ref={moveableRef}
               target={moveableTarget}
@@ -1274,11 +1345,29 @@ export default function StudioCanvas() {
               data-export-ignore="true"
               className="absolute z-50 flex items-center bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 shadow-xl rounded-full px-2 py-1 gap-1 text-stone-700 dark:text-stone-200 transition-all"
               style={{
-                left: `${Math.max(10, selectedEl.x + selectedEl.width / 2 - 60)}px`,
-                top: `${Math.max(10, selectedEl.y - 42)}px`,
+                left: `${Math.max(10, selectedEl.x + selectedEl.width / 2 - 80)}px`,
+                top: `${selectedEl.y > 60 ? selectedEl.y - 52 : selectedEl.y + selectedEl.height + 14}px`,
               }}
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Lock / Unlock Toggle */}
+              <button
+                onClick={() => {
+                  updateElement(selectedEl.id, { isLocked: !selectedEl.isLocked }, true);
+                  if (!selectedEl.isLocked) {
+                    selectElement(null);
+                  }
+                }}
+                className={`p-1.5 rounded-full transition-colors ${
+                  selectedEl.isLocked
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300'
+                }`}
+                title={selectedEl.isLocked ? 'Mở khóa phần tử' : 'Khóa đối tượng (chống click nhầm)'}
+              >
+                {selectedEl.isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+              </button>
+
               <button
                 onClick={() => duplicateElement(selectedEl.id)}
                 className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors"

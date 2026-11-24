@@ -28,8 +28,31 @@ function StudioEditorInner({ mode = 'user' }: StudioEditorProps) {
   const isInspectorOpen = useStudioStore((state) => state.isInspectorOpen);
   const toggleInspector = useStudioStore((state) => state.toggleInspector);
   const setShowOnboardingGuide = useStudioStore((state) => state.setShowOnboardingGuide);
+  const initRealtimeSync = useStudioStore((state) => state.initRealtimeSync);
+  const setCurrentTemplateSlug = useStudioStore((state) => state.setCurrentTemplateSlug);
+  const lastSyncedAt = useStudioStore((state) => state.lastSyncedAt);
+  const lastSyncedFrom = useStudioStore((state) => state.lastSyncedFrom);
   const [loadingTemplate, setLoadingTemplate] = useState(false);
   const [loadedNotification, setLoadedNotification] = useState<string | null>(null);
+
+  // Initialize Realtime Bidirectional Sync Bus (Web <-> Desktop App)
+  useEffect(() => {
+    setCurrentTemplateSlug(templateSlug || null);
+    const unsubscribe = initRealtimeSync(templateSlug || undefined);
+    return () => {
+      unsubscribe();
+    };
+  }, [templateSlug, initRealtimeSync, setCurrentTemplateSlug]);
+
+  // Notify when a realtime sync update was received from another client
+  useEffect(() => {
+    if (lastSyncedAt && lastSyncedFrom) {
+      const sourceName = lastSyncedFrom === 'desktop' ? 'Desktop App' : 'Trình duyệt Web';
+      setLoadedNotification(`⚡ Đã tự động đồng bộ thời gian thực từ ${sourceName}!`);
+      const timer = setTimeout(() => setLoadedNotification(null), 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [lastSyncedAt, lastSyncedFrom]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
