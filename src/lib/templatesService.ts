@@ -38,12 +38,14 @@ function readNonWeddingHarvestedTemplates(): CatalogTemplate[] {
             .replace(/-\s*CineLove.*$/i, '')
             .trim() || t.slug;
 
-          const thumb =
+          let thumb =
             t.coverImage ||
             t.longThumbnail ||
-            (t.images && t.images.length > 0 ? t.images[0] : null) ||
-            FALLBACK_CATEGORY_THUMBS[t.category] ||
-            FALLBACK_CATEGORY_THUMBS.event;
+            (t.images && t.images.length > 0 ? t.images[0] : null);
+
+          if (!thumb || typeof thumb !== 'string' || thumb.includes('assets.lovestory.vn')) {
+            thumb = FALLBACK_CATEGORY_THUMBS[t.category] || FALLBACK_CATEGORY_THUMBS.event;
+          }
 
           return {
             id: `harvested-${t.slug}`,

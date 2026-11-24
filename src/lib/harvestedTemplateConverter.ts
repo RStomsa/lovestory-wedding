@@ -186,10 +186,11 @@ export function getHarvestedRawTemplate(slug: string): HarvestedRawTemplate | nu
  * Convert a raw harvested template into a full rich Studio preset with 100% authentic data
  */
 export function convertHarvestedToStudioPreset(raw: HarvestedRawTemplate): StudioTemplatePreset {
-  // Clean raw image URLs (remove trailing backslashes, invalid formatting)
+  // Clean raw image URLs and resolve to local high-res samples
   const images = (raw.images || [])
-    .filter((url) => typeof url === 'string' && url.startsWith('http'))
-    .map((url) => url.replace(/\\+/g, '').trim());
+    .filter((url) => typeof url === 'string')
+    .map((url) => resolveStudioAssetUrl(url.replace(/\\+/g, '').trim()))
+    .filter(Boolean);
 
   // Clean raw text snippets
   const texts = (raw.textSnippets || [])
@@ -206,7 +207,7 @@ export function convertHarvestedToStudioPreset(raw: HarvestedRawTemplate): Studi
 
   const audio =
     raw.audios && raw.audios.length > 0
-      ? raw.audios[0]
+      ? resolveStudioAssetUrl(raw.audios[0])
       : '/assets/wedding/mp3/ee11a985-5e0e-4eb0-b6da-28fa39c9946f.mp3';
 
   // Clean title
@@ -245,7 +246,7 @@ export function convertHarvestedToStudioPreset(raw: HarvestedRawTemplate): Studi
   // 1. Cover Photo & Hero Header
   if (isC61) {
     // Magazine style Cover for C61
-    const coverImg = images[0] || raw.longThumbnail || '/assets/wedding/templates/c165/photo_01.webp';
+    const coverImg = images[0] || resolveStudioAssetUrl(raw.longThumbnail) || '/assets/wedding/samples/sample_02.jpg';
     elements.push({
       id: `cover-hero-${raw.slug}`,
       type: 'image',
@@ -651,7 +652,7 @@ export function convertHarvestedToStudioPreset(raw: HarvestedRawTemplate): Studi
       ? 'graduation'
       : 'wedding',
     tier: 'PREMIUM',
-    thumbnail: raw.longThumbnail || images[0] || '/assets/wedding/templates/c165/photo_01.webp',
+    thumbnail: resolveStudioAssetUrl(raw.longThumbnail) || images[0] || '/assets/wedding/samples/sample_01.jpg',
     imagesCount: images.length,
     description: `Mẫu thiết kế cao cấp "${cleanTitle}" với ${images.length} ảnh thực tế sắc nét và hiệu ứng tương tác hoàn chỉnh.`,
     config: {
@@ -969,6 +970,14 @@ export function getStudioTemplate(slugOrId: string): StudioTemplatePreset | null
   }
   if (custom && custom.elements && custom.elements.length > 0) {
     return custom;
+  }
+
+  // 1.5 TOP PRIORITY: Curated Studio Presets (thiep-cuoi-165, thiep-cuoi-61, thiep-cuoi-97, thiep-cuoi-132, etc.)
+  const curatedMatch = STUDIO_TEMPLATE_PRESETS.find(
+    (p) => p.slug.toLowerCase() === norm || p.id.toLowerCase() === norm
+  );
+  if (curatedMatch && curatedMatch.elements && curatedMatch.elements.length > 0) {
+    return curatedMatch;
   }
 
   // 0. Check VIP templates

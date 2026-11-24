@@ -1,5 +1,20 @@
 [
   {
+    "id": "mau-thiep-cuoi-tap-chi-our-love-begins",
+    "name": "Mẫu thiệp cưới tạp chí Our Love Begins",
+    "slug": "mau-thiep-cuoi-tap-chi-our-love-begins",
+    "category": "wedding",
+    "tier": "PREMIUM",
+    "price": 30000,
+    "badge": "Hot VIP",
+    "longThumbnail": "/assets/uploads/thumbnails/mau-thiep-cuoi-tap-chi-our-love-begins-1795487650050.png",
+    "baseTemplateId": "mau-thiep-cuoi-tap-chi-our-love-begins",
+    "description": "Mẫu thiệp cưới scrollytelling hoàng gia sang trọng được thiết kế bởi LoveStory Studio.",
+    "isCustom": true,
+    "views": 0,
+    "likes": 0
+  },
+  {
     "id": "envelope-chamomile",
     "name": "Thiệp Cưới Kem Chữ Vàng Save The Date (C165)",
     "slug": "envelope-chamomile",

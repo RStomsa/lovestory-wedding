@@ -37,6 +37,7 @@ import StudioColorPalette from './StudioColorPalette';
 import harvestedTemplates from '@/data/harvested_templates/index.json';
 import minviteTemplates from '@/data/minvite_templates.json';
 import { resolveFontFamily } from '@/lib/studioFonts';
+import { resolveStudioAssetUrl } from '@/lib/studioUtils';
 import { WEDDING_TEXT_TEMPLATES } from '@/data/weddingTextTemplates';
 import { Skeleton } from '@/components/common/Skeleton';
 import { compressWeddingPhoto } from '@/lib/imageCompressor';
@@ -1720,8 +1721,11 @@ export default function StudioLeftRail() {
                     <div className="relative aspect-[16/10] bg-stone-200 overflow-hidden">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={preset.thumbnail}
+                        src={resolveStudioAssetUrl(preset.thumbnail)}
                         alt={preset.name}
+                        onError={(e) => {
+                          e.currentTarget.src = '/assets/wedding/samples/sample_01.jpg';
+                        }}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <span className="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-black/70 text-white backdrop-blur-xs">
@@ -1798,7 +1802,14 @@ export default function StudioLeftRail() {
                         <div className="w-12 h-16 rounded-lg bg-stone-200 overflow-hidden flex-shrink-0 relative">
                           {m.thumbnail ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={m.thumbnail} alt={m.name} className="w-full h-full object-cover" />
+                            <img
+                              src={resolveStudioAssetUrl(m.thumbnail)}
+                              alt={m.name}
+                              onError={(e) => {
+                                e.currentTarget.src = '/assets/wedding/samples/sample_01.jpg';
+                              }}
+                              className="w-full h-full object-cover"
+                            />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-[10px] text-stone-400">
                               Ảnh
@@ -1875,8 +1886,11 @@ export default function StudioLeftRail() {
                       <div className="w-12 h-16 rounded-lg bg-stone-200 overflow-hidden flex-shrink-0 relative">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={m.coverImage || m.thumbnail}
+                          src={resolveStudioAssetUrl(m.coverImage || m.thumbnail)}
                           alt={m.title}
+                          onError={(e) => {
+                            e.currentTarget.src = '/assets/wedding/samples/sample_01.jpg';
+                          }}
                           referrerPolicy="no-referrer"
                           className="w-full h-full object-cover"
                         />

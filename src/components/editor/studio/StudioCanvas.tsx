@@ -619,7 +619,7 @@ export default function StudioCanvas() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={resolveStudioAssetUrl(el.src)}
-              alt={el.alt || 'Đồ họa LoveStory'}
+              alt={el.alt || 'Ảnh cưới LoveStory'}
               referrerPolicy="no-referrer"
               onError={(e) => {
                 const target = e.currentTarget;
@@ -631,7 +631,7 @@ export default function StudioCanvas() {
                   }
                 }
                 // Fallback to local wedding sample if image fails
-                if (!target.src.includes('/assets/wedding/samples/')) {
+                if (!target.src.endsWith('/sample_01.jpg')) {
                   target.src = '/assets/wedding/samples/sample_01.jpg';
                 }
               }}

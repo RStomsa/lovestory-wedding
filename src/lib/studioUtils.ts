@@ -3,6 +3,29 @@
  * Zero-mock asset resolver and sanitizer
  */
 
+export const WEDDING_SAMPLE_IMAGES: string[] = [
+  '/assets/wedding/samples/sample_01.jpg',
+  '/assets/wedding/samples/sample_02.jpg',
+  '/assets/wedding/samples/sample_03.jpg',
+  '/assets/wedding/samples/sample_04.jpg',
+  '/assets/wedding/samples/sample_05.jpg',
+  '/assets/wedding/samples/sample_06.jpg',
+  '/assets/wedding/samples/sample_07.jpg',
+  '/assets/wedding/samples/sample_08.jpg',
+  '/assets/wedding/samples/sample_09.jpg',
+  '/assets/wedding/samples/sample_10.jpg',
+  '/assets/wedding/samples/sample_11.jpg',
+  '/assets/wedding/samples/sample_12.jpg',
+  '/assets/wedding/samples/sample_13.jpg',
+  '/assets/wedding/samples/sample_14.jpg',
+  '/assets/wedding/samples/sample_15.jpg',
+  '/assets/wedding/samples/sample_16.jpg',
+  '/assets/wedding/samples/sample_17.jpg',
+  '/assets/wedding/samples/sample_18.jpg',
+  '/assets/wedding/samples/sample_19.jpg',
+  '/assets/wedding/samples/sample_20.jpg',
+];
+
 /**
  * Resolves any legacy or external asset URL to an accessible local/optimized path.
  * In particular, transforms Biihappy/M-Invite stock SVG assets (which send invalid image/svg mime-type
@@ -15,10 +38,19 @@ export function resolveStudioAssetUrl(src?: string | null): string {
   const trimmed = src.trim();
   if (!trimmed) return '';
 
-  // 1. Resolve broken / offline assets.lovestory.vn assets to local high-res wedding sample photos
-  if (trimmed.includes('assets.lovestory.vn')) {
+  // 1. Resolve broken / offline assets.lovestory.vn or assets.chungdoi.com assets to local high-res wedding sample photos
+  if (trimmed.includes('assets.lovestory.vn') || trimmed.includes('assets.chungdoi.com')) {
     if (trimmed.includes('.mp3')) {
       return '/assets/wedding/audio/wedding-melody-01.mp3';
+    }
+    // Small plugins, hearts, calendar stickers
+    if (
+      trimmed.includes('plugins') ||
+      trimmed.includes('heart') ||
+      trimmed.includes('calen') ||
+      trimmed.includes('seal')
+    ) {
+      return '/assets/m-invite/stock/6964ecd375dc09b0bdcfa023.svg';
     }
     // Deterministically hash the URL so the same template element consistently gets the same photo
     let hash = 0;
@@ -26,9 +58,8 @@ export function resolveStudioAssetUrl(src?: string | null): string {
       hash = (hash << 5) - hash + trimmed.charCodeAt(i);
       hash |= 0;
     }
-    const sampleIndex = (Math.abs(hash) % 18) + 1;
-    const sampleNum = String(sampleIndex).padStart(2, '0');
-    return `/assets/wedding/samples/sample_${sampleNum}.jpg`;
+    const sampleIndex = Math.abs(hash) % WEDDING_SAMPLE_IMAGES.length;
+    return WEDDING_SAMPLE_IMAGES[sampleIndex];
   }
 
   // 2. Check if it's an M-Invite stock asset (SVG/PNG/WebP)
