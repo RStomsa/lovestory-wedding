@@ -22,12 +22,21 @@ export default async function AdminTemplatesPage() {
 
   const catalogTemplates = getAllCatalogTemplates();
 
-  // Load harvested templates summary index
+  // Load harvested templates summary index (streamlined preview data to keep RSC payload ultra-light)
   let harvestedTemplates: any[] = [];
   try {
     const indexFile = path.join(process.cwd(), 'src', 'data', 'harvested_templates', 'index.json');
     if (fs.existsSync(indexFile)) {
-      harvestedTemplates = JSON.parse(fs.readFileSync(indexFile, 'utf-8'));
+      const raw = JSON.parse(fs.readFileSync(indexFile, 'utf-8'));
+      if (Array.isArray(raw)) {
+        harvestedTemplates = raw.map((item: any) => ({
+          slug: item.slug,
+          title: item.title,
+          category: item.category,
+          imagesCount: item.imagesCount || 10,
+          coverImage: item.coverImage || item.longThumbnail || (item.images && item.images.length > 0 ? item.images[0] : ''),
+        }));
+      }
     }
   } catch (err) {
     console.error('Failed to load harvested templates index:', err);

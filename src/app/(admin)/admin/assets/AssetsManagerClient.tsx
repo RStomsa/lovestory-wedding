@@ -840,23 +840,39 @@ export default function AssetsManagerClient({
           MODAL: THÊM PHÔNG CHỮ MỚI
       ========================================================================= */}
       {showAddFontModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-stone-900 border border-stone-200/90 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-1">Thêm Phông Chữ Mới Vào Hệ Thống</h3>
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-2xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl w-full max-w-md p-6 relative shadow-2xl text-stone-900 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100 mb-4">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-stone-500 tracking-wider">
+                  Cấu Hình Phông Chữ
+                </span>
+                <h3 className="text-lg font-serif font-bold text-stone-900">
+                  Thêm Phông Chữ Mới
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddFontModal(false)}
+                className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
             <p className="text-xs text-stone-500 mb-4">
-              Nhập tên phông chữ từ Google Fonts. Phông mới sẽ hiển thị cho toàn bộ khách hàng trong Studio.
+              Nhập tên phông chữ từ Google Fonts hoặc tải tệp font máy tính. Phông mới sẽ hiển thị tức thì cho toàn bộ khách hàng trong Studio.
             </p>
 
-            <form onSubmit={handleAddFont} className="space-y-3">
+            <form onSubmit={handleAddFont} className="space-y-3.5">
               {/* Tải tệp font từ máy tính */}
-              <div className="p-3 bg-stone-50/60 rounded-2xl border border-dashed border-stone-200/80 hover:border-stone-900 transition-colors">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-semibold text-stone-200 flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5 text-stone-700" />
+              <div className="p-3.5 bg-stone-50 rounded-2xl border border-dashed border-stone-200 hover:border-stone-400 transition-colors">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold text-stone-700 flex items-center gap-1.5">
+                    <Upload className="w-3.5 h-3.5 text-stone-500" />
                     Tải tệp font từ máy (.ttf, .otf, .woff, .woff2)
                   </span>
                   {newFontFileUrl && (
-                    <span className="text-[10px] text-emerald-400 font-medium">✓ Đã tải tệp</span>
+                    <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">✓ Đã tải tệp</span>
                   )}
                 </div>
                 <input
@@ -870,53 +886,53 @@ export default function AssetsManagerClient({
                   type="button"
                   onClick={() => fontFileInputRef.current?.click()}
                   disabled={isUploadingFont}
-                  className="w-full py-2 px-3 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-medium flex items-center justify-center gap-2 transition-all cursor-pointer border border-stone-600"
+                  className="w-full py-2 px-3 rounded-xl bg-white hover:bg-stone-100 text-stone-700 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer border border-stone-200 shadow-2xs"
                 >
-                  <Upload className="w-3.5 h-3.5" />
+                  <Upload className="w-3.5 h-3.5 text-stone-500" />
                   <span>{isUploadingFont ? 'Đang tải tệp lên...' : newFontFileUrl ? 'Đổi tệp font khác' : 'Chọn tệp phông chữ từ máy tính'}</span>
                 </button>
                 {newFontFileUrl && (
-                  <p className="text-[10px] text-stone-700 font-mono mt-1.5 truncate">
+                  <p className="text-[10px] text-stone-500 font-mono mt-2 truncate bg-white p-1.5 rounded-lg border border-stone-200">
                     Đường dẫn: {newFontFileUrl}
                   </p>
                 )}
               </div>
 
-              <div className="relative flex items-center justify-center my-1">
-                <span className="text-[10px] uppercase text-stone-500 bg-stone-900 px-2 z-10 font-bold">Hoặc dùng Google Font</span>
-                <div className="absolute inset-x-0 h-px bg-stone-800"></div>
+              <div className="relative flex items-center justify-center my-2">
+                <span className="text-[10px] uppercase text-stone-400 bg-white px-2 z-10 font-bold tracking-wider">Hoặc dùng Google Font</span>
+                <div className="absolute inset-x-0 h-px bg-stone-200"></div>
               </div>
 
               <div>
-                <label className="text-xs text-stone-300 block mb-1 font-medium">Tên Phông Chữ (Hiển thị) *</label>
+                <label className="text-xs text-stone-700 block mb-1 font-semibold">Tên Phông Chữ (Hiển thị) *</label>
                 <input
                   type="text"
                   required
                   placeholder="Ví dụ: Playfair Display, Great Vibes, Allura..."
                   value={newFontName}
                   onChange={(e) => setNewFontName(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-stone-300 block mb-1 font-medium">Google Font ID / Family Name (nếu không tải tệp)</label>
+                <label className="text-xs text-stone-700 block mb-1 font-semibold">Google Font ID / Family Name (nếu không tải tệp)</label>
                 <input
                   type="text"
                   placeholder="Ví dụ: Playfair+Display hoặc để trống tự sinh"
                   value={newFontGoogle}
                   onChange={(e) => setNewFontGoogle(e.target.value)}
                   disabled={!!newFontFileUrl}
-                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900 disabled:opacity-40"
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 disabled:opacity-40 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-stone-300 block mb-1 font-medium">Phân Loại Phông Chữ *</label>
+                <label className="text-xs text-stone-700 block mb-1 font-semibold">Phân Loại Phông Chữ *</label>
                 <select
                   value={newFontCategory}
                   onChange={(e) => setNewFontCategory(e.target.value as any)}
-                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                 >
                   <option value="script">Viết tay &amp; Thư pháp (Script)</option>
                   <option value="serif">Có chân &amp; Cổ điển (Serif)</option>
@@ -925,28 +941,28 @@ export default function AssetsManagerClient({
               </div>
 
               <div>
-                <label className="text-xs text-stone-300 block mb-1 font-medium">Mô Tả Kiểu Dáng</label>
+                <label className="text-xs text-stone-700 block mb-1 font-semibold">Mô Tả Kiểu Dáng</label>
                 <input
                   type="text"
                   placeholder="Ví dụ: Lãng mạn bay bổng, Hoàng gia kiêu sa..."
                   value={newFontDesc}
                   onChange={(e) => setNewFontDesc(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                 />
               </div>
 
-              <div className="pt-3 flex items-center justify-end gap-2">
+              <div className="pt-3 flex items-center justify-end gap-2 border-t border-stone-100">
                 <button
                   type="button"
                   onClick={() => setShowAddFontModal(false)}
-                  className="px-4 py-2 rounded-xl border border-stone-200/80 text-stone-300 hover:bg-stone-800 text-xs font-medium"
+                  className="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition-colors"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingFont}
-                  className="px-5 py-2 rounded-xl bg-stone-900 hover:bg-purple-500 text-white text-xs font-bold shadow-md disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-2xs transition-colors disabled:opacity-50"
                 >
                   {isSubmittingFont ? 'Đang thêm...' : 'Lưu Phông Chữ'}
                 </button>
@@ -960,32 +976,48 @@ export default function AssetsManagerClient({
           MODAL: THÊM ĐỒ HỌA MỚI
       ========================================================================= */}
       {showAddGfxModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-stone-900 border border-stone-200/90 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-1">Thêm Đồ Họa &amp; Sticker Mới</h3>
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-2xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl w-full max-w-md p-6 relative shadow-2xl text-stone-900 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100 mb-4">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-stone-500 tracking-wider">
+                  Cấu Hình Đồ Họa &amp; Sticker
+                </span>
+                <h3 className="text-lg font-serif font-bold text-stone-900">
+                  Thêm Đồ Họa &amp; Sticker Mới
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddGfxModal(false)}
+                className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
             <p className="text-xs text-stone-500 mb-4">
               Tải ảnh PNG không nền (transparent) hoặc dán URL SVG/hình ảnh vào thư viện Studio.
             </p>
 
-            <form onSubmit={handleAddGraphic} className="space-y-3">
+            <form onSubmit={handleAddGraphic} className="space-y-3.5">
               <div>
-                <label className="text-xs text-stone-300 block mb-1 font-medium">Tên Đồ Họa / Họa Tiết *</label>
+                <label className="text-xs text-stone-700 block mb-1 font-semibold">Tên Đồ Họa / Họa Tiết *</label>
                 <input
                   type="text"
                   required
                   placeholder="Ví dụ: Nơ ruy băng hoa hồng, Vòng hoa vintage..."
                   value={newGfxName}
                   onChange={(e) => setNewGfxName(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-stone-300 block mb-1 font-medium">Danh Mục Hiển Thị *</label>
+                <label className="text-xs text-stone-700 block mb-1 font-semibold">Danh Mục Hiển Thị *</label>
                 <select
                   value={newGfxCategory}
                   onChange={(e) => setNewGfxCategory(e.target.value as any)}
-                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                 >
                   <option value="Yếu tố đám cưới">Yếu tố đám cưới</option>
                   <option value="Văn hóa Việt">Văn hóa Việt</option>
@@ -1000,12 +1032,12 @@ export default function AssetsManagerClient({
 
               {/* Upload File or Paste URL */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs text-stone-300 font-medium">Tải Tệp Ảnh Lên (Khuyên dùng PNG trong suốt)</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs text-stone-700 font-semibold">Tải Tệp Ảnh Lên (Khuyên dùng PNG trong suốt)</label>
                   <button
                     type="button"
                     onClick={() => gfxFileInputRef.current?.click()}
-                    className="text-[11px] text-stone-700 hover:text-stone-700 flex items-center gap-1 font-medium"
+                    className="text-[11px] text-stone-600 hover:text-stone-900 flex items-center gap-1 font-semibold"
                   >
                     <Upload className="w-3 h-3" />
                     <span>Chọn tệp từ máy...</span>
@@ -1026,16 +1058,16 @@ export default function AssetsManagerClient({
                   placeholder="Hoặc dán URL ảnh / SVG: /assets/wedding/... hoặc https://..."
                   value={newGfxSrc}
                   onChange={(e) => setNewGfxSrc(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                 />
 
                 {isUploadingGfx && (
-                  <p className="text-[10px] text-stone-700 mt-1 animate-pulse">Đang tải tệp ảnh lên máy chủ...</p>
+                  <p className="text-[10px] text-stone-600 mt-1 animate-pulse">Đang tải tệp ảnh lên máy chủ...</p>
                 )}
 
                 {newGfxSrc && (
-                  <div className="mt-2 p-2 bg-stone-50/60 rounded-xl border border-stone-200/90 flex items-center gap-3">
-                    <div className="w-12 h-12 flex items-center justify-center p-1 bg-stone-900 rounded-lg">
+                  <div className="mt-2 p-2 bg-stone-50 rounded-xl border border-stone-200 flex items-center gap-3">
+                    <div className="w-12 h-12 flex items-center justify-center p-1 bg-white rounded-lg border border-stone-200 shadow-2xs">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={newGfxSrc} alt="Preview" className="max-w-full max-h-full object-contain" />
                     </div>
@@ -1047,37 +1079,37 @@ export default function AssetsManagerClient({
               {/* Dimensions */}
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[10px] text-stone-500 block mb-1">Chiều Rộng (px)</label>
+                  <label className="text-[10px] text-stone-500 font-medium block mb-1">Chiều Rộng (px)</label>
                   <input
                     type="number"
                     value={newGfxWidth}
                     onChange={(e) => setNewGfxWidth(Number(e.target.value))}
-                    className="w-full px-3 py-1.5 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white"
+                    className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-stone-500 block mb-1">Chiều Cao (px)</label>
+                  <label className="text-[10px] text-stone-500 font-medium block mb-1">Chiều Cao (px)</label>
                   <input
                     type="number"
                     value={newGfxHeight}
                     onChange={(e) => setNewGfxHeight(Number(e.target.value))}
-                    className="w-full px-3 py-1.5 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white"
+                    className="w-full px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900"
                   />
                 </div>
               </div>
 
-              <div className="pt-3 flex items-center justify-end gap-2">
+              <div className="pt-3 flex items-center justify-end gap-2 border-t border-stone-100">
                 <button
                   type="button"
                   onClick={() => setShowAddGfxModal(false)}
-                  className="px-4 py-2 rounded-xl border border-stone-200/80 text-stone-300 hover:bg-stone-800 text-xs font-medium"
+                  className="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition-colors"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingGfx}
-                  className="px-5 py-2 rounded-xl bg-stone-900 hover:bg-purple-500 text-white text-xs font-bold shadow-md disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-2xs transition-colors disabled:opacity-50"
                 >
                   {isSubmittingGfx ? 'Đang thêm...' : 'Lưu Đồ Họa'}
                 </button>
@@ -1091,44 +1123,60 @@ export default function AssetsManagerClient({
           MODAL: THÊM BÀI HÁT MỚI
       ========================================================================= */}
       {showAddMusicModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-stone-900 border border-stone-200/90 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-1">Thêm Bài Hát Mới Vào Thư Viện</h3>
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-2xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl w-full max-w-md p-6 relative shadow-2xl text-stone-900 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100 mb-4">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-stone-500 tracking-wider">
+                  Cấu Hình Nhạc Cưới
+                </span>
+                <h3 className="text-lg font-serif font-bold text-stone-900">
+                  Thêm Bài Hát Mới Vào Thư Viện
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddMusicModal(false)}
+                className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
             <p className="text-xs text-stone-500 mb-4">
               Tải tệp MP3 hoặc dán liên kết âm thanh trực tiếp. Khách hàng có thể chọn bài hát này làm nhạc nền thiệp cưới.
             </p>
 
-            <form onSubmit={handleAddMusic} className="space-y-3">
+            <form onSubmit={handleAddMusic} className="space-y-3.5">
               <div>
-                <label className="text-xs text-stone-300 block mb-1 font-medium">Tên Bài Hát *</label>
+                <label className="text-xs text-stone-700 block mb-1 font-semibold">Tên Bài Hát *</label>
                 <input
                   type="text"
                   required
                   placeholder="Ví dụ: Beautiful In White, Cưới Nhau Đi, I Do..."
                   value={newMusicTitle}
                   onChange={(e) => setNewMusicTitle(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-stone-300 block mb-1 font-medium">Nghệ Sĩ / Ca Sĩ</label>
+                <label className="text-xs text-stone-700 block mb-1 font-semibold">Nghệ Sĩ / Ca Sĩ</label>
                 <input
                   type="text"
                   placeholder="Ví dụ: Shane Filan, Đức Phúc, 911..."
                   value={newMusicArtist}
                   onChange={(e) => setNewMusicArtist(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                 />
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs text-stone-300 font-medium">Đường Dẫn Âm Thanh MP3 *</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs text-stone-700 font-semibold">Đường Dẫn Âm Thanh MP3 *</label>
                   <button
                     type="button"
                     onClick={() => musicFileInputRef.current?.click()}
-                    className="text-[11px] text-stone-700 hover:text-stone-700 flex items-center gap-1 font-medium"
+                    className="text-[11px] text-stone-600 hover:text-stone-900 flex items-center gap-1 font-semibold"
                   >
                     <Upload className="w-3 h-3" />
                     <span>Tải tệp MP3 từ máy...</span>
@@ -1149,26 +1197,26 @@ export default function AssetsManagerClient({
                   placeholder="Dán link âm thanh /assets/wedding/mp3/... hoặc https://..."
                   value={newMusicUrl}
                   onChange={(e) => setNewMusicUrl(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white focus:outline-none focus:border-stone-900"
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors font-mono"
                 />
 
                 {isUploadingMusic && (
-                  <p className="text-[10px] text-stone-700 mt-1 animate-pulse">Đang tải tệp MP3 lên máy chủ...</p>
+                  <p className="text-[10px] text-stone-600 mt-1 animate-pulse">Đang tải tệp MP3 lên máy chủ...</p>
                 )}
               </div>
 
-              <div className="pt-3 flex items-center justify-end gap-2">
+              <div className="pt-3 flex items-center justify-end gap-2 border-t border-stone-100">
                 <button
                   type="button"
                   onClick={() => setShowAddMusicModal(false)}
-                  className="px-4 py-2 rounded-xl border border-stone-200/80 text-stone-300 hover:bg-stone-800 text-xs font-medium"
+                  className="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition-colors"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingMusic}
-                  className="px-5 py-2 rounded-xl bg-stone-900 hover:bg-purple-500 text-white text-xs font-bold shadow-md disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-2xs transition-colors disabled:opacity-50"
                 >
                   {isSubmittingMusic ? 'Đang thêm...' : 'Lưu Bài Hát'}
                 </button>

@@ -67,10 +67,12 @@ export default function TemplatesManagerClient({
   const [harvestedTemplates] = useState<any[]>(initialHarvestedTemplates);
   const [searchHarvested, setSearchHarvested] = useState('');
   const [harvestedFilter, setHarvestedFilter] = useState<'all' | 'wedding' | 'birthday' | 'graduation' | 'event' | 'anniversary'>('all');
+  const [harvestedVisibleCount, setHarvestedVisibleCount] = useState<number>(25);
 
   // State for VIP Modern Templates
   const [searchMinvite, setSearchMinvite] = useState('');
   const [minviteFilter, setMinviteFilter] = useState<string>('all');
+  const [minviteVisibleCount, setMinviteVisibleCount] = useState<number>(25);
 
   // State for DB Engine Templates
   const [dbTemplates, setDbTemplates] = useState<DbTemplateData[]>(initialDbTemplates);
@@ -979,7 +981,7 @@ export default function TemplatesManagerClient({
 
           {/* Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {filteredHarvested.map((item, idx) => {
+            {filteredHarvested.slice(0, harvestedVisibleCount).map((item, idx) => {
               const cleanTitle = item.title
                 ? item.title.replace(/-\s*Thiệp online LoveStory.*$/i, '').replace(/-\s*CineLove.*$/i, '').trim()
                 : `Mẫu Thiệp ${item.slug}`;
@@ -1085,6 +1087,29 @@ export default function TemplatesManagerClient({
               );
             })}
           </div>
+
+          {/* Pagination / Progressive Loading for Harvested Templates */}
+          {filteredHarvested.length > harvestedVisibleCount && (
+            <div className="flex items-center justify-center gap-3 pt-4 pb-2">
+              <button
+                type="button"
+                onClick={() => setHarvestedVisibleCount((prev) => prev + 25)}
+                className="px-5 py-2.5 rounded-xl bg-stone-900 text-white font-medium text-xs hover:bg-stone-800 transition-colors shadow-xs flex items-center gap-2"
+              >
+                <span>Xem thêm 25 mẫu</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-stone-800 text-stone-300">
+                  {Math.min(harvestedVisibleCount, filteredHarvested.length)} / {filteredHarvested.length}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setHarvestedVisibleCount(filteredHarvested.length)}
+                className="px-4 py-2.5 rounded-xl bg-stone-100 text-stone-700 font-medium text-xs hover:bg-stone-200 transition-colors"
+              >
+                Tải tất cả ({filteredHarvested.length})
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -1131,7 +1156,7 @@ export default function TemplatesManagerClient({
 
           {/* Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {filteredMinvite.map((item: any, idx: number) => {
+            {filteredMinvite.slice(0, minviteVisibleCount).map((item: any, idx: number) => {
               const thumbUrl = item.coverImage || item.thumbnail;
               return (
                 <div
@@ -1208,6 +1233,29 @@ export default function TemplatesManagerClient({
               );
             })}
           </div>
+
+          {/* Pagination / Progressive Loading for VIP Modern Templates */}
+          {filteredMinvite.length > minviteVisibleCount && (
+            <div className="flex items-center justify-center gap-3 pt-4 pb-2">
+              <button
+                type="button"
+                onClick={() => setMinviteVisibleCount((prev) => prev + 25)}
+                className="px-5 py-2.5 rounded-xl bg-stone-900 text-white font-medium text-xs hover:bg-stone-800 transition-colors shadow-xs flex items-center gap-2"
+              >
+                <span>Xem thêm 25 mẫu</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-stone-800 text-stone-300">
+                  {Math.min(minviteVisibleCount, filteredMinvite.length)} / {filteredMinvite.length}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMinviteVisibleCount(filteredMinvite.length)}
+                className="px-4 py-2.5 rounded-xl bg-stone-100 text-stone-700 font-medium text-xs hover:bg-stone-200 transition-colors"
+              >
+                Tải tất cả ({filteredMinvite.length})
+              </button>
+            </div>
+          )}
         </div>
       )}
 
