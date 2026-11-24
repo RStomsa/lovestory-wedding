@@ -43,6 +43,12 @@ export default function StudioRightInspector() {
     canvas,
     elements,
     selectedId,
+    selectedIds,
+    selectElement,
+    removeSelectedElements,
+    duplicateSelectedElements,
+    alignSelectedElements,
+    hiddenElementIds,
     updateElement,
     removeElement,
     duplicateElement,
@@ -318,9 +324,146 @@ export default function StudioRightInspector() {
       </button>
 
       {/* =========================================================================
-          CASE 1: NO ELEMENT SELECTED -> GENERAL INVITATION SETTINGS (SCREENSHOT 1)
+          CASE 0: MULTIPLE ELEMENTS SELECTED (MULTI-SELECTION INSPECTOR)
       ========================================================================= */}
-      {!selectedElement ? (
+      {selectedIds.length > 1 ? (
+        <div className="p-5 space-y-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-[10px] text-blue-500 block uppercase font-bold tracking-wider">
+                Chọn Nhiều Khối
+              </span>
+              <h3 className="text-base font-bold text-stone-900 dark:text-white mt-0.5 flex items-center gap-2">
+                <span>Đã chọn {selectedIds.length} phần tử</span>
+              </h3>
+            </div>
+            <button
+              onClick={() => selectElement(null)}
+              className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 transition-colors"
+            >
+              Bỏ chọn
+            </button>
+          </div>
+
+          {/* Quick Alignments Group */}
+          <div className="p-3 bg-stone-50 dark:bg-stone-800/60 rounded-2xl border border-stone-200 dark:border-stone-700/80 space-y-2.5">
+            <span className="text-[11px] font-bold text-stone-600 dark:text-stone-400 block uppercase tracking-wider">
+              Căn chỉnh hàng loạt
+            </span>
+            <div className="grid grid-cols-3 gap-1.5">
+              <button
+                type="button"
+                onClick={() => alignSelectedElements('left')}
+                className="py-1.5 px-2 bg-white dark:bg-stone-850 hover:bg-blue-50 text-stone-700 dark:text-stone-200 rounded-xl border border-stone-200 dark:border-stone-700 flex items-center justify-center gap-1 font-medium text-[11px] active:scale-95 transition-all"
+                title="Canh thẳng lề trái"
+              >
+                <AlignLeft className="w-3.5 h-3.5" /> Canh trái
+              </button>
+              <button
+                type="button"
+                onClick={() => alignSelectedElements('center')}
+                className="py-1.5 px-2 bg-white dark:bg-stone-850 hover:bg-blue-50 text-stone-700 dark:text-stone-200 rounded-xl border border-stone-200 dark:border-stone-700 flex items-center justify-center gap-1 font-medium text-[11px] active:scale-95 transition-all"
+                title="Canh giữa chiều ngang"
+              >
+                <AlignCenter className="w-3.5 h-3.5" /> Canh giữa
+              </button>
+              <button
+                type="button"
+                onClick={() => alignSelectedElements('right')}
+                className="py-1.5 px-2 bg-white dark:bg-stone-850 hover:bg-blue-50 text-stone-700 dark:text-stone-200 rounded-xl border border-stone-200 dark:border-stone-700 flex items-center justify-center gap-1 font-medium text-[11px] active:scale-95 transition-all"
+                title="Canh thẳng lề phải"
+              >
+                <AlignRight className="w-3.5 h-3.5" /> Canh phải
+              </button>
+            </div>
+            <div className="grid grid-cols-3 gap-1.5">
+              <button
+                type="button"
+                onClick={() => alignSelectedElements('top')}
+                className="py-1.5 px-2 bg-white dark:bg-stone-850 hover:bg-blue-50 text-stone-700 dark:text-stone-200 rounded-xl border border-stone-200 dark:border-stone-700 flex items-center justify-center gap-1 font-medium text-[11px] active:scale-95 transition-all"
+                title="Canh mép trên"
+              >
+                Canh trên
+              </button>
+              <button
+                type="button"
+                onClick={() => alignSelectedElements('middle')}
+                className="py-1.5 px-2 bg-white dark:bg-stone-850 hover:bg-blue-50 text-stone-700 dark:text-stone-200 rounded-xl border border-stone-200 dark:border-stone-700 flex items-center justify-center gap-1 font-medium text-[11px] active:scale-95 transition-all"
+                title="Canh giữa chiều dọc"
+              >
+                Canh giữa dọc
+              </button>
+              <button
+                type="button"
+                onClick={() => alignSelectedElements('bottom')}
+                className="py-1.5 px-2 bg-white dark:bg-stone-850 hover:bg-blue-50 text-stone-700 dark:text-stone-200 rounded-xl border border-stone-200 dark:border-stone-700 flex items-center justify-center gap-1 font-medium text-[11px] active:scale-95 transition-all"
+                title="Canh mép dưới"
+              >
+                Canh dưới
+              </button>
+            </div>
+          </div>
+
+          {/* Batch Actions: Duplicate & Delete */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => duplicateSelectedElements()}
+              className="w-full py-2 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 font-semibold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all"
+            >
+              <Copy className="w-4 h-4" />
+              <span>Nhân bản tất cả</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => removeSelectedElements()}
+              className="w-full py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 font-semibold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Xóa tất cả</span>
+            </button>
+          </div>
+
+          {/* List of Selected Elements */}
+          <div className="space-y-2">
+            <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block">
+              Danh sách phần tử đang chọn
+            </span>
+            <div className="space-y-1.5 max-h-72 overflow-y-auto">
+              {elements
+                .filter((e) => selectedIds.includes(e.id))
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-2.5 bg-stone-50 dark:bg-stone-800/80 rounded-xl border border-stone-200 dark:border-stone-700 flex items-center justify-between gap-2"
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                      <span className="font-semibold text-xs text-stone-800 dark:text-stone-200 truncate">
+                        {item.type === 'text'
+                          ? `"${item.text?.slice(0, 20) || 'Văn bản'}"`
+                          : item.type === 'image'
+                          ? 'Ảnh cưới'
+                          : item.type === 'graphic'
+                          ? 'Đồ họa trang trí'
+                          : item.type === 'shape'
+                          ? 'Hình khối'
+                          : 'Tiện ích'}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => selectElement(item.id)}
+                      className="text-[10px] text-blue-500 hover:underline shrink-0 font-medium"
+                    >
+                      Chỉ chọn mục này
+                    </button>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      ) : !selectedElement ? (
         <div className="p-5 space-y-5">
           <div className="flex items-center justify-between">
             <div>
@@ -623,6 +766,65 @@ export default function StudioRightInspector() {
               </button>
             </div>
           </div>
+
+          {/* Overlapping Layers Quick Switcher (Chọn nhanh lớp đè bên dưới) */}
+          {(() => {
+            const overlappingWithCurrent = elements
+              .filter(
+                (other) =>
+                  other.id !== selectedElement.id &&
+                  !other.isLocked &&
+                  !hiddenElementIds?.includes(other.id) &&
+                  !(
+                    other.x >= selectedElement.x + selectedElement.width ||
+                    other.x + other.width <= selectedElement.x ||
+                    other.y >= selectedElement.y + selectedElement.height ||
+                    other.y + other.height <= selectedElement.y
+                  )
+              )
+              .sort((a, b) => (b.zIndex || 0) - (a.zIndex || 0));
+
+            if (overlappingWithCurrent.length === 0) return null;
+
+            return (
+              <div className="p-3 bg-blue-50/70 dark:bg-blue-950/40 rounded-2xl border border-blue-200 dark:border-blue-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-blue-700 dark:text-blue-300 flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5" />
+                    <span>Có {overlappingWithCurrent.length} lớp đè cùng vị trí</span>
+                  </span>
+                </div>
+                <p className="text-[10px] text-blue-600/80 dark:text-blue-400 leading-tight">
+                  Bấm để chọn ngay lớp đè bên dưới mà không cần di chuyển đối tượng:
+                </p>
+                <div className="space-y-1">
+                  {overlappingWithCurrent.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => selectElement(item.id)}
+                      className="w-full flex items-center justify-between p-2 rounded-xl bg-white dark:bg-stone-900 border border-blue-200/60 dark:border-blue-800/60 hover:border-blue-400 text-left text-xs font-semibold text-stone-800 dark:text-stone-200 transition-all hover:scale-[1.01]"
+                    >
+                      <span className="truncate">
+                        {item.type === 'text'
+                          ? `"${item.text?.slice(0, 22) || 'Văn bản'}"`
+                          : item.type === 'image'
+                          ? 'Ảnh cưới'
+                          : item.type === 'graphic'
+                          ? 'Đồ họa'
+                          : item.type === 'shape'
+                          ? 'Hình khối'
+                          : 'Tiện ích'}
+                      </span>
+                      <span className="text-[10px] text-blue-500 font-mono shrink-0 ml-2">
+                        Chọn lớp này ➔
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Push-Down & Vertical Spacing Control (Chế độ đẩy chèn mục vào giữa) */}
           <div className="p-3 bg-stone-50 dark:bg-stone-850 rounded-2xl border border-stone-200 dark:border-stone-700/80 space-y-2.5">

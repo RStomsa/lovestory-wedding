@@ -30,6 +30,14 @@ import {
   Smartphone,
   Lock,
   Unlock,
+  Layers,
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  Type,
+  Square,
+  LayoutGrid,
+  Sparkles,
 } from 'lucide-react';
 
 // Dynamically import react-moveable to ensure SSR safe
@@ -41,7 +49,14 @@ export default function StudioCanvas() {
     canvas,
     elements,
     selectedId,
+    selectedIds,
     selectElement,
+    toggleSelectElement,
+    selectMultipleElements,
+    removeSelectedElements,
+    duplicateSelectedElements,
+    updateElementsBatch,
+    alignSelectedElements,
     addElement,
     pushElementsBelow,
     updateElement,
@@ -71,14 +86,19 @@ export default function StudioCanvas() {
   const [showLayerMenu, setShowLayerMenu] = useState(false);
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
   const [showScreenGuides, setShowScreenGuides] = useState(true);
+  const [marquee, setMarquee] = useState<{ startX: number; startY: number; currentX: number; currentY: number } | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; elements: CanvasElement[] } | null>(null);
 
-  // Auto-close layer options menu when clicking outside
+  // Auto-close layer options menu and context menu when clicking outside
   useEffect(() => {
-    if (!showLayerMenu) return;
-    const handleOutside = () => setShowLayerMenu(false);
+    if (!showLayerMenu && !contextMenu) return;
+    const handleOutside = () => {
+      setShowLayerMenu(false);
+      setContextMenu(null);
+    };
     window.addEventListener('pointerdown', handleOutside);
     return () => window.removeEventListener('pointerdown', handleOutside);
-  }, [showLayerMenu]);
+  }, [showLayerMenu, contextMenu]);
 
   // Dynamic Fold Label inspector based on real elements positioned in each fold
   const getFoldLabel = (foldIndex: number, foldTop: number, foldBottom: number) => {
@@ -281,7 +301,7 @@ export default function StudioCanvas() {
       }
     });
     return () => cancelAnimationFrame(handle);
-  }, [selectedId, editingTextId]);
+  }, [selectedId, selectedIds, editingTextId]);
 
   const handleCanvasClick = (e: React.MouseEvent) => {
     // If clicked on canvas background, deselect
@@ -289,8 +309,96 @@ export default function StudioCanvas() {
       selectElement(null);
       setMoveableTarget(null);
       setShowLayerMenu(false);
+      setContextMenu(null);
       setEditingTextId(null);
     }
+  };
+
+  // Canvas context menu (Right click) to pick any overlapping layer directly
+  const handleCanvasContextMenu = (e: React.MouseEvent) => {
+    const canvasNode = canvasRef.current;
+    if (!canvasNode) return;
+    const rect = canvasNode.getBoundingClientRect();
+    const clickX = (e.clientX - rect.left) / zoom;
+    const clickY = (e.clientY - rect.top) / zoom;
+
+    const overlappingAtPoint = elements
+      .filter(
+        (other) =>
+          !hiddenElementIds.includes(other.id) &&
+          clickX >= other.x &&
+          clickX <= other.x + other.width &&
+          clickY >= other.y &&
+          clickY <= other.y + other.height
+      )
+      .sort((a, b) => (b.zIndex || 0) - (a.zIndex || 0));
+
+    if (overlappingAtPoint.length > 0) {
+      e.preventDefault();
+      setContextMenu({ x: clickX, y: clickY, elements: overlappingAtPoint });
+    }
+  };
+
+  // Canvas pointer down for rubberband / marquee drag-selection
+  const handleCanvasPointerDown = (e: React.PointerEvent) => {
+    if (e.button !== 0) return; // Only primary mouse button
+
+    const canvasNode = canvasRef.current;
+    if (!canvasNode) return;
+    const rect = canvasNode.getBoundingClientRect();
+    const startX = (e.clientX - rect.left) / zoom;
+    const startY = (e.clientY - rect.top) / zoom;
+
+    setMarquee({ startX, startY, currentX: startX, currentY: startY });
+
+    const onPointerMove = (moveEvt: PointerEvent) => {
+      const curX = (moveEvt.clientX - rect.left) / zoom;
+      const curY = (moveEvt.clientY - rect.top) / zoom;
+      setMarquee((prev) => (prev ? { ...prev, currentX: curX, currentY: curY } : null));
+    };
+
+    const onPointerUp = (upEvt: PointerEvent) => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+
+      const endX = (upEvt.clientX - rect.left) / zoom;
+      const endY = (upEvt.clientY - rect.top) / zoom;
+      const dist = Math.hypot(endX - startX, endY - startY);
+
+      if (dist > 8) {
+        // Multi-selection box
+        const minX = Math.min(startX, endX);
+        const maxX = Math.max(startX, endX);
+        const minY = Math.min(startY, endY);
+        const maxY = Math.max(startY, endY);
+
+        const matched = elements.filter(
+          (el) =>
+            !el.isLocked &&
+            !hiddenElementIds.includes(el.id) &&
+            el.x < maxX &&
+            el.x + el.width > minX &&
+            el.y < maxY &&
+            el.y + el.height > minY
+        );
+
+        if (matched.length > 0) {
+          selectMultipleElements(matched.map((m) => m.id));
+        } else {
+          selectElement(null);
+        }
+      } else {
+        // Simple click on canvas background
+        selectElement(null);
+        setEditingTextId(null);
+        setShowLayerMenu(false);
+        setContextMenu(null);
+      }
+      setMarquee(null);
+    };
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
   };
 
   // =========================================================================
@@ -325,15 +433,23 @@ export default function StudioCanvas() {
         return;
       }
 
-      // Actions below require a selected element
-      if (!selectedId) return;
+      // Actions below require a selected element or group
+      if (!selectedId && selectedIds.length === 0) return;
 
-      // 2. Delete / Backspace: Remove selected element
+      // 2. Delete / Backspace: Remove selected element(s)
       if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault();
-        removeElement(selectedId);
-        selectElement(null);
-        setMoveableTarget(null);
+        if (selectedIds.length > 1) {
+          removeSelectedElements();
+          setMoveableTarget(null);
+          return;
+        }
+        if (selectedId) {
+          removeElement(selectedId);
+          selectElement(null);
+          setMoveableTarget(null);
+          return;
+        }
         return;
       }
 
@@ -343,13 +459,21 @@ export default function StudioCanvas() {
         selectElement(null);
         setMoveableTarget(null);
         setEditingTextId(null);
+        setContextMenu(null);
         return;
       }
 
       // 4. Duplicate (Ctrl + D / Cmd + D)
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'd') {
         e.preventDefault();
-        duplicateElement(selectedId);
+        if (selectedIds.length > 1) {
+          duplicateSelectedElements();
+          return;
+        }
+        if (selectedId) {
+          duplicateElement(selectedId);
+          return;
+        }
         return;
       }
 
@@ -376,31 +500,52 @@ export default function StudioCanvas() {
 
       if (deltaX !== 0 || deltaY !== 0) {
         e.preventDefault();
-        const currentEl = elements.find((el) => el.id === selectedId);
-        if (!currentEl) return;
-
-        const nextX = currentEl.x + deltaX;
-        const nextY = currentEl.y + deltaY;
-
-        // Instant DOM update for 60fps responsiveness
-        const domNode = document.getElementById(`canvas-node-${selectedId}`);
-        if (domNode) {
-          domNode.style.left = `${nextX}px`;
-          domNode.style.top = `${nextY}px`;
+        if (selectedIds.length > 1) {
+          const targets = elements.filter((el) => selectedIds.includes(el.id));
+          const batchUpdates = targets.map((el) => {
+            const nextX = el.x + deltaX;
+            const nextY = el.y + deltaY;
+            const domNode = document.getElementById(`canvas-node-${el.id}`);
+            if (domNode) {
+              domNode.style.left = `${nextX}px`;
+              domNode.style.top = `${nextY}px`;
+            }
+            return { id: el.id, updates: { x: nextX, y: nextY } };
+          });
+          updateElementsBatch(batchUpdates, true);
+          requestAnimationFrame(() => {
+            moveableRef.current?.updateRect();
+          });
+          return;
         }
 
-        updateElement(selectedId, { x: nextX, y: nextY }, true);
+        if (selectedId) {
+          const currentEl = elements.find((el) => el.id === selectedId);
+          if (!currentEl) return;
 
-        // Update Moveable controller bounding box
-        requestAnimationFrame(() => {
-          moveableRef.current?.updateRect();
-        });
+          const nextX = currentEl.x + deltaX;
+          const nextY = currentEl.y + deltaY;
+
+          // Instant DOM update for 60fps responsiveness
+          const domNode = document.getElementById(`canvas-node-${selectedId}`);
+          if (domNode) {
+            domNode.style.left = `${nextX}px`;
+            domNode.style.top = `${nextY}px`;
+          }
+
+          updateElement(selectedId, { x: nextX, y: nextY }, true);
+
+          // Update Moveable controller bounding box
+          requestAnimationFrame(() => {
+            moveableRef.current?.updateRect();
+          });
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedId, editingTextId, elements, removeElement, selectElement, updateElement, duplicateElement, undo, redo]);
+  }, [selectedId, selectedIds, editingTextId, elements, removeElement, removeSelectedElements, duplicateSelectedElements, updateElementsBatch, selectElement, updateElement, duplicateElement, undo, redo]);
 
   // =========================================================================
   // DRAG & DROP DIRECTLY FROM DESKTOP ONTO CANVAS (0ms OPTIMISTIC UI)
@@ -833,7 +978,23 @@ export default function StudioCanvas() {
             backgroundColor: canvas.background,
             overflow: 'hidden',
           }}
+          onPointerDown={handleCanvasPointerDown}
+          onContextMenu={handleCanvasContextMenu}
         >
+          {/* Marquee Selection Drag Box */}
+          {marquee && (
+            <div
+              data-export-ignore="true"
+              className="absolute border-2 border-blue-500 bg-blue-500/20 rounded-xs pointer-events-none z-40 transition-none"
+              style={{
+                left: `${Math.min(marquee.startX, marquee.currentX)}px`,
+                top: `${Math.min(marquee.startY, marquee.currentY)}px`,
+                width: `${Math.abs(marquee.currentX - marquee.startX)}px`,
+                height: `${Math.abs(marquee.currentY - marquee.startY)}px`,
+              }}
+            />
+          )}
+
           {/* Drag & Drop Visual Indicator Overlay */}
           {isDraggingOver && (
             <div className="absolute inset-0 z-50 bg-blue-500/15 backdrop-blur-[2px] border-4 border-dashed border-blue-500 flex flex-col items-center justify-center pointer-events-none animate-in fade-in duration-150">
@@ -943,7 +1104,7 @@ export default function StudioCanvas() {
           {elements.map((el) => {
             if (hiddenElementIds.includes(el.id)) return null;
 
-            const isSelected = selectedId === el.id;
+            const isSelected = selectedIds.includes(el.id);
 
             // Entrance animation class & inline style
             let entranceClass = '';
@@ -989,10 +1150,43 @@ export default function StudioCanvas() {
                     return;
                   }
 
+                  // 1. Shift or Ctrl/Cmd multi-selection
+                  if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                    e.stopPropagation();
+                    toggleSelectElement(el.id);
+                    return;
+                  }
+
                   e.stopPropagation();
-                  selectElement(el.id);
+
+                  // Check if multiple elements overlap at this click coordinate
+                  const canvasNode = canvasRef.current;
+                  const rect = canvasNode?.getBoundingClientRect();
+                  const clickX = rect ? (e.clientX - rect.left) / zoom : el.x;
+                  const clickY = rect ? (e.clientY - rect.top) / zoom : el.y;
+
+                  const overlappingAtPoint = elements
+                    .filter(
+                      (other) =>
+                        !other.isLocked &&
+                        !hiddenElementIds.includes(other.id) &&
+                        clickX >= other.x &&
+                        clickX <= other.x + other.width &&
+                        clickY >= other.y &&
+                        clickY <= other.y + other.height
+                    )
+                    .sort((a, b) => (b.zIndex || 0) - (a.zIndex || 0));
+
+                  const wasAlreadySelected = selectedId === el.id;
+                  const isPartOfMulti = selectedIds.length > 1 && selectedIds.includes(el.id);
+
+                  if (!isPartOfMulti) {
+                    selectElement(el.id);
+                    const node = e.currentTarget;
+                    setMoveableTarget(node);
+                  }
+
                   const node = e.currentTarget;
-                  setMoveableTarget(node);
 
                   if (typeof window !== 'undefined' && 'vibrate' in navigator) {
                     try {
@@ -1012,10 +1206,21 @@ export default function StudioCanvas() {
                     if (!hasDragged && Math.hypot(dx, dy) < 3) return;
                     hasDragged = true;
 
-                    const nextX = Math.round(origX + dx);
-                    const nextY = Math.round(origY + dy);
-                    node.style.left = `${nextX}px`;
-                    node.style.top = `${nextY}px`;
+                    if (isPartOfMulti) {
+                      selectedIds.forEach((id) => {
+                        const targetNode = document.getElementById(`canvas-node-${id}`);
+                        const targetEl = elements.find((item) => item.id === id);
+                        if (targetNode && targetEl) {
+                          targetNode.style.left = `${Math.round(targetEl.x + dx)}px`;
+                          targetNode.style.top = `${Math.round(targetEl.y + dy)}px`;
+                        }
+                      });
+                    } else {
+                      const nextX = Math.round(origX + dx);
+                      const nextY = Math.round(origY + dy);
+                      node.style.left = `${nextX}px`;
+                      node.style.top = `${nextY}px`;
+                    }
                   };
 
                   const onPointerUp = (upEvt: PointerEvent) => {
@@ -1025,9 +1230,33 @@ export default function StudioCanvas() {
                     if (hasDragged) {
                       const dx = (upEvt.clientX - startX) / zoom;
                       const dy = (upEvt.clientY - startY) / zoom;
-                      const nextX = Math.round(origX + dx);
-                      const nextY = Math.round(origY + dy);
-                      updateElement(el.id, { x: nextX, y: nextY }, true);
+                      if (isPartOfMulti) {
+                        const batchUpdates = selectedIds.map((id) => {
+                          const targetEl = elements.find((item) => item.id === id);
+                          return {
+                            id,
+                            updates: {
+                              x: Math.round((targetEl?.x || 0) + dx),
+                              y: Math.round((targetEl?.y || 0) + dy),
+                            },
+                          };
+                        });
+                        updateElementsBatch(batchUpdates, true);
+                      } else {
+                        const nextX = Math.round(origX + dx);
+                        const nextY = Math.round(origY + dy);
+                        updateElement(el.id, { x: nextX, y: nextY }, true);
+                      }
+                    } else {
+                      // Tap without drag
+                      // If user clicked again on an already selected element where 2+ layers overlap:
+                      // Cycle to select the layer underneath!
+                      if (wasAlreadySelected && overlappingAtPoint.length > 1) {
+                        const curIdx = overlappingAtPoint.findIndex((item) => item.id === el.id);
+                        const nextEl = overlappingAtPoint[(curIdx + 1) % overlappingAtPoint.length];
+                        selectElement(nextEl.id);
+                        setMoveableTarget(document.getElementById(`canvas-node-${nextEl.id}`));
+                      }
                     }
                   };
 
@@ -1257,7 +1486,7 @@ export default function StudioCanvas() {
           })}
 
           {/* Moveable Bounding Box Controller with Smart Snapping Guidelines (Desktop only) */}
-          {!isTouchFriendly && selectedId && moveableTarget && !selectedEl?.isLocked && (
+          {!isTouchFriendly && selectedIds.length === 1 && selectedId && moveableTarget && !selectedEl?.isLocked && (
             <DynamicMoveable
               ref={moveableRef}
               target={moveableTarget}
@@ -1339,132 +1568,321 @@ export default function StudioCanvas() {
             />
           )}
 
+          {/* Moveable Controller for Multiple Elements Selection Group */}
+          {!isTouchFriendly && selectedIds.length > 1 && (
+            <DynamicMoveable
+              ref={moveableRef}
+              targets={selectedIds
+                .map((id) => (typeof document !== 'undefined' ? document.getElementById(`canvas-node-${id}`) : null))
+                .filter((node): node is HTMLElement => Boolean(node))}
+              container={typeof document !== 'undefined' ? (document.getElementById('studio-main-canvas') as HTMLElement | null) : null}
+              draggable={true}
+              resizable={false}
+              rotatable={false}
+              origin={false}
+              zoom={zoom}
+              onDragGroupStart={({ events }: any) => {
+                events.forEach((ev: any) => {
+                  const left = parseFloat(ev.target.style.left) || 0;
+                  const top = parseFloat(ev.target.style.top) || 0;
+                  ev.set([left, top]);
+                });
+              }}
+              onDragGroup={({ events }: any) => {
+                events.forEach((ev: any) => {
+                  ev.target.style.left = `${ev.left}px`;
+                  ev.target.style.top = `${ev.top}px`;
+                });
+              }}
+              onDragGroupEnd={({ targets, isDrag }: any) => {
+                if (!isDrag) return;
+                const batchUpdates = targets.map((t: HTMLElement) => {
+                  const id = t.id.replace('canvas-node-', '');
+                  const left = parseFloat(t.style.left);
+                  const top = parseFloat(t.style.top);
+                  return { id, updates: { x: Math.round(left), y: Math.round(top) } };
+                });
+                updateElementsBatch(batchUpdates, true);
+              }}
+            />
+          )}
+
           {/* FLOATING MINI ACTION TOOLBAR DIRECTLY ABOVE THE SELECTED ELEMENT (Desktop only) */}
-          {!isTouchFriendly && selectedEl && (
+          {!isTouchFriendly && selectedEl && selectedIds.length <= 1 && (() => {
+            const overlappingBelow = elements.filter(
+              (other) =>
+                other.id !== selectedEl.id &&
+                !other.isLocked &&
+                !hiddenElementIds.includes(other.id) &&
+                !(
+                  other.x >= selectedEl.x + selectedEl.width ||
+                  other.x + other.width <= selectedEl.x ||
+                  other.y >= selectedEl.y + selectedEl.height ||
+                  other.y + other.height <= selectedEl.y
+                )
+            ).sort((a, b) => (b.zIndex || 0) - (a.zIndex || 0));
+
+            return (
+              <div
+                data-export-ignore="true"
+                className="absolute z-50 flex items-center bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 shadow-xl rounded-full px-2 py-1 gap-1 text-stone-700 dark:text-stone-200 transition-all"
+                style={{
+                  left: `${Math.max(10, selectedEl.x + selectedEl.width / 2 - 100)}px`,
+                  top: `${selectedEl.y > 60 ? selectedEl.y - 52 : selectedEl.y + selectedEl.height + 14}px`,
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Lock / Unlock Toggle */}
+                <button
+                  onClick={() => {
+                    updateElement(selectedEl.id, { isLocked: !selectedEl.isLocked }, true);
+                    if (!selectedEl.isLocked) {
+                      selectElement(null);
+                    }
+                  }}
+                  className={`p-1.5 rounded-full transition-colors ${
+                    selectedEl.isLocked
+                      ? 'bg-amber-100 text-amber-700'
+                      : 'hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300'
+                  }`}
+                  title={selectedEl.isLocked ? 'Mở khóa phần tử' : 'Khóa đối tượng (chống click nhầm)'}
+                >
+                  {selectedEl.isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                </button>
+
+                {/* Overlapping Layer Selector Button: Selects layer beneath */}
+                {overlappingBelow.length > 0 && (
+                  <button
+                    onClick={() => {
+                      const nextEl = overlappingBelow[0];
+                      if (nextEl) {
+                        selectElement(nextEl.id);
+                        setMoveableTarget(document.getElementById(`canvas-node-${nextEl.id}`));
+                      }
+                    }}
+                    className="px-2 py-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 rounded-full transition-colors flex items-center gap-1 font-semibold text-[11px] shadow-2xs"
+                    title={`Có ${overlappingBelow.length} lớp đè bên dưới. Bấm để chọn lớp dưới!`}
+                  >
+                    <Layers className="w-3.5 h-3.5" />
+                    <span>Lớp dưới</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => duplicateElement(selectedEl.id)}
+                  className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors"
+                  title="Nhân bản (Ctrl+D)"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => {
+                    const pushAmount = selectedEl.height + 24;
+                    pushElementsBelow(selectedEl.y + selectedEl.height - 10, pushAmount, true);
+                  }}
+                  className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-950/60 text-blue-600 rounded-full transition-colors"
+                  title="Đẩy các mục bên dưới xuống (Dãn cách để chèn mục - Alt+Down)"
+                >
+                  <ArrowDownToLine className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => {
+                    const pullAmount = -(selectedEl.height + 24);
+                    pushElementsBelow(selectedEl.y + selectedEl.height - 10, pullAmount, true);
+                  }}
+                  className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 rounded-full transition-colors"
+                  title="Kéo các mục bên dưới lên (Thu gọn - Alt+Up)"
+                >
+                  <ArrowUpToLine className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => removeElement(selectedEl.id)}
+                  className="p-1.5 hover:bg-red-50 text-red-500 rounded-full transition-colors"
+                  title="Xóa phần tử (Delete)"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowLayerMenu(!showLayerMenu)}
+                    className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors"
+                    title="Thêm tùy chọn"
+                  >
+                    <MoreHorizontal className="w-3.5 h-3.5" />
+                  </button>
+                  {showLayerMenu && (
+                    <div className="absolute top-8 left-0 w-48 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl shadow-2xl p-1 text-xs space-y-0.5 z-50">
+                      <button
+                        onClick={() => {
+                          pushElementsBelow(selectedEl.y + selectedEl.height - 10, 50, true);
+                          setShowLayerMenu(false);
+                        }}
+                        className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2 text-stone-700 dark:text-stone-300"
+                      >
+                        <ArrowDownToLine className="w-3.5 h-3.5 text-blue-500" />
+                        <span>Đẩy xuống +50px</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          pushElementsBelow(selectedEl.y + selectedEl.height - 10, 150, true);
+                          setShowLayerMenu(false);
+                        }}
+                        className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2 text-stone-700 dark:text-stone-300"
+                      >
+                        <ArrowDownToLine className="w-3.5 h-3.5 text-blue-500" />
+                        <span>Đẩy xuống +150px</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          pushElementsBelow(selectedEl.y + selectedEl.height - 10, -50, true);
+                          setShowLayerMenu(false);
+                        }}
+                        className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2 text-stone-700 dark:text-stone-300"
+                      >
+                        <ArrowUpToLine className="w-3.5 h-3.5 text-stone-500" />
+                        <span>Kéo lên -50px</span>
+                      </button>
+                      <div className="h-px bg-stone-100 dark:bg-stone-800 my-1" />
+                      <button
+                        onClick={() => {
+                          bringToFront(selectedEl.id);
+                          setShowLayerMenu(false);
+                        }}
+                        className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2"
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                        <span>Lên trên cùng</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          sendToBack(selectedEl.id);
+                          setShowLayerMenu(false);
+                        }}
+                        className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                        <span>Xuống dưới cùng</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* FLOATING ACTION TOOLBAR FOR MULTI-SELECTION GROUP */}
+          {!isTouchFriendly && selectedIds.length > 1 && (() => {
+            const selectedEls = elements.filter((e) => selectedIds.includes(e.id));
+            if (selectedEls.length <= 1) return null;
+            const groupMinX = Math.min(...selectedEls.map((e) => e.x));
+            const groupMaxX = Math.max(...selectedEls.map((e) => e.x + e.width));
+            const groupMinY = Math.min(...selectedEls.map((e) => e.y));
+            const groupMaxY = Math.max(...selectedEls.map((e) => e.y + e.height));
+            const groupW = groupMaxX - groupMinX;
+
+            return (
+              <div
+                data-export-ignore="true"
+                className="absolute z-50 flex items-center bg-stone-900 text-white border border-stone-700 shadow-2xl rounded-full px-3 py-1.5 gap-2 text-xs font-medium animate-in fade-in"
+                style={{
+                  left: `${Math.max(10, groupMinX + groupW / 2 - 140)}px`,
+                  top: `${groupMinY > 60 ? groupMinY - 52 : groupMaxY + 14}px`,
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <span className="font-bold text-blue-400 whitespace-nowrap">
+                  ✨ Đã chọn {selectedIds.length} khối
+                </span>
+                <div className="w-px h-4 bg-stone-700" />
+                <button
+                  onClick={() => alignSelectedElements('center')}
+                  className="hover:text-blue-300 flex items-center gap-1 p-1 hover:bg-stone-800 rounded-md transition-colors"
+                  title="Canh giữa các khối đang chọn"
+                >
+                  <AlignCenter className="w-3.5 h-3.5" />
+                  <span>Canh giữa</span>
+                </button>
+                <button
+                  onClick={() => duplicateSelectedElements()}
+                  className="hover:text-blue-300 flex items-center gap-1 p-1 hover:bg-stone-800 rounded-md transition-colors"
+                  title="Nhân bản các khối đang chọn (Ctrl+D)"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>Nhân bản</span>
+                </button>
+                <button
+                  onClick={() => removeSelectedElements()}
+                  className="hover:text-red-400 flex items-center gap-1 text-red-300 p-1 hover:bg-stone-800 rounded-md transition-colors"
+                  title="Xóa các khối đang chọn (Delete)"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Xóa</span>
+                </button>
+                <div className="w-px h-4 bg-stone-700" />
+                <button
+                  onClick={() => selectElement(null)}
+                  className="px-2 py-0.5 rounded-full bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px]"
+                >
+                  Bỏ chọn
+                </button>
+              </div>
+            );
+          })()}
+
+          {/* RIGHT-CLICK CONTEXT MENU: PICK ANY OVERLAPPING LAYER DIRECTLY */}
+          {contextMenu && (
             <div
               data-export-ignore="true"
-              className="absolute z-50 flex items-center bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 shadow-xl rounded-full px-2 py-1 gap-1 text-stone-700 dark:text-stone-200 transition-all"
+              className="absolute z-50 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 shadow-2xl rounded-2xl p-2 min-w-[240px] max-w-xs animate-in fade-in"
               style={{
-                left: `${Math.max(10, selectedEl.x + selectedEl.width / 2 - 80)}px`,
-                top: `${selectedEl.y > 60 ? selectedEl.y - 52 : selectedEl.y + selectedEl.height + 14}px`,
+                left: `${Math.min(canvas.width - 250, Math.max(10, contextMenu.x))}px`,
+                top: `${Math.min(canvas.height - 240, Math.max(10, contextMenu.y))}px`,
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Lock / Unlock Toggle */}
-              <button
-                onClick={() => {
-                  updateElement(selectedEl.id, { isLocked: !selectedEl.isLocked }, true);
-                  if (!selectedEl.isLocked) {
-                    selectElement(null);
-                  }
-                }}
-                className={`p-1.5 rounded-full transition-colors ${
-                  selectedEl.isLocked
-                    ? 'bg-amber-100 text-amber-700'
-                    : 'hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300'
-                }`}
-                title={selectedEl.isLocked ? 'Mở khóa phần tử' : 'Khóa đối tượng (chống click nhầm)'}
-              >
-                {selectedEl.isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-              </button>
+              <div className="px-2.5 py-1 text-[11px] font-bold text-stone-500 uppercase tracking-wider flex items-center justify-between border-b border-stone-100 dark:border-stone-800 mb-1">
+                <span>Chọn lớp ({contextMenu.elements.length})</span>
+                <span className="text-[10px] text-stone-400">z-Index</span>
+              </div>
+              <div className="space-y-0.5 max-h-60 overflow-y-auto">
+                {contextMenu.elements.map((item) => {
+                  const isCurrent = selectedIds.includes(item.id);
+                  const name =
+                    item.type === 'text'
+                      ? `"${item.text?.slice(0, 22) || 'Văn bản'}"`
+                      : item.type === 'image'
+                      ? 'Ảnh cưới'
+                      : item.type === 'graphic'
+                      ? 'Họa tiết'
+                      : item.type === 'shape'
+                      ? 'Hình khối'
+                      : 'Tiện ích';
 
-              <button
-                onClick={() => duplicateElement(selectedEl.id)}
-                className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors"
-                title="Nhân bản (Ctrl+D)"
-              >
-                <Copy className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => {
-                  const pushAmount = selectedEl.height + 24;
-                  pushElementsBelow(selectedEl.y + selectedEl.height - 10, pushAmount, true);
-                }}
-                className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-950/60 text-blue-600 rounded-full transition-colors"
-                title="Đẩy các mục bên dưới xuống (Dãn cách để chèn mục - Alt+Down)"
-              >
-                <ArrowDownToLine className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => {
-                  const pullAmount = -(selectedEl.height + 24);
-                  pushElementsBelow(selectedEl.y + selectedEl.height - 10, pullAmount, true);
-                }}
-                className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 rounded-full transition-colors"
-                title="Kéo các mục bên dưới lên (Thu gọn - Alt+Up)"
-              >
-                <ArrowUpToLine className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => removeElement(selectedEl.id)}
-                className="p-1.5 hover:bg-red-50 text-red-500 rounded-full transition-colors"
-                title="Xóa phần tử (Delete)"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-              <div className="relative">
-                <button
-                  onClick={() => setShowLayerMenu(!showLayerMenu)}
-                  className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors"
-                  title="Thêm tùy chọn"
-                >
-                  <MoreHorizontal className="w-3.5 h-3.5" />
-                </button>
-                {showLayerMenu && (
-                  <div className="absolute top-8 left-0 w-44 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl shadow-2xl p-1 text-xs space-y-0.5 z-50">
+                  return (
                     <button
+                      key={item.id}
                       onClick={() => {
-                        pushElementsBelow(selectedEl.y + selectedEl.height - 10, 50, true);
-                        setShowLayerMenu(false);
+                        selectElement(item.id);
+                        setContextMenu(null);
                       }}
-                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2 text-stone-700 dark:text-stone-300"
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-left text-xs transition-colors ${
+                        isCurrent
+                          ? 'bg-blue-50 text-blue-600 font-bold dark:bg-blue-950/60 dark:text-blue-400'
+                          : 'hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300'
+                      }`}
                     >
-                      <ArrowDownToLine className="w-3.5 h-3.5 text-blue-500" />
-                      <span>Đẩy xuống +50px</span>
+                      <div className="flex items-center gap-2 truncate">
+                        {item.type === 'text' && <Type className="w-3.5 h-3.5 text-stone-400 shrink-0" />}
+                        {item.type === 'image' && <ImageIcon className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
+                        {item.type === 'graphic' && <Sparkles className="w-3.5 h-3.5 text-purple-500 shrink-0" />}
+                        {item.type === 'widget' && <LayoutGrid className="w-3.5 h-3.5 text-rose-500 shrink-0" />}
+                        {item.type === 'shape' && <Square className="w-3.5 h-3.5 text-emerald-500 shrink-0" />}
+                        <span className="truncate">{name}</span>
+                      </div>
+                      <span className="text-[10px] font-mono text-stone-400 ml-2 shrink-0">z:{item.zIndex}</span>
                     </button>
-                    <button
-                      onClick={() => {
-                        pushElementsBelow(selectedEl.y + selectedEl.height - 10, 150, true);
-                        setShowLayerMenu(false);
-                      }}
-                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2 text-stone-700 dark:text-stone-300"
-                    >
-                      <ArrowDownToLine className="w-3.5 h-3.5 text-blue-500" />
-                      <span>Đẩy xuống +150px</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        pushElementsBelow(selectedEl.y + selectedEl.height - 10, -50, true);
-                        setShowLayerMenu(false);
-                      }}
-                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2 text-stone-700 dark:text-stone-300"
-                    >
-                      <ArrowUpToLine className="w-3.5 h-3.5 text-stone-500" />
-                      <span>Kéo lên -50px</span>
-                    </button>
-                    <div className="h-px bg-stone-100 dark:bg-stone-800 my-1" />
-                    <button
-                      onClick={() => {
-                        bringToFront(selectedEl.id);
-                        setShowLayerMenu(false);
-                      }}
-                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2"
-                    >
-                      <ArrowUp className="w-3.5 h-3.5" />
-                      <span>Lên trên cùng</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        sendToBack(selectedEl.id);
-                        setShowLayerMenu(false);
-                      }}
-                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center gap-2"
-                    >
-                      <ArrowDown className="w-3.5 h-3.5" />
-                      <span>Xuống dưới cùng</span>
-                    </button>
-                  </div>
-                )}
+                  );
+                })}
               </div>
             </div>
           )}

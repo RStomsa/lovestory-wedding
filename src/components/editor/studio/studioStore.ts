@@ -11,6 +11,7 @@ interface StudioState {
   canvas: CanvasConfig;
   elements: CanvasElement[];
   selectedId: string | null;
+  selectedIds: string[];
   activeTab: SidebarTab;
   zoom: number;
   hasUnsavedChanges: boolean;
@@ -35,6 +36,12 @@ interface StudioState {
   addElementWithPush: (el: Omit<CanvasElement, 'id' | 'zIndex'>, options?: { push?: boolean; gap?: number }) => void;
 
   selectElement: (id: string | null) => void;
+  toggleSelectElement: (id: string) => void;
+  selectMultipleElements: (ids: string[]) => void;
+  removeSelectedElements: () => void;
+  duplicateSelectedElements: () => void;
+  updateElementsBatch: (updates: { id: string; updates: Partial<CanvasElement> }[], recordHistory?: boolean) => void;
+  alignSelectedElements: (alignment: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => void;
   addElement: (el: Omit<CanvasElement, 'id' | 'zIndex'>) => void;
   updateElement: (id: string, updates: Partial<CanvasElement>, recordHistory?: boolean) => void;
   removeElement: (id: string) => void;
@@ -458,6 +465,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   },
   elements: DEFAULT_ELEMENTS,
   selectedId: null,
+  selectedIds: [],
   activeTab: 'text',
   zoom: 1,
   hasUnsavedChanges: false,
@@ -628,9 +636,142 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   selectElement: (id) =>
     set((state) => ({
       selectedId: id,
+      selectedIds: id ? [id] : [],
       activeMobileSheet: id ? state.activeMobileSheet : null,
       isInspectorOpen: id ? true : state.isInspectorOpen,
     })),
+
+  toggleSelectElement: (id) =>
+    set((state) => {
+      const exists = state.selectedIds.includes(id);
+      const nextIds = exists
+        ? state.selectedIds.filter((item) => item !== id)
+        : [...state.selectedIds, id];
+      return {
+        selectedIds: nextIds,
+        selectedId: nextIds.length > 0 ? nextIds[nextIds.length - 1] : null,
+        activeMobileSheet: nextIds.length > 0 ? state.activeMobileSheet : null,
+        isInspectorOpen: nextIds.length > 0 ? true : state.isInspectorOpen,
+      };
+    }),
+
+  selectMultipleElements: (ids) =>
+    set((state) => ({
+      selectedIds: ids,
+      selectedId: ids.length > 0 ? ids[0] : null,
+      activeMobileSheet: ids.length > 0 ? state.activeMobileSheet : null,
+      isInspectorOpen: ids.length > 0 ? true : state.isInspectorOpen,
+    })),
+
+  removeSelectedElements: () => {
+    const { elements, past, selectedIds } = get();
+    if (!selectedIds.length) return;
+    const idsSet = new Set(selectedIds);
+    set({
+      past: [...past, elements],
+      future: [],
+      elements: elements.filter((e) => !idsSet.has(e.id)),
+      selectedId: null,
+      selectedIds: [],
+      hasUnsavedChanges: true,
+    });
+  },
+
+  duplicateSelectedElements: () => {
+    const { elements, past, selectedIds } = get();
+    if (!selectedIds.length) return;
+    const targets = elements.filter((e) => selectedIds.includes(e.id));
+    if (!targets.length) return;
+
+    let maxZ = elements.reduce((max, e) => Math.max(max, e.zIndex), 0);
+    const newElements: CanvasElement[] = [];
+    const newIds: string[] = [];
+
+    targets.forEach((target) => {
+      maxZ += 1;
+      const newId = `el-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
+      newIds.push(newId);
+      newElements.push({
+        ...JSON.parse(JSON.stringify(target)),
+        id: newId,
+        x: target.x + 20,
+        y: target.y + 20,
+        zIndex: maxZ,
+      });
+    });
+
+    set({
+      past: [...past, elements],
+      future: [],
+      elements: [...elements, ...newElements],
+      selectedIds: newIds,
+      selectedId: newIds[0] || null,
+      hasUnsavedChanges: true,
+    });
+  },
+
+  updateElementsBatch: (updates, recordHistory = false) => {
+    const { elements, past } = get();
+    const updateMap = new Map(updates.map((u) => [u.id, u.updates]));
+    const nextElements = elements.map((e) => {
+      const u = updateMap.get(e.id);
+      return u ? { ...e, ...u } : e;
+    });
+    set({
+      past: recordHistory ? [...past, elements] : past,
+      future: recordHistory ? [] : get().future,
+      elements: nextElements,
+      hasUnsavedChanges: true,
+    });
+  },
+
+  alignSelectedElements: (alignment) => {
+    const { elements, selectedIds, canvas } = get();
+    if (!selectedIds.length) return;
+
+    const targets = elements.filter((e) => selectedIds.includes(e.id));
+    if (!targets.length) return;
+
+    let minX = Math.min(...targets.map((e) => e.x));
+    let maxX = Math.max(...targets.map((e) => e.x + e.width));
+    let minY = Math.min(...targets.map((e) => e.y));
+    let maxY = Math.max(...targets.map((e) => e.y + e.height));
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+
+    // If only 1 element selected, align relative to canvas
+    if (targets.length === 1) {
+      minX = 0;
+      maxX = canvas.width;
+    }
+
+    const updates = targets.map((e) => {
+      let nextX = e.x;
+      let nextY = e.y;
+      if (alignment === 'left') nextX = minX;
+      else if (alignment === 'center') {
+        nextX = targets.length === 1 ? Math.round((canvas.width - e.width) / 2) : Math.round(centerX - e.width / 2);
+      } else if (alignment === 'right') nextX = maxX - e.width;
+      else if (alignment === 'top') nextY = minY;
+      else if (alignment === 'middle') nextY = Math.round(centerY - e.height / 2);
+      else if (alignment === 'bottom') nextY = maxY - e.height;
+
+      return { id: e.id, updates: { x: nextX, y: nextY } };
+    });
+
+    const updateMap = new Map(updates.map((u) => [u.id, u.updates]));
+    const nextElements = elements.map((e) => {
+      const u = updateMap.get(e.id);
+      return u ? { ...e, ...u } : e;
+    });
+
+    set({
+      past: [...get().past, elements],
+      future: [],
+      elements: nextElements,
+      hasUnsavedChanges: true,
+    });
+  },
 
   // Push-Down & Spacing Engine state
   autoPushDown: true,
@@ -720,6 +861,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       elements: nextElements,
       canvas: nextCanvas,
       selectedId: newId,
+      selectedIds: [newId],
       hasUnsavedChanges: true,
     });
   },
@@ -737,6 +879,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       future: [],
       elements: [...elements, newElement],
       selectedId: newElement.id,
+      selectedIds: [newElement.id],
       hasUnsavedChanges: true,
     });
   },
@@ -753,12 +896,14 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   },
 
   removeElement: (id) => {
-    const { elements, past, selectedId } = get();
+    const { elements, past, selectedId, selectedIds } = get();
+    const nextIds = (selectedIds || []).filter((item) => item !== id);
     set({
       past: [...past, elements],
       future: [],
       elements: elements.filter((e) => e.id !== id),
-      selectedId: selectedId === id ? null : selectedId,
+      selectedId: selectedId === id ? (nextIds[0] || null) : selectedId,
+      selectedIds: nextIds,
       hasUnsavedChanges: true,
     });
   },
@@ -782,6 +927,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       future: [],
       elements: [...elements, cloned],
       selectedId: cloned.id,
+      selectedIds: [cloned.id],
       hasUnsavedChanges: true,
     });
   },
@@ -814,6 +960,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       future: [elements, ...future],
       elements: previous,
       selectedId: null,
+      selectedIds: [],
       hasUnsavedChanges: true,
     });
   },
@@ -828,6 +975,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       future: newFuture,
       elements: next,
       selectedId: null,
+      selectedIds: [],
       hasUnsavedChanges: true,
     });
   },
@@ -841,6 +989,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       elements,
       canvas: { ...state.canvas, ...config },
       selectedId: null,
+      selectedIds: [],
       hasUnsavedChanges: false,
     }));
   },
