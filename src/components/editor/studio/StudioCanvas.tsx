@@ -6,6 +6,7 @@ import { useStudioStore } from './studioStore';
 import { CanvasElement } from './studioTypes';
 import StudioFallingOverlay from './StudioFallingOverlay';
 import StudioWidgetRenderer from './StudioWidgetRenderer';
+import StudioScreenStyleModal from './StudioScreenStyleModal';
 import { resolveFontFamily, loadCustomFontFile } from '@/lib/studioFonts';
 import { resolveStudioAssetUrl } from '@/lib/studioUtils';
 import {
@@ -81,6 +82,7 @@ export default function StudioCanvas() {
     hiddenElementIds,
     undo,
     redo,
+    setActiveScreenPickerIndex,
   } = useStudioStore();
 
   const isTouchFriendly = isMobileView && !desktopModeOnMobile;
@@ -759,6 +761,14 @@ export default function StudioCanvas() {
       animClass = 'animate-heartbeat';
     } else if (el.continuousAnimation?.type === 'wobble') {
       animClass = 'animate-wobble';
+    } else if (el.continuousAnimation?.type === 'glow') {
+      animClass = 'animate-glow';
+    } else if (el.continuousAnimation?.type === 'pulse') {
+      animClass = 'animate-pulse-subtle';
+    } else if (el.continuousAnimation?.type === 'bounce-slow') {
+      animClass = 'animate-bounce';
+    } else if (el.continuousAnimation?.type === 'rotate-slow' || el.continuousAnimation?.type === 'spin') {
+      animClass = 'animate-spin';
     }
 
     // Flip transform
@@ -1008,7 +1018,11 @@ export default function StudioCanvas() {
         );
 
       case 'widget':
-        return <StudioWidgetRenderer element={el} isSelected={selectedId === el.id} />;
+        return (
+          <div className={`w-full h-full ${animClass}`}>
+            <StudioWidgetRenderer element={el} isSelected={selectedId === el.id} />
+          </div>
+        );
 
       default:
         return null;
@@ -1137,15 +1151,26 @@ export default function StudioCanvas() {
                           <span className="text-stone-400">({foldTop}px - {foldBottom}px)</span>
                         </div>
 
-                        {/* Right Align to Fold Center Button */}
-                        <button
-                          type="button"
-                          onClick={() => centerInScreenFold(i)}
-                          className="pointer-events-auto bg-white/95 hover:bg-rose-50 text-stone-700 hover:text-rose-600 border border-stone-200 text-[10px] font-semibold px-2.5 py-1 rounded-md shadow-md flex items-center gap-1 -translate-y-1/2 active:scale-95 transition-all"
-                          title={`Canh giữa phần tử đang chọn vào ${label}`}
-                        >
-                          <span>🎯 Canh giữa Màn {i + 1}</span>
-                        </button>
+                        {/* Right Actions */}
+                        <div className="flex items-center gap-1.5 -translate-y-1/2">
+                          <button
+                            type="button"
+                            onClick={() => setActiveScreenPickerIndex(i)}
+                            className="pointer-events-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-md flex items-center gap-1 active:scale-95 transition-all"
+                            title={`Đổi kiểu thiết kế cho ${label}`}
+                          >
+                            <Sparkles className="w-3 h-3 text-white" />
+                            <span>Đổi Kiểu Màn {i + 1}</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => centerInScreenFold(i)}
+                            className="pointer-events-auto bg-white/95 hover:bg-rose-50 text-stone-700 hover:text-rose-600 border border-stone-200 text-[10px] font-semibold px-2 py-1 rounded-md shadow-md flex items-center gap-1 active:scale-95 transition-all"
+                            title={`Canh giữa phần tử đang chọn vào ${label}`}
+                          >
+                            <span>🎯 Canh giữa</span>
+                          </button>
+                        </div>
                       </div>
                     )}
 
@@ -1159,14 +1184,25 @@ export default function StudioCanvas() {
                           <span>📱 {label}</span>
                           <span className="text-stone-400">(0px - {foldBottom}px)</span>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => centerInScreenFold(0)}
-                          className="pointer-events-auto bg-white/95 hover:bg-rose-50 text-stone-700 hover:text-rose-600 border border-stone-200 text-[10px] font-semibold px-2.5 py-1 rounded-md shadow-md flex items-center gap-1 active:scale-95 transition-all"
-                          title="Canh giữa phần tử đang chọn vào Màn 1"
-                        >
-                          <span>🎯 Canh giữa Màn 1</span>
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setActiveScreenPickerIndex(0)}
+                            className="pointer-events-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-md flex items-center gap-1 active:scale-95 transition-all"
+                            title="Đổi kiểu trang bìa Màn 1"
+                          >
+                            <Sparkles className="w-3 h-3 text-white" />
+                            <span>Đổi Kiểu Bìa Màn 1</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => centerInScreenFold(0)}
+                            className="pointer-events-auto bg-white/95 hover:bg-rose-50 text-stone-700 hover:text-rose-600 border border-stone-200 text-[10px] font-semibold px-2 py-1 rounded-md shadow-md flex items-center gap-1 active:scale-95 transition-all"
+                            title="Canh giữa phần tử đang chọn vào Màn 1"
+                          >
+                            <span>🎯 Canh giữa</span>
+                          </button>
+                        </div>
                       </div>
                     )}
 
@@ -1205,7 +1241,8 @@ export default function StudioCanvas() {
               else if (entranceType === 'zoom-out') entranceClass = 'anim-zoom-out';
               else if (entranceType === 'fade-in') entranceClass = 'animate-fade-in';
               else if (entranceType === 'rotate-in') entranceClass = 'anim-rotate-in';
-              else if (entranceType === 'bounce-in') entranceClass = 'anim-bounce-in';
+              else if (entranceType === 'bounce-in' || entranceType === 'bounce') entranceClass = 'anim-bounce-in';
+              else if (entranceType === 'flip') entranceClass = 'anim-flip-in';
             }
 
             const entranceStyle: React.CSSProperties = entranceClass
@@ -2282,6 +2319,9 @@ export default function StudioCanvas() {
       >
         <MessageCircle className="w-5 h-5 fill-current" />
       </button>
+
+      {/* Screen Fold Modular Block Switcher Modal */}
+      <StudioScreenStyleModal />
     </div>
   );
 }

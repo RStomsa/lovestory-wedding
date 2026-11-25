@@ -82,6 +82,11 @@ interface StudioState {
   isAiDesignerModalOpen: boolean;
   setAiDesignerModalOpen: (open: boolean) => void;
 
+  // Screen Block Replacer
+  activeScreenPickerIndex: number | null;
+  setActiveScreenPickerIndex: (index: number | null) => void;
+  replaceScreenElements: (screenIndex: number, newElements: CanvasElement[]) => void;
+
   // Animation Replay Trigger
   previewAnimKey: number;
   triggerPreviewAnim: () => void;
@@ -737,6 +742,33 @@ export const useStudioStore = create<StudioState>((set, get) => ({
 
   isAiDesignerModalOpen: false,
   setAiDesignerModalOpen: (open) => set({ isAiDesignerModalOpen: open }),
+
+  activeScreenPickerIndex: null,
+  setActiveScreenPickerIndex: (index) => set({ activeScreenPickerIndex: index }),
+
+  replaceScreenElements: (screenIndex, newElements) => {
+    const { elements, past } = get();
+    const startY = screenIndex * 850;
+    const endY = (screenIndex + 1) * 850;
+
+    // Filter out elements that belong to this screen fold
+    const remainingElements = elements.filter(
+      (el) => el.y < startY || el.y >= endY
+    );
+
+    const nextElements = [...remainingElements, ...newElements].sort(
+      (a, b) => a.zIndex - b.zIndex
+    );
+
+    set({
+      past: [...past, elements],
+      future: [],
+      elements: nextElements,
+      selectedId: null,
+      selectedIds: [],
+      hasUnsavedChanges: true,
+    });
+  },
 
   setActiveTab: (tab) => set({ activeTab: tab }),
   setZoom: (zoom) => set({ zoom: Math.min(Math.max(zoom, 0.4), 2.0) }),

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useStudioStore } from './studioStore';
 import { AI_COLOR_PALETTES, AiDesignResult } from '@/lib/ai/aiStudioService';
+import { STUDIO_TEMPLATE_PRESETS } from '@/data/studioTemplatePresets';
 
 interface StudioAiDesignerModalProps {
   isOpen?: boolean;
@@ -85,7 +86,7 @@ export default function StudioAiDesignerModal({
   const isOpen = propIsOpen !== undefined ? propIsOpen : isAiDesignerModalOpen;
   const handleClose = propOnClose || (() => setAiDesignerModalOpen(false));
 
-  const [activeTab, setActiveTab] = useState<'create' | 'restyle' | 'wording'>('create');
+  const [activeTab, setActiveTab] = useState<'create' | 'restyle' | 'wording' | 'curated'>('create');
 
   // Tab 1: AI Generate Form
   const mainCeremony = weddingProfile?.ceremonies?.find((c) => c.isMain) || weddingProfile?.ceremonies?.[0];
@@ -376,6 +377,19 @@ export default function StudioAiDesignerModal({
           >
             <FileText className="w-4 h-4" />
             <span>AI Soạn Lời Mời</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('curated')}
+            className={`pb-2.5 px-3 text-xs font-semibold flex items-center gap-2 border-b-2 transition-all whitespace-nowrap ${
+              activeTab === 'curated'
+                ? 'border-purple-600 text-purple-600 dark:text-purple-400'
+                : 'border-transparent text-stone-500 hover:text-stone-900 dark:hover:text-stone-300'
+            }`}
+          >
+            <Crown className="w-4 h-4 text-amber-500" />
+            <span>👑 Mẫu VIP Tuyển Chọn ({STUDIO_TEMPLATE_PRESETS.length})</span>
           </button>
         </div>
 
@@ -786,6 +800,75 @@ export default function StudioAiDesignerModal({
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ======================================================== */}
+          {/* TAB 4: CURATED VIP MASTER PRESETS (DESIGNER CRAFTED) */}
+          {/* ======================================================== */}
+          {activeTab === 'curated' && (
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2">
+                  <Crown className="w-4 h-4 text-amber-500" />
+                  <span>Kho Mẫu Tuyển Chọn Nghệ Thuật (Khung Vàng Hoàn Hảo)</span>
+                </h4>
+                <p className="text-xs text-stone-500 dark:text-stone-400">
+                  Từng mẫu thiệp dưới đây đều được Designer căn chỉnh thủ công chuẩn từng pixel theo tỷ lệ vàng. Bạn có thể nạp mẫu lên Canvas, sau đó dùng Tab &quot;AI Phối Bảng Màu&quot; để đổi tone màu theo sở thích!
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                {STUDIO_TEMPLATE_PRESETS.map((preset, idx) => (
+                  <div
+                    key={preset.id}
+                    className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-800/80 overflow-hidden shadow-xs hover:shadow-md hover:border-purple-500 transition-all flex flex-col justify-between group"
+                  >
+                    <div className="relative aspect-[16/10] bg-stone-100 dark:bg-stone-900 overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={preset.thumbnail || '/assets/wedding/samples/sample_01.jpg'}
+                        alt={preset.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+                        <span className="text-[10px] font-serif font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-stone-900/90 text-white shadow-xs">
+                          Mẫu 0{idx + 1}
+                        </span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500 text-stone-950 shadow-xs">
+                          {preset.tier}
+                        </span>
+                      </div>
+                      <span className="absolute bottom-2.5 right-2.5 text-[10px] font-mono px-2 py-0.5 rounded-full bg-black/60 text-white backdrop-blur-xs font-semibold">
+                        {preset.imagesCount} ảnh cưới
+                      </span>
+                    </div>
+
+                    <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
+                      <div>
+                        <h4 className="font-bold text-xs text-stone-900 dark:text-white line-clamp-1">
+                          {preset.name}
+                        </h4>
+                        <p className="text-[11px] text-stone-500 dark:text-stone-400 line-clamp-2 mt-1">
+                          {preset.description}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          loadTemplateData(preset.elements, preset.config, preset.name, preset.slug);
+                          handleClose();
+                        }}
+                        className="w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-purple-600/20 transition-transform active:scale-95 cursor-pointer"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Nạp Mẫu Lên Canvas Ngay</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
