@@ -78,6 +78,10 @@ interface StudioState {
   setWeddingProfile: (profile: Partial<WeddingProfileData>) => void;
   applyWeddingProfileToCanvas: (profile: WeddingProfileData) => void;
 
+  // AI Studio Designer Modal
+  isAiDesignerModalOpen: boolean;
+  setAiDesignerModalOpen: (open: boolean) => void;
+
   // Animation Replay Trigger
   previewAnimKey: number;
   triggerPreviewAnim: () => void;
@@ -730,6 +734,9 @@ export const useStudioStore = create<StudioState>((set, get) => ({
 
   previewAnimKey: 0,
   triggerPreviewAnim: () => set((state) => ({ previewAnimKey: state.previewAnimKey + 1 })),
+
+  isAiDesignerModalOpen: false,
+  setAiDesignerModalOpen: (open) => set({ isAiDesignerModalOpen: open }),
 
   setActiveTab: (tab) => set({ activeTab: tab }),
   setZoom: (zoom) => set({ zoom: Math.min(Math.max(zoom, 0.4), 2.0) }),

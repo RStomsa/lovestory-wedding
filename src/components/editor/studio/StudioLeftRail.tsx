@@ -97,6 +97,7 @@ export default function StudioLeftRail() {
     applyWeddingProfileToCanvas,
     currentTemplateSlug,
     setCurrentTemplateSlug,
+    setAiDesignerModalOpen,
   } = useStudioStore();
 
   const [profileToast, setProfileToast] = useState<string | null>(null);
@@ -1788,6 +1789,44 @@ export default function StudioLeftRail() {
                     key={idx}
                     onClick={() => {
                       const targetY = getSmartInsertY(w.height);
+                      let widgetConfig: any = {};
+                      let continuousAnimation: any = undefined;
+
+                      if (w.type === 'countdown') {
+                        widgetConfig = {
+                          style: 'boxes',
+                          quote: 'Cùng đếm ngược đến khoảnh khắc trọng đại của chúng mình',
+                          targetDate: '2026-12-28T18:00',
+                          accentColor: '#d97706',
+                        };
+                      } else if (w.type === 'calendar') {
+                        widgetConfig = {
+                          style: 'classic-grid',
+                          selectedDay: 28,
+                          selectedMonth: 12,
+                          selectedYear: 2026,
+                          markerColor: '#e11d48',
+                          monthTitle: 'THÁNG 12 / 2026',
+                          subtitle: 'SAVE THE DATE',
+                        };
+                      } else if (w.type === 'family_info') {
+                        widgetConfig = {
+                          style: 'two-column-card',
+                          header: 'HÔN PHỐI TRÂN TRỌNG KÍNH BÁO',
+                          subheader: 'Gia Đình Hai Bên',
+                          invitationNote: 'Kính mời quý quan viên hai họ và bạn bè thân hữu tới dự',
+                          groomFather: 'Ông: Nguyễn Văn An',
+                          groomMother: 'Bà: Trần Thị Mai',
+                          groomTitle: 'Trưởng Nam',
+                          groomName: 'Minh Trí',
+                          brideFather: 'Ông: Lê Hoàng Long',
+                          brideMother: 'Bà: Phạm Thu Cúc',
+                          brideTitle: 'Út Nữ',
+                          brideName: 'Ngọc Anh',
+                          accentColor: '#be185d',
+                        };
+                      }
+
                       addElementWithPush({
                         type: 'widget',
                         widgetType: w.type as any,
@@ -1797,6 +1836,13 @@ export default function StudioLeftRail() {
                         height: w.height,
                         rotation: 0,
                         opacity: 1,
+                        widgetConfig,
+                        animation: {
+                          type: 'slide-up',
+                          duration: 0.8,
+                          delay: 0.1,
+                        },
+                        continuousAnimation,
                       });
                     }}
                     className="p-3 bg-white dark:bg-stone-800 rounded-2xl border border-stone-200/80 dark:border-stone-700/80 flex flex-col items-center justify-center hover:border-blue-400 hover:shadow-xs transition-all text-center group shadow-2xs"
@@ -1836,6 +1882,12 @@ export default function StudioLeftRail() {
                         height: w.height,
                         rotation: 0,
                         opacity: 1,
+                        widgetConfig: {},
+                        animation: {
+                          type: 'slide-up',
+                          duration: 0.8,
+                          delay: 0.1,
+                        },
                       });
                     }}
                     className="p-3 bg-white dark:bg-stone-800 rounded-2xl border border-stone-200/80 dark:border-stone-700/80 flex flex-col items-center justify-center hover:border-blue-400 hover:shadow-xs transition-all text-center group shadow-2xs"
@@ -1876,6 +1928,12 @@ export default function StudioLeftRail() {
                         height: w.height,
                         rotation: 0,
                         opacity: 1,
+                        widgetConfig: {},
+                        animation: {
+                          type: 'slide-up',
+                          duration: 0.8,
+                          delay: 0.1,
+                        },
                       });
                     }}
                     className="p-3 bg-white dark:bg-stone-800 rounded-2xl border border-stone-200/80 dark:border-stone-700/80 flex flex-col items-center justify-center hover:border-blue-400 hover:shadow-xs transition-all text-center group shadow-2xs"
@@ -1935,6 +1993,27 @@ export default function StudioLeftRail() {
                   {cat.label}
                 </button>
               ))}
+            </div>
+
+            {/* ✨ AI Studio Designer Card Banner */}
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 text-white space-y-2.5 shadow-md shadow-purple-600/20">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center shrink-0">
+                  <Sparkles className="w-4 h-4 text-white animate-pulse" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-xs leading-tight">AI Thiết Kế Mẫu Tự Động</h4>
+                  <p className="text-[10px] text-white/80 leading-tight">Tạo mẫu thiệp scrollytelling theo yêu cầu</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAiDesignerModalOpen(true)}
+                className="w-full py-2 px-3 rounded-xl bg-white hover:bg-stone-100 text-purple-700 font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-transform active:scale-95 cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                <span>Mở Trợ Lý AI Thiết Kế</span>
+              </button>
             </div>
 
             {/* Pinned Active Template Card */}

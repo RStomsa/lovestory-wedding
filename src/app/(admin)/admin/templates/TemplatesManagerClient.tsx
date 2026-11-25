@@ -639,6 +639,14 @@ export default function TemplatesManagerClient({
 
         <div className="flex items-center gap-2.5 shrink-0">
           <Link
+            href="/admin/studio?ai=1"
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:from-purple-500 hover:to-amber-400 text-white font-bold text-xs shadow-md shadow-purple-600/25 flex items-center justify-center gap-2 transition-all transform active:scale-95"
+            title="Sáng tạo mẫu thiệp cưới mới tức thì bằng AI"
+          >
+            <Sparkles className="w-4 h-4 text-white animate-pulse" />
+            <span>✨ Tạo Mẫu Bằng AI</span>
+          </Link>
+          <Link
             href="/admin/studio"
             className="px-5 py-3 rounded-2xl bg-purple-500/20 hover:bg-purple-500/30 text-stone-700 hover:text-white border border-stone-900/30 font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all transform active:scale-95"
           >

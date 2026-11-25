@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { useStudioStore } from './studioStore';
 import StudioPreviewModal from './StudioPreviewModal';
+import StudioAiDesignerModal from './StudioAiDesignerModal';
 import { useAuth } from '@/context/AuthContext';
 
 interface StudioTopBarProps {
@@ -64,10 +65,19 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
     currentTemplateSlug,
     setCurrentTemplateSlug,
     setCanvasTitle,
+    isAiDesignerModalOpen,
+    setAiDesignerModalOpen,
   } = useStudioStore();
 
+  const searchParams = useSearchParams();
   const [isExporting, setIsExporting] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+
+  useEffect(() => {
+    if (searchParams && searchParams.get('ai') === '1') {
+      setAiDesignerModalOpen(true);
+    }
+  }, [searchParams, setAiDesignerModalOpen]);
 
   // Helper function to turn a human title into a clean SEO-friendly slug
   const slugify = (text: string) => {
@@ -682,6 +692,16 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
           >
             {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-500" /> : <Download className="w-3.5 h-3.5" />}
             <span>Xuất ảnh</span>
+          </button>
+
+          {/* ✨ AI Studio Designer Button */}
+          <button
+            onClick={() => setAiDesignerModalOpen(true)}
+            className="px-3 sm:px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:from-purple-500 hover:to-amber-400 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-purple-600/25 transition-transform active:scale-95 shrink-0"
+            title="Trợ lý AI thiết kế mẫu thiệp & phối bảng màu thông minh"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-white animate-pulse shrink-0" />
+            <span className="hidden sm:inline">AI Thiết Kế</span>
           </button>
 
           <button
@@ -1361,6 +1381,11 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
       <StudioPreviewModal
         isOpen={showPreviewModal}
         onClose={() => setShowPreviewModal(false)}
+      />
+
+      {/* AI Studio Designer Modal */}
+      <StudioAiDesignerModal
+        isAdmin={isAdmin || mode === 'admin'}
       />
     </>
   );
