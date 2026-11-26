@@ -271,7 +271,7 @@ export default function StudioLivePreviewPage() {
           );
 
         case 'widget':
-          return <StudioWidgetRenderer element={el} isSelected={false} />;
+          return <StudioWidgetRenderer element={el} isSelected={false} canvasBackground={canvas.background} />;
 
         default:
           return null;

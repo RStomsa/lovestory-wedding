@@ -309,6 +309,50 @@ export default function StudioLeftRail() {
   const [loadingTemplateSlug, setLoadingTemplateSlug] = useState<string | null>(null);
   const [marketTemplates, setMarketTemplates] = useState<any[]>([]);
 
+  // Bidirectional template slug & alias matcher
+  const isMatchTemplateSlug = React.useCallback(
+    (currentSlug: string | null | undefined, targetSlug: string | null | undefined) => {
+      if (!currentSlug || !targetSlug) return false;
+      const c = currentSlug.toLowerCase().trim();
+      const t = targetSlug.toLowerCase().trim();
+      if (c === t) return true;
+      const pairs: [string, string][] = [
+        ['envelope-chamomile', 'thiep-cuoi-44'],
+        ['envelope-chamomile', 'tpl-44'],
+        ['envelope-chamomile', 'tpl-wedding-03'],
+        ['our-love-begins', 'thiep-cuoi-61'],
+        ['our-love-begins', 'tpl-61'],
+        ['our-love-begins', 'tpl-wedding-01'],
+        ['our-love-story-rose', 'thiep-cuoi-39'],
+        ['our-love-story-rose', 'tpl-39'],
+        ['our-love-story-rose', 'tpl-wedding-02'],
+        ['save-the-date-cream-gold', 'thiep-cuoi-165'],
+        ['thiep-cuoi-hoang-gia', 'thiep-cuoi-165'],
+        ['c165', 'thiep-cuoi-165'],
+        ['tpl-165', 'thiep-cuoi-165'],
+        ['tpl-wedding-165', 'thiep-cuoi-165'],
+      ];
+      return pairs.some(([p1, p2]) => (c === p1 && t === p2) || (c === p2 && t === p1));
+    },
+    []
+  );
+
+  // Active template display title resolved accurately from presets/catalog
+  const activeTemplateTitle = React.useMemo(() => {
+    if (!currentTemplateSlug) return '';
+    const presetMatch = STUDIO_TEMPLATE_PRESETS.find(
+      (p) => isMatchTemplateSlug(currentTemplateSlug, p.slug) || isMatchTemplateSlug(currentTemplateSlug, p.id)
+    );
+    if (presetMatch) return presetMatch.name;
+
+    const marketMatch = marketTemplates.find(
+      (m: any) => isMatchTemplateSlug(currentTemplateSlug, m.slug) || isMatchTemplateSlug(currentTemplateSlug, m.id)
+    );
+    if (marketMatch) return marketMatch.name;
+
+    return canvas.title || currentTemplateSlug;
+  }, [currentTemplateSlug, canvas.title, marketTemplates, isMatchTemplateSlug]);
+
   React.useEffect(() => {
     let isCancelled = false;
     fetch('/api/templates/studio')
@@ -401,15 +445,19 @@ export default function StudioLeftRail() {
     { id: 'pages', label: 'Trang', icon: <FileText className="w-5 h-5" /> },
   ];
 
-  // Graphic categories matching full 2,900+ stock library
+  // Graphic categories & Folders matching full 2,900+ stock library
   const graphicCategories = [
     'Tất cả',
     'Yếu tố đám cưới',
-    'Nhân vật',
+    'Nền thiệp',
+    'Khung viền',
+    'Nơ & Ruy băng',
     'Hoa cưới',
     'Chữ hỷ',
+    'Con dấu sáp & Phong bì',
     'Trái tim',
     'Thuần Việt',
+    'Nhân vật',
     'Trang trí không gian',
     'Hoa văn',
     'Hoa lá',
@@ -424,8 +472,6 @@ export default function StudioLeftRail() {
     'Phong bì',
     'Quà mừng',
     'Tốt nghiệp',
-    'Khung viền',
-    'Nền',
     'Đồ họa của tôi',
   ];
 
@@ -436,14 +482,23 @@ export default function StudioLeftRail() {
         (item) =>
           (item as GraphicSticker & { isCustom?: boolean }).isCustom ||
           item.subCategory === 'Đồ họa của tôi' ||
+          item.folder === 'Đồ họa của tôi' ||
           item.id.startsWith('custom-')
       );
     } else if (graphicCategory === 'Thuần Việt') {
       list = list.filter(
-        (item) => item.category === 'Thuần Việt' || item.category === 'Văn hóa Việt'
+        (item) =>
+          item.category === 'Thuần Việt' ||
+          item.category === 'Văn hóa Việt' ||
+          item.folder === 'Văn hóa Việt'
       );
     } else if (graphicCategory !== 'Tất cả') {
-      list = list.filter((item) => item.category === graphicCategory);
+      list = list.filter(
+        (item) =>
+          item.category === graphicCategory ||
+          item.folder === graphicCategory ||
+          item.subCategory === graphicCategory
+      );
     }
     if (graphicSearch.trim()) {
       const q = graphicSearch.toLowerCase().trim();
@@ -451,6 +506,7 @@ export default function StudioLeftRail() {
         (item) =>
           item.name.toLowerCase().includes(q) ||
           item.category.toLowerCase().includes(q) ||
+          (item.folder && item.folder.toLowerCase().includes(q)) ||
           (item.subCategory && item.subCategory.toLowerCase().includes(q))
       );
     }
@@ -1789,11 +1845,15 @@ export default function StudioLeftRail() {
                     key={idx}
                     onClick={() => {
                       const targetY = getSmartInsertY(w.height);
-                      let widgetConfig: any = {};
+                      let widgetConfig: any = {
+                        backgroundColor: 'transparent',
+                        borderWidth: 0,
+                      };
                       let continuousAnimation: any = undefined;
 
                       if (w.type === 'countdown') {
                         widgetConfig = {
+                          ...widgetConfig,
                           style: 'boxes',
                           quote: 'Cùng đếm ngược đến khoảnh khắc trọng đại của chúng mình',
                           targetDate: '2026-12-28T18:00',
@@ -1801,6 +1861,7 @@ export default function StudioLeftRail() {
                         };
                       } else if (w.type === 'calendar') {
                         widgetConfig = {
+                          ...widgetConfig,
                           style: 'classic-grid',
                           selectedDay: 28,
                           selectedMonth: 12,
@@ -1811,6 +1872,7 @@ export default function StudioLeftRail() {
                         };
                       } else if (w.type === 'family_info') {
                         widgetConfig = {
+                          ...widgetConfig,
                           style: 'two-column-card',
                           header: 'HÔN PHỐI TRÂN TRỌNG KÍNH BÁO',
                           subheader: 'Gia Đình Hai Bên',
@@ -1882,7 +1944,10 @@ export default function StudioLeftRail() {
                         height: w.height,
                         rotation: 0,
                         opacity: 1,
-                        widgetConfig: {},
+                        widgetConfig: {
+                          backgroundColor: 'transparent',
+                          borderWidth: 0,
+                        },
                         animation: {
                           type: 'slide-up',
                           duration: 0.8,
@@ -1928,7 +1993,10 @@ export default function StudioLeftRail() {
                         height: w.height,
                         rotation: 0,
                         opacity: 1,
-                        widgetConfig: {},
+                        widgetConfig: {
+                          backgroundColor: 'transparent',
+                          borderWidth: 0,
+                        },
                         animation: {
                           type: 'slide-up',
                           duration: 0.8,
@@ -2030,7 +2098,7 @@ export default function StudioLeftRail() {
                 </div>
                 <div>
                   <h4 className="font-bold text-xs text-stone-900 dark:text-white line-clamp-1">
-                    {canvas.title || currentTemplateSlug}
+                    {activeTemplateTitle}
                   </h4>
                   <p className="text-[10px] text-purple-700 dark:text-purple-300 font-mono mt-0.5">
                     Mã mẫu: /{currentTemplateSlug}
@@ -2048,11 +2116,12 @@ export default function StudioLeftRail() {
               <div className="space-y-3">
                 {STUDIO_TEMPLATE_PRESETS.map((preset, pIdx) => {
                   const presetCode = `Mẫu 0${pIdx + 1}`;
+                  const isCurrent = isMatchTemplateSlug(currentTemplateSlug, preset.slug);
                   return (
                     <div
                       key={preset.id}
                       className={`group rounded-2xl border ${
-                        currentTemplateSlug === preset.slug
+                        isCurrent
                           ? 'border-purple-600 dark:border-purple-500 ring-2 ring-purple-500/30 bg-purple-50/20 shadow-md'
                           : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800'
                       } overflow-hidden shadow-xs hover:shadow-md hover:border-rose-400 transition-all`}
@@ -2080,7 +2149,7 @@ export default function StudioLeftRail() {
                             {preset.tier}
                           </span>
                         </div>
-                        {currentTemplateSlug === preset.slug && (
+                        {isCurrent && (
                           <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white shadow-md animate-pulse">
                             ✓ ĐANG MỞ
                           </span>
@@ -2107,7 +2176,7 @@ export default function StudioLeftRail() {
                           disabled={loadingTemplateSlug === preset.slug}
                           onClick={() => handleApplyTemplate(preset.slug, preset, preset.name)}
                           className={`w-full mt-3 py-1.5 rounded-xl text-white text-[11px] font-semibold transition-all shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 ${
-                            currentTemplateSlug === preset.slug
+                            isCurrent
                               ? 'bg-purple-600 hover:bg-purple-700'
                               : 'bg-stone-900 hover:bg-black'
                           }`}
@@ -2117,7 +2186,7 @@ export default function StudioLeftRail() {
                               <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-400" />
                               <span>Đang nạp dữ liệu thật...</span>
                             </>
-                          ) : currentTemplateSlug === preset.slug ? (
+                          ) : isCurrent ? (
                             <>
                               <Check className="w-3.5 h-3.5" />
                               <span>✓ Đang mở mẫu này</span>
@@ -2172,7 +2241,7 @@ export default function StudioLeftRail() {
                         return matchCat && matchSearch;
                       })
                       .map((m: any, mIdx: number) => {
-                        const isCurrent = currentTemplateSlug === m.slug || currentTemplateSlug === m.id;
+                        const isCurrent = isMatchTemplateSlug(currentTemplateSlug, m.slug) || isMatchTemplateSlug(currentTemplateSlug, m.id);
                         const templateCode = m.code || `Mẫu ${String(mIdx + 5).padStart(2, '0')}`;
                         const templateSubtitle = m.subtitle || m.name.replace(/^Mẫu\s*\d+\s*[-—:]\s*/i, '');
                         return (

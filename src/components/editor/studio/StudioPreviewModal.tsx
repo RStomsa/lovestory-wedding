@@ -14,6 +14,8 @@ import {
   ChevronDown,
   ChevronUp,
   Layers,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { useStudioStore } from './studioStore';
 import { CanvasElement } from './studioTypes';
@@ -29,12 +31,14 @@ interface StudioPreviewModalProps {
 }
 
 export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewModalProps) {
-  const { canvas, elements } = useStudioStore();
+  const { canvas, elements, currentTemplateSlug } = useStudioStore();
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
   const [viewMode, setViewMode] = useState<'phone' | 'fullscreen'>('phone');
   const [scrollMode, setScrollMode] = useState<'snap' | 'continuous'>('snap');
   const [currentSection, setCurrentSection] = useState(0);
   const [replayKey, setReplayKey] = useState(0);
+  const [previewGuestName, setPreviewGuestName] = useState('Gia Đình Bác Hùng');
+  const [copiedGuestLink, setCopiedGuestLink] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -227,19 +231,35 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
             );
           }
 
+          const isFoilGold = el.foilEffect === 'gold';
+          const isFoilRoseGold = el.foilEffect === 'rosegold';
+          const isFoilSilver = el.foilEffect === 'silver';
+          const foilClass = isFoilGold
+            ? 'foil-text-gold'
+            : isFoilRoseGold
+            ? 'foil-text-rosegold'
+            : isFoilSilver
+            ? 'foil-text-silver'
+            : '';
+
+          let renderedText = el.text || '';
+          if (previewGuestName) {
+            renderedText = renderedText.replace(/\{\{?\s*(guestName|guest|tenKhach|khach)\s*\}?\}/gi, previewGuestName);
+          }
+
           return (
             <div
-              className={`w-full h-full flex flex-col justify-center select-none ${animClass}`}
+              className={`w-full h-full flex flex-col justify-center items-center select-none ${animClass}`}
               style={{
                 fontFamily: resolveFontFamily(el.fontFamily),
                 fontSize: `${el.fontSize || 16}px`,
                 fontWeight: el.fontWeight || 'normal',
                 fontStyle: el.fontStyle || 'normal',
-                color: el.color || '#000',
+                color: foilClass ? undefined : el.color || '#000',
                 textAlign: el.textAlign || 'center',
                 letterSpacing: el.letterSpacing ? `${el.letterSpacing}px` : 'normal',
-                lineHeight: el.lineHeight || 1.2,
-                padding: el.padding ? `${el.padding}px` : undefined,
+                lineHeight: el.lineHeight || 1.35,
+                padding: el.padding !== undefined ? `${el.padding}px` : '4px 6px',
                 boxShadow: boxShadow !== 'none' ? boxShadow : undefined,
                 textShadow: textShadow !== 'none' ? textShadow : undefined,
                 transform: flipStyle || undefined,
@@ -247,7 +267,13 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
                 wordBreak: 'break-word',
               }}
             >
-              {el.text}
+              {foilClass ? (
+                <span className={foilClass}>
+                  {renderedText}
+                </span>
+              ) : (
+                renderedText
+              )}
             </div>
           );
 
@@ -336,7 +362,7 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
           );
 
         case 'widget':
-          return <StudioWidgetRenderer element={el} isSelected={false} />;
+          return <StudioWidgetRenderer element={el} isSelected={false} canvasBackground={canvas.background} />;
 
         default:
           return null;
@@ -481,6 +507,39 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
         </div>
       </div>
 
+      {/* Guest Personalization Toolbar */}
+      <div className="w-full max-w-4xl bg-stone-900/90 text-white rounded-2xl px-4 py-2 flex flex-wrap items-center justify-between gap-2.5 border border-stone-800 shadow-md backdrop-blur-md mb-2">
+        <div className="flex items-center gap-2 flex-1 min-w-[240px]">
+          <span className="text-xs text-rose-400 font-bold whitespace-nowrap flex items-center gap-1.5">
+            <span>💌 Thử nghiệm tên khách mời:</span>
+          </span>
+          <input
+            type="text"
+            value={previewGuestName}
+            onChange={(e) => setPreviewGuestName(e.target.value)}
+            placeholder="vd: Anh Hoàng, Bác Hùng, Cô Lan..."
+            className="bg-stone-800 border border-stone-700 rounded-lg px-2.5 py-1 text-xs text-white placeholder-stone-500 outline-none focus:border-rose-500 flex-1 max-w-xs"
+          />
+        </div>
+
+        <button
+          onClick={() => {
+            const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+            const targetSlug = currentTemplateSlug || 'thiep-cuoi-165';
+            const guestParam = encodeURIComponent(previewGuestName.trim() || 'Ban');
+            const link = `${origin}/${targetSlug}?to=${guestParam}&envelope=1`;
+            navigator.clipboard.writeText(link);
+            setCopiedGuestLink(true);
+            setTimeout(() => setCopiedGuestLink(false), 2500);
+          }}
+          className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:opacity-90 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs shrink-0 cursor-pointer"
+          title="Sao chép đường link gửi riêng cho khách mời này kèm phong bì mở thiệp"
+        >
+          {copiedGuestLink ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
+          <span>{copiedGuestLink ? 'Đã sao chép link mời!' : 'Sao Chép Link Mời Đích Danh'}</span>
+        </button>
+      </div>
+
       {/* Main Preview Container */}
       <div className="flex-1 w-full flex items-center justify-center overflow-hidden relative">
         {viewMode === 'phone' ? (
@@ -507,9 +566,10 @@ export default function StudioPreviewModal({ isOpen, onClose }: StudioPreviewMod
               {/* Envelope Opening Cover Overlay inside phone */}
               {canvas.envelopeCover?.enabled !== false && (
                 <EnvelopeOpeningEffect
-                  key={`env-${replayKey}`}
+                  key={`env-${replayKey}-${previewGuestName}`}
                   coverId={canvas.envelopeCover?.coverId || 'default'}
                   autoOpen={canvas.envelopeCover?.autoOpen ?? false}
+                  guestName={previewGuestName}
                   groomName={canvas.weddingProfile?.groom?.shortName || canvas.weddingProfile?.groom?.fullName || 'Chú Rể'}
                   brideName={canvas.weddingProfile?.bride?.shortName || canvas.weddingProfile?.bride?.fullName || 'Cô Dâu'}
                   weddingDate={canvas.weddingProfile?.ceremonies?.find((c) => c.isMain)?.date || '2026-11-28'}

@@ -21,20 +21,28 @@ import {
   Check,
   Wand2,
   X,
+  Folder,
+  FolderPlus,
+  FolderOpen,
+  ChevronRight,
+  ArrowLeft,
+  Layers,
 } from 'lucide-react';
 import { StudioFont, resolveFontFamily } from '@/lib/studioFonts';
 import { GraphicSticker } from '@/data/graphicsCatalog';
-import { MusicTrack } from '@/lib/systemAssetsService';
+import { MusicTrack, GraphicFolder } from '@/lib/systemAssetsService';
 
 interface Props {
   initialFonts: (StudioFont & { isCustom?: boolean })[];
   initialGraphics: (GraphicSticker & { isCustom?: boolean })[];
+  initialFolders?: GraphicFolder[];
   initialMusic: MusicTrack[];
 }
 
 export default function AssetsManagerClient({
   initialFonts,
   initialGraphics,
+  initialFolders = [],
   initialMusic,
 }: Props) {
   const [activeTab, setActiveTab] = useState<'fonts' | 'graphics' | 'music'>('fonts');
@@ -161,21 +169,84 @@ export default function AssetsManagerClient({
   });
 
   // ==========================================
-  // 2. GRAPHICS STATE & HANDLERS
+  // 2. GRAPHICS & FOLDERS STATE & HANDLERS
   // ==========================================
   const [graphics, setGraphics] = useState(initialGraphics);
+  const [folders, setFolders] = useState<GraphicFolder[]>(initialFolders);
+  const [gfxViewMode, setGfxViewMode] = useState<'folder' | 'flat'>('folder');
+  const [currentFolder, setCurrentFolder] = useState<string | null>(null);
+
   const [searchGfx, setSearchGfx] = useState('');
   const [gfxCategoryFilter, setGfxCategoryFilter] = useState<string>('all');
   const [gfxVisibleLimit, setGfxVisibleLimit] = useState<number>(60);
   const [showAddGfxModal, setShowAddGfxModal] = useState(false);
+  const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
+
+  const [newFolderName, setNewFolderName] = useState('');
+  const [newFolderIcon, setNewFolderIcon] = useState('📁');
+  const [newFolderDesc, setNewFolderDesc] = useState('');
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+
   const [newGfxName, setNewGfxName] = useState('');
   const [newGfxSrc, setNewGfxSrc] = useState('');
   const [newGfxCategory, setNewGfxCategory] = useState<GraphicSticker['category']>('Yếu tố đám cưới');
+  const [newGfxFolder, setNewGfxFolder] = useState<string>('Yếu tố đám cưới');
+  const [isCreatingNewFolderInModal, setIsCreatingNewFolderInModal] = useState(false);
   const [newGfxWidth, setNewGfxWidth] = useState<number>(100);
   const [newGfxHeight, setNewGfxHeight] = useState<number>(100);
   const [isUploadingGfx, setIsUploadingGfx] = useState(false);
   const [isSubmittingGfx, setIsSubmittingGfx] = useState(false);
   const gfxFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleCreateFolder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newFolderName.trim()) return;
+    setIsCreatingFolder(true);
+    try {
+      const res = await fetch('/api/admin/assets/graphics/folders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newFolderName.trim(),
+          icon: newFolderIcon.trim() || '📁',
+          description: newFolderDesc.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Tạo thư mục thất bại');
+
+      setFolders((prev) => {
+        const exists = prev.some((f) => f.name.toLowerCase() === data.folder.name.toLowerCase());
+        return exists ? prev : [...prev, data.folder];
+      });
+      setShowCreateFolderModal(false);
+      setNewFolderName('');
+      setNewFolderDesc('');
+      setMessage({ text: data.message, type: 'success' });
+      setTimeout(() => setMessage(null), 3500);
+    } catch (err: any) {
+      setMessage({ text: err.message || 'Lỗi khi tạo thư mục', type: 'error' });
+    } finally {
+      setIsCreatingFolder(false);
+    }
+  };
+
+  const handleDeleteFolder = async (folder: GraphicFolder) => {
+    if (!confirm(`Bạn có chắc muốn xóa thư mục "${folder.name}"?`)) return;
+    try {
+      const res = await fetch(`/api/admin/assets/graphics/folders?id=${encodeURIComponent(folder.id || folder.name)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Xóa thư mục thất bại');
+      setFolders((prev) => prev.filter((f) => f.id !== folder.id && f.name !== folder.name));
+      if (currentFolder === folder.name) setCurrentFolder(null);
+      setMessage({ text: data.message, type: 'success' });
+      setTimeout(() => setMessage(null), 3500);
+    } catch (err: any) {
+      setMessage({ text: err.message || 'Lỗi khi xóa thư mục', type: 'error' });
+    }
+  };
 
   const handleUploadGfxFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -221,6 +292,8 @@ export default function AssetsManagerClient({
     setIsSubmittingGfx(true);
     setMessage(null);
 
+    const targetFolder = newGfxFolder.trim() || newGfxCategory || 'Yếu tố đám cưới';
+
     try {
       const res = await fetch('/api/admin/assets/graphics', {
         method: 'POST',
@@ -229,6 +302,8 @@ export default function AssetsManagerClient({
           name: newGfxName.trim(),
           src: newGfxSrc.trim(),
           category: newGfxCategory,
+          folder: targetFolder,
+          subCategory: targetFolder,
           defaultWidth: Number(newGfxWidth) || 100,
           defaultHeight: Number(newGfxHeight) || 100,
         }),
@@ -240,6 +315,15 @@ export default function AssetsManagerClient({
       }
 
       setGraphics((prev) => [data.graphic, ...prev]);
+      // Update folder count locally
+      setFolders((prev) =>
+        prev.map((f) =>
+          f.name.toLowerCase() === targetFolder.toLowerCase()
+            ? { ...f, count: (f.count || 0) + 1 }
+            : f
+        )
+      );
+
       setShowAddGfxModal(false);
       setNewGfxName('');
       setNewGfxSrc('');
@@ -615,11 +699,12 @@ export default function AssetsManagerClient({
       )}
 
       {/* =========================================================================
-          TAB 2: ĐỒ HỌA & STICKER (GRAPHICS MANAGEMENT)
+          TAB 2: ĐỒ HỌA & STICKER (GRAPHICS MANAGEMENT WITH FOLDERS)
       ========================================================================= */}
       {activeTab === 'graphics' && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-stone-200/90">
+          {/* Top Control Bar: Search + View Mode Switch + Action Buttons */}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-stone-200/90 shadow-2xs">
             {/* Search */}
             <div className="relative flex-1 max-w-sm">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-500" />
@@ -627,120 +712,356 @@ export default function AssetsManagerClient({
                 type="text"
                 value={searchGfx}
                 onChange={(e) => setSearchGfx(e.target.value)}
-                placeholder="Tìm đồ họa theo tên..."
-                className="w-full pl-9 pr-3 py-1.5 bg-stone-50/60 border border-stone-200/90 rounded-xl text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-stone-900"
+                placeholder="Tìm đồ họa theo tên hoặc thư mục..."
+                className="w-full pl-9 pr-3 py-1.5 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-stone-900 focus:bg-white transition-colors"
               />
             </div>
 
-            {/* Category Filter Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-              {[
-                'all',
-                'Yếu tố đám cưới',
-                'Nhân vật',
-                'Hoa cưới',
-                'Chữ hỷ',
-                'Trái tim',
-                'Thuần Việt',
-                'Trang trí không gian',
-                'Hoa văn',
-                'Hoa lá',
-                'Số và chữ cái',
-                'Kết hợp chữ',
-                'Mặt trời',
-                'Ngôi sao',
-                'Biểu tượng',
-                'Mẹ và bé',
-                'Sinh nhật',
-                'Bản đồ',
-                'Phong bì',
-                'Quà mừng',
-                'Tốt nghiệp',
-                'Khung viền',
-                'Nền',
-              ].map((c) => (
-                <button
-                  key={c}
-                  onClick={() => {
-                    setGfxCategoryFilter(c);
-                    setGfxVisibleLimit(60);
-                  }}
-                  className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold whitespace-nowrap transition-all ${
-                    gfxCategoryFilter === c
-                      ? 'bg-rose-600 text-white shadow-xs'
-                      : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-                  }`}
-                >
-                  {c === 'all' ? 'Tất cả' : c}
-                </button>
-              ))}
+            {/* View Mode Toggle: Folder View vs Flat Grid */}
+            <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-xl shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setGfxViewMode('folder');
+                  setCurrentFolder(null);
+                }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  gfxViewMode === 'folder'
+                    ? 'bg-white text-stone-900 shadow-2xs'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                <Folder className="w-3.5 h-3.5 text-amber-500" />
+                <span>Theo Thư Mục</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setGfxViewMode('flat')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  gfxViewMode === 'flat'
+                    ? 'bg-white text-stone-900 shadow-2xs'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5 text-blue-500" />
+                <span>Tất Cả ({graphics.length})</span>
+              </button>
             </div>
 
-            {/* Add Graphic Button */}
-            <button
-              onClick={() => setShowAddGfxModal(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Thêm Đồ Họa</span>
-            </button>
-          </div>
-
-          {/* Graphics Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {filteredGraphics.slice(0, gfxVisibleLimit).map((item) => (
-              <div
-                key={item.id}
-                className="p-3 rounded-2xl bg-white border border-stone-200/90 hover:border-stone-200/80 transition-all flex flex-col items-center justify-between group relative shadow-2xs"
-              >
-                {/* Delete button for custom graphics */}
-                {item.isCustom && (
-                  <button
-                    onClick={() => handleDeleteGraphic(item.id, item.name)}
-                    className="absolute top-2 right-2 text-stone-500 hover:text-red-400 p-1 transition-colors z-10"
-                    title="Xóa đồ họa này"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                )}
-
-                {/* Preview Image */}
-                <div className="w-20 h-20 flex items-center justify-center p-2 mb-2 bg-stone-50/60 rounded-xl border border-stone-200/80">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.src}
-                    alt={item.name}
-                    referrerPolicy="no-referrer"
-                    loading="lazy"
-                    className="max-w-full max-h-full object-contain pointer-events-none group-hover:scale-110 transition-transform duration-200"
-                  />
-                </div>
-
-                <div className="w-full text-center">
-                  <span className="block text-xs font-semibold text-stone-800 truncate" title={item.name}>
-                    {item.name}
-                  </span>
-                  <span className="block text-[9px] text-stone-500 truncate mt-0.5">
-                    {item.category}
-                  </span>
-                  {item.isCustom && (
-                    <span className="inline-block text-[8px] uppercase tracking-wider px-1.5 py-0.2 rounded bg-purple-500/20 text-stone-700 font-semibold mt-1">
-                      Mới thêm
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {filteredGraphics.length > gfxVisibleLimit && (
-            <div className="text-center pt-2">
+            {/* Actions: Create Folder + Add Graphic */}
+            <div className="flex items-center gap-2 shrink-0">
               <button
-                onClick={() => setGfxVisibleLimit((prev) => prev + 60)}
-                className="px-6 py-2.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 rounded-xl font-semibold text-xs hover:bg-rose-100 transition-colors shadow-xs"
+                type="button"
+                onClick={() => setShowCreateFolderModal(true)}
+                className="px-3.5 py-1.5 rounded-xl border border-stone-200 hover:bg-stone-100 text-stone-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-2xs"
               >
-                Tải thêm 60 đồ họa ({gfxVisibleLimit} / {filteredGraphics.length.toLocaleString()})
+                <FolderPlus className="w-3.5 h-3.5 text-amber-600" />
+                <span>+ Tạo Thư Mục Mới</span>
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (currentFolder) {
+                    setNewGfxFolder(currentFolder);
+                  }
+                  setShowAddGfxModal(true);
+                }}
+                className="px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs active:scale-95 transition-all"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Thêm Đồ Họa</span>
+              </button>
+            </div>
+          </div>
+
+          {/* VIEW MODE 1: FOLDER VIEW */}
+          {gfxViewMode === 'folder' && (
+            <div>
+              {/* Case A: Folder Grid (Overview) */}
+              {currentFolder === null ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-xs font-bold text-stone-700 uppercase tracking-wider flex items-center gap-1.5">
+                      <FolderOpen className="w-4 h-4 text-amber-500" />
+                      <span>Danh Sách Thư Mục Đồ Họa ({folders.length} thư mục)</span>
+                    </span>
+                    <span className="text-[11px] text-stone-500">
+                      Bấm vào thư mục để xem hoặc quản lý đồ họa bên trong
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5">
+                    {folders.map((folder) => {
+                      const folderGraphics = graphics.filter(
+                        (g) => (g.folder || g.subCategory || g.category || '').toLowerCase() === folder.name.toLowerCase()
+                      );
+                      const count = folderGraphics.length || folder.count || 0;
+
+                      return (
+                        <div
+                          key={folder.id || folder.name}
+                          onClick={() => setCurrentFolder(folder.name)}
+                          className="bg-white p-4 rounded-2xl border border-stone-200/90 hover:border-amber-400 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between shadow-2xs"
+                        >
+                          <div>
+                            <div className="flex items-start justify-between mb-2.5">
+                              <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-200/60 flex items-center justify-center text-xl shadow-2xs group-hover:scale-110 transition-transform">
+                                {folder.icon || '📁'}
+                              </div>
+
+                              <div className="flex items-center gap-1">
+                                <span className="px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 text-[10px] font-bold">
+                                  {count} mẫu
+                                </span>
+                                {!folder.isDefault && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteFolder(folder);
+                                    }}
+                                    className="p-1 text-stone-400 hover:text-red-500 rounded-lg hover:bg-stone-100 transition-colors"
+                                    title="Xóa thư mục này"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+
+                            <h4 className="font-serif font-bold text-sm text-stone-900 group-hover:text-amber-700 transition-colors">
+                              {folder.name}
+                            </h4>
+                            <p className="text-[11px] text-stone-500 line-clamp-1 mt-0.5">
+                              {folder.description || 'Thư mục tài nguyên đồ họa'}
+                            </p>
+                          </div>
+
+                          <div className="pt-3 mt-3 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-500 group-hover:text-amber-600 font-semibold">
+                            <span>Mở thư mục</span>
+                            <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                /* Case B: Inside Specific Folder */
+                <div className="space-y-4">
+                  {/* Breadcrumb Header */}
+                  <div className="flex items-center justify-between bg-white p-3.5 rounded-2xl border border-stone-200/90 shadow-2xs">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setCurrentFolder(null)}
+                        className="px-2.5 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold flex items-center gap-1 transition-colors"
+                      >
+                        <ArrowLeft className="w-3.5 h-3.5" />
+                        <span>Danh sách thư mục</span>
+                      </button>
+                      <span className="text-stone-300">/</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-lg">
+                          {folders.find((f) => f.name.toLowerCase() === currentFolder.toLowerCase())?.icon || '📁'}
+                        </span>
+                        <h3 className="font-serif font-bold text-stone-900 text-sm md:text-base">
+                          {currentFolder}
+                        </h3>
+                        <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold">
+                          {
+                            graphics.filter(
+                              (g) =>
+                                (g.folder || g.subCategory || g.category || '').toLowerCase() ===
+                                currentFolder.toLowerCase()
+                            ).length
+                          }{' '}
+                          đồ họa
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewGfxFolder(currentFolder);
+                        setShowAddGfxModal(true);
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Thêm ảnh vào thư mục này</span>
+                    </button>
+                  </div>
+
+                  {/* Folder Items Grid */}
+                  {(() => {
+                    const currentFolderItems = graphics.filter((g) => {
+                      const matchesFolder =
+                        (g.folder || g.subCategory || g.category || '').toLowerCase() ===
+                        currentFolder.toLowerCase();
+                      const matchesSearch =
+                        !searchGfx.trim() ||
+                        g.name.toLowerCase().includes(searchGfx.toLowerCase());
+                      return matchesFolder && matchesSearch;
+                    });
+
+                    if (currentFolderItems.length === 0) {
+                      return (
+                        <div className="p-12 text-center bg-white rounded-3xl border border-stone-200/80 space-y-3">
+                          <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-3xl mx-auto">
+                            📁
+                          </div>
+                          <h4 className="font-bold text-stone-800 text-sm">
+                            Thư mục &quot;{currentFolder}&quot; chưa có đồ họa nào
+                          </h4>
+                          <p className="text-xs text-stone-500 max-w-sm mx-auto">
+                            Bấm nút bên dưới để tải các hình ảnh PNG trong suốt hoặc vector SVG vào thư mục này.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNewGfxFolder(currentFolder);
+                              setShowAddGfxModal(true);
+                            }}
+                            className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-2xs transition-colors"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>Tải Đồ Họa Vào Thư Mục Ngay</span>
+                          </button>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                        {currentFolderItems.map((item) => (
+                          <div
+                            key={item.id}
+                            className="p-3 rounded-2xl bg-white border border-stone-200/90 hover:border-amber-300 transition-all flex flex-col items-center justify-between group relative shadow-2xs"
+                          >
+                            {item.isCustom && (
+                              <button
+                                onClick={() => handleDeleteGraphic(item.id, item.name)}
+                                className="absolute top-2 right-2 text-stone-400 hover:text-red-500 p-1 transition-colors z-10"
+                                title="Xóa đồ họa này"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+
+                            <div className="w-20 h-20 flex items-center justify-center p-2 mb-2 bg-stone-50 rounded-xl border border-stone-200/80">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={item.src}
+                                alt={item.name}
+                                referrerPolicy="no-referrer"
+                                loading="lazy"
+                                className="max-w-full max-h-full object-contain pointer-events-none group-hover:scale-110 transition-transform duration-200"
+                              />
+                            </div>
+
+                            <div className="w-full text-center">
+                              <span className="block text-xs font-semibold text-stone-800 truncate" title={item.name}>
+                                {item.name}
+                              </span>
+                              <span className="block text-[9px] text-stone-500 truncate mt-0.5">
+                                {item.folder || item.category}
+                              </span>
+                              {item.isCustom && (
+                                <span className="inline-block text-[8px] uppercase tracking-wider px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 font-semibold mt-1">
+                                  Tùy chỉnh
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* VIEW MODE 2: FLAT ALL GRAPHICS GRID */}
+          {gfxViewMode === 'flat' && (
+            <div className="space-y-3">
+              {/* Category Filter Pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar bg-white p-2.5 rounded-2xl border border-stone-200/90 shadow-2xs">
+                {['all', ...folders.map((f) => f.name)].map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => {
+                      setGfxCategoryFilter(c);
+                      setGfxVisibleLimit(60);
+                    }}
+                    className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold whitespace-nowrap transition-all ${
+                      gfxCategoryFilter === c
+                        ? 'bg-rose-600 text-white shadow-xs'
+                        : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
+                    }`}
+                  >
+                    {c === 'all' ? 'Tất cả' : c}
+                  </button>
+                ))}
+              </div>
+
+              {/* Graphics Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                {filteredGraphics.slice(0, gfxVisibleLimit).map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-3 rounded-2xl bg-white border border-stone-200/90 hover:border-stone-200/80 transition-all flex flex-col items-center justify-between group relative shadow-2xs"
+                  >
+                    {item.isCustom && (
+                      <button
+                        onClick={() => handleDeleteGraphic(item.id, item.name)}
+                        className="absolute top-2 right-2 text-stone-500 hover:text-red-400 p-1 transition-colors z-10"
+                        title="Xóa đồ họa này"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+
+                    <div className="w-20 h-20 flex items-center justify-center p-2 mb-2 bg-stone-50/60 rounded-xl border border-stone-200/80">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={item.src}
+                        alt={item.name}
+                        referrerPolicy="no-referrer"
+                        loading="lazy"
+                        className="max-w-full max-h-full object-contain pointer-events-none group-hover:scale-110 transition-transform duration-200"
+                      />
+                    </div>
+
+                    <div className="w-full text-center">
+                      <span className="block text-xs font-semibold text-stone-800 truncate" title={item.name}>
+                        {item.name}
+                      </span>
+                      <span className="block text-[9px] text-stone-500 truncate mt-0.5">
+                        {item.folder || item.category}
+                      </span>
+                      {item.isCustom && (
+                        <span className="inline-block text-[8px] uppercase tracking-wider px-1.5 py-0.2 rounded bg-purple-500/20 text-stone-700 font-semibold mt-1">
+                          Mới thêm
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {filteredGraphics.length > gfxVisibleLimit && (
+                <div className="text-center pt-2">
+                  <button
+                    onClick={() => setGfxVisibleLimit((prev) => prev + 60)}
+                    className="px-6 py-2.5 bg-rose-50 text-rose-600 border border-rose-200 rounded-xl font-semibold text-xs hover:bg-rose-100 transition-colors shadow-xs"
+                  >
+                    Tải thêm 60 đồ họa ({gfxVisibleLimit} / {filteredGraphics.length.toLocaleString()})
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -974,7 +1295,7 @@ export default function AssetsManagerClient({
       )}
 
       {/* =========================================================================
-          MODAL: THÊM ĐỒ HỌA MỚI
+          MODAL: THÊM ĐỒ HỌA MỚI (VỚI CHỌN & TẠO THƯ MỤC)
       ========================================================================= */}
       {showAddGfxModal && (
         <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-2xs flex items-center justify-center p-4">
@@ -997,7 +1318,7 @@ export default function AssetsManagerClient({
               </button>
             </div>
             <p className="text-xs text-stone-500 mb-4">
-              Tải ảnh PNG không nền (transparent) hoặc dán URL SVG/hình ảnh vào thư viện Studio.
+              Tải ảnh PNG không nền (transparent) hoặc dán URL SVG/hình ảnh vào thư mục trong thư viện Studio.
             </p>
 
             <form onSubmit={handleAddGraphic} className="space-y-3.5">
@@ -1011,6 +1332,54 @@ export default function AssetsManagerClient({
                   onChange={(e) => setNewGfxName(e.target.value)}
                   className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
                 />
+              </div>
+
+              {/* Thư Mục Lưu Trữ (Folder Selection) */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs text-stone-700 font-semibold flex items-center gap-1">
+                    <Folder className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Thư Mục Lưu Trữ *</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setIsCreatingNewFolderInModal(!isCreatingNewFolderInModal)}
+                    className="text-[11px] text-amber-600 hover:text-amber-800 font-bold"
+                  >
+                    {isCreatingNewFolderInModal ? 'Chọn thư mục có sẵn' : '+ Tạo thư mục mới'}
+                  </button>
+                </div>
+
+                {isCreatingNewFolderInModal ? (
+                  <input
+                    type="text"
+                    required
+                    placeholder="Gõ tên thư mục mới... (vd: Nơ lụa hoa cưới)"
+                    value={newGfxFolder}
+                    onChange={(e) => setNewGfxFolder(e.target.value)}
+                    className="w-full px-3 py-2 bg-amber-50/50 border border-amber-300 rounded-xl text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-amber-500 transition-colors"
+                  />
+                ) : (
+                  <select
+                    value={newGfxFolder}
+                    onChange={(e) => {
+                      if (e.target.value === '__NEW__') {
+                        setIsCreatingNewFolderInModal(true);
+                        setNewGfxFolder('');
+                      } else {
+                        setNewGfxFolder(e.target.value);
+                      }
+                    }}
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900/10 transition-colors"
+                  >
+                    {folders.map((f) => (
+                      <option key={f.id || f.name} value={f.name}>
+                        {f.icon || '📁'} {f.name}
+                      </option>
+                    ))}
+                    <option value="__NEW__">+ Tạo thư mục mới...</option>
+                  </select>
+                )}
               </div>
 
               <div>
@@ -1028,6 +1397,7 @@ export default function AssetsManagerClient({
                   <option value="Trái tim">Trái tim</option>
                   <option value="Ngôi sao">Ngôi sao</option>
                   <option value="Khung viền">Khung viền</option>
+                  <option value="Nền">Nền</option>
                 </select>
               </div>
 
@@ -1113,6 +1483,102 @@ export default function AssetsManagerClient({
                   className="px-5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-2xs transition-colors disabled:opacity-50"
                 >
                   {isSubmittingGfx ? 'Đang thêm...' : 'Lưu Đồ Họa'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          MODAL: TẠO THƯ MỤC ĐỒ HỌA MỚI
+      ========================================================================= */}
+      {showCreateFolderModal && (
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-2xs flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl w-full max-w-md p-6 relative shadow-2xl text-stone-900 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-xl">
+                  {newFolderIcon}
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-stone-500 tracking-wider">
+                    QUẢN LÝ THƯ MỤC
+                  </span>
+                  <h3 className="text-lg font-serif font-bold text-stone-900">
+                    Tạo Thư Mục Đồ Họa Mới
+                  </h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCreateFolderModal(false)}
+                className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateFolder} className="space-y-3.5">
+              <div>
+                <label className="text-xs text-stone-700 block mb-1 font-semibold">Tên Thư Mục *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ví dụ: Nơ hoa cưới, Con dấu sáp 3D, Họa tiết Vintage..."
+                  value={newFolderName}
+                  onChange={(e) => setNewFolderName(e.target.value)}
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-stone-700 block mb-1 font-semibold">Biểu Tượng Thư Mục</label>
+                <div className="flex items-center gap-1.5 flex-wrap p-2 bg-stone-50 rounded-xl border border-stone-200">
+                  {['📁', '🖼️', '🔲', '🎀', '🌸', '💍', '囍', '💌', '❤️', '🏮', '✨', '👫', '🕊️', '🍰', '🍷'].map(
+                    (emoji) => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        onClick={() => setNewFolderIcon(emoji)}
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center text-base transition-all ${
+                          newFolderIcon === emoji
+                            ? 'bg-amber-200/80 border border-amber-400 scale-110 shadow-2xs'
+                            : 'hover:bg-white'
+                        }`}
+                      >
+                        {emoji}
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs text-stone-700 block mb-1 font-semibold">Mô Tả Ngắn Gọn</label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: Các mẫu nơ ruy băng trang trí phong bì và thiệp cưới"
+                  value={newFolderDesc}
+                  onChange={(e) => setNewFolderDesc(e.target.value)}
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-stone-900 transition-colors"
+                />
+              </div>
+
+              <div className="pt-3 flex items-center justify-end gap-2 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateFolderModal(false)}
+                  className="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition-colors"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={isCreatingFolder}
+                  className="px-5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-2xs transition-colors disabled:opacity-50"
+                >
+                  {isCreatingFolder ? 'Đang tạo...' : 'Tạo Thư Mục'}
                 </button>
               </div>
             </form>

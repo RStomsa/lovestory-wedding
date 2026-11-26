@@ -17,6 +17,7 @@ import {
   LayoutTemplate,
   Heart,
   Cpu,
+  AppWindow,
 } from 'lucide-react';
 
 export const metadata = {
@@ -36,6 +37,7 @@ export default async function AdminLayout({
     { label: 'Quản Lý Cỗ Cưới & RSVP', href: '/admin/rsvps', icon: Users },
     { label: 'Kho Templates', href: '/admin/templates', icon: Palette },
     { label: 'Tài Nguyên (Font, Nhạc, Đồ họa)', href: '/admin/assets', icon: Music },
+    { label: 'Quản Lý Tiện Ích', href: '/admin/widgets', icon: AppWindow },
     { label: 'Công Cụ Rust (Hiệu Năng)', href: '/admin/tools', icon: Cpu },
     { label: 'Admin Studio (Soạn Mẫu)', href: '/admin/studio', icon: LayoutTemplate },
     { label: 'Quản Lý Thiệp Cưới', href: '/admin/sites', icon: HeartHandshake },

@@ -942,20 +942,37 @@ function convertMinviteDesignToStudioPreset(minviteMatch: any, rawDesign: any): 
 
 export function getStudioTemplate(slugOrId: string): StudioTemplatePreset | null {
   const norm = slugOrId.toLowerCase().trim();
+  const mappedSlug = (HARVESTED_SLUG_MAP[norm] || norm).toLowerCase();
 
-  // 1. TOP PRIORITY: Check custom presets created or edited by Admin
-  let custom = getCustomStudioPreset(norm);
-  if (!custom) {
-    const target = HARVESTED_SLUG_MAP[norm];
-    if (target) {
-      custom = getCustomStudioPreset(target);
+  // 1. TOP PRIORITY: Flagship Curated Studio Presets (thiep-cuoi-165, thiep-cuoi-61, thiep-cuoi-39, thiep-cuoi-44)
+  const curatedMatch = STUDIO_TEMPLATE_PRESETS.find(
+    (p) =>
+      p.slug.toLowerCase() === norm ||
+      p.slug.toLowerCase() === mappedSlug ||
+      p.id.toLowerCase() === norm ||
+      p.id.toLowerCase() === mappedSlug
+  );
+  if (curatedMatch && curatedMatch.elements && curatedMatch.elements.length > 0) {
+    // Check if admin has a clean, non-corrupted custom preset for this template
+    const custom = getCustomStudioPreset(curatedMatch.slug) || getCustomStudioPreset(curatedMatch.id);
+    if (
+      custom &&
+      custom.elements &&
+      custom.elements.length > 0 &&
+      !(curatedMatch.slug !== 'thiep-cuoi-165' && custom.name?.includes('C165'))
+    ) {
+      return custom;
     }
-    if (!custom) {
-      for (const [alias, mapped] of Object.entries(HARVESTED_SLUG_MAP)) {
-        if (mapped.toLowerCase() === norm) {
-          custom = getCustomStudioPreset(alias);
-          if (custom) break;
-        }
+    return curatedMatch;
+  }
+
+  // 2. Check custom presets created or edited by Admin
+  let custom = getCustomStudioPreset(norm) || getCustomStudioPreset(mappedSlug);
+  if (!custom) {
+    for (const [alias, mapped] of Object.entries(HARVESTED_SLUG_MAP)) {
+      if (mapped.toLowerCase() === norm || mapped.toLowerCase() === mappedSlug) {
+        custom = getCustomStudioPreset(alias);
+        if (custom) break;
       }
     }
   }
@@ -970,14 +987,6 @@ export function getStudioTemplate(slugOrId: string): StudioTemplatePreset | null
   }
   if (custom && custom.elements && custom.elements.length > 0) {
     return custom;
-  }
-
-  // 1.5 TOP PRIORITY: Curated Studio Presets (thiep-cuoi-165, thiep-cuoi-61, thiep-cuoi-97, thiep-cuoi-132, etc.)
-  const curatedMatch = STUDIO_TEMPLATE_PRESETS.find(
-    (p) => p.slug.toLowerCase() === norm || p.id.toLowerCase() === norm
-  );
-  if (curatedMatch && curatedMatch.elements && curatedMatch.elements.length > 0) {
-    return curatedMatch;
   }
 
   // 0. Check VIP templates
@@ -1260,8 +1269,8 @@ export function getStudioTemplate(slugOrId: string): StudioTemplatePreset | null
   }
 
   // 3. Direct Harvested Slug mapping
-  const mappedSlug = HARVESTED_SLUG_MAP[norm] || norm;
-  const rawHarvested = getHarvestedRawTemplate(mappedSlug);
+  const directHarvestedSlug = mappedSlug || HARVESTED_SLUG_MAP[norm] || norm;
+  const rawHarvested = getHarvestedRawTemplate(directHarvestedSlug);
   if (rawHarvested && rawHarvested.images && rawHarvested.images.length > 0) {
     return convertHarvestedToStudioPreset(rawHarvested);
   }

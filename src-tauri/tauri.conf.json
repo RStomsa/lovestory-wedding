@@ -5,14 +5,16 @@
   "identifier": "com.lovestory.studio",
   "build": {
     "beforeDevCommand": "",
-    "devUrl": "http://localhost:3000",
-    "beforeBuildCommand": "bun run build",
-    "frontendDist": "../out"
+    "devUrl": "http://localhost:3000/admin/studio",
+    "beforeBuildCommand": "",
+    "frontendDist": "dist"
   },
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "LoveStory Studio - Quản Trị & Thiết Kế Thiệp Cưới Đa Nền Tảng",
+        "url": "http://localhost:3000/admin/studio",
         "width": 1440,
         "height": 920,
         "minWidth": 1024,

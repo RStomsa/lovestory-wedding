@@ -26,6 +26,8 @@
 }
 
 :root {
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --background: #fbf9f6;
   --foreground: #1c1917;
 }
@@ -187,6 +189,37 @@ body {
   }
 }
 
+@keyframes flipInAnimation {
+  from {
+    opacity: 0;
+    transform: perspective(800px) rotateX(60deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(800px) rotateX(0deg) scale(1);
+  }
+}
+
+@keyframes glowAnimation {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px rgba(245, 158, 11, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.75));
+  }
+}
+
+@keyframes pulseSubtleAnimation {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(0.97);
+  }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out forwards;
 }
@@ -223,6 +256,10 @@ body {
   animation: bounceIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+.anim-flip-in {
+  animation: flipInAnimation 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 .animate-float {
   animation: floatAnimation 2.0s ease-in-out infinite;
 }
@@ -233,6 +270,14 @@ body {
 
 .animate-wobble {
   animation: wobbleAnimation 2.0s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glowAnimation 2.5s ease-in-out infinite;
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtleAnimation 2.0s ease-in-out infinite;
 }
 
 /* Custom scrollbar */
@@ -272,3 +317,193 @@ html {
   perspective: 1000px;
 }
 
+/* =========================================================================
+   Luxury Metallic Foil Shimmer Animations (Ép Kim Vàng, Vàng Hồng, Bạc)
+   ========================================================================= */
+@keyframes foilShimmer {
+  0%, 100% {
+    background-position: 120% 0;
+  }
+  50% {
+    background-position: -30% 0;
+  }
+}
+
+.foil-text-gold {
+  background-image: linear-gradient(
+    108deg,
+    #7a4a08 0%,
+    #d4af37 15%,
+    #fff4b8 24%,
+    #b87014 38%,
+    #f6d66d 52%,
+    #8e560b 68%,
+    #fff0a2 78%,
+    #c98218 100%
+  ) !important;
+  background-size: 240% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  color: transparent !important;
+  animation: foilShimmer 4s ease-in-out infinite !important;
+  text-shadow: 0 1px 1px rgba(255, 244, 184, 0.4), 0 3px 10px rgba(0, 0, 0, 0.25) !important;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  display: inline-block;
+}
+
+
+
+.foil-text-rosegold {
+  background-image: linear-gradient(
+    108deg,
+    #8c4343 0%,
+    #e6a8a8 18%,
+    #fff0f0 26%,
+    #b56b6b 38%,
+    #f3bebe 52%,
+    #944b4b 68%,
+    #ffdede 78%,
+    #be7171 100%
+  ) !important;
+  background-size: 240% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  color: transparent !important;
+  animation: foilShimmer 4s ease-in-out infinite !important;
+  text-shadow: 0 1px 1px rgba(255, 220, 220, 0.4), 0 3px 10px rgba(0, 0, 0, 0.25) !important;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  display: inline-block;
+}
+
+
+
+.foil-text-silver {
+  background-image: linear-gradient(
+    108deg,
+    #4a4d52 0%,
+    #c8cdd4 18%,
+    #ffffff 24%,
+    #858b94 36%,
+    #d8dde4 51%,
+    #5a5e66 68%,
+    #f0f3f7 76%,
+    #9ba1ab 100%
+  ) !important;
+  background-size: 240% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  color: transparent !important;
+  animation: foilShimmer 4s ease-in-out infinite !important;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5), 0 3px 10px rgba(0, 0, 0, 0.25) !important;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  display: inline-block;
+}
+
+/* =========================================================================
+   Studio Custom Styled Widget Overrides (Background, Colors, Borders)
+   ========================================================================= */
+.studio-custom-styled-widget {
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+.studio-custom-styled-widget > div:first-child {
+  border-radius: inherit !important;
+  font-family: inherit !important;
+}
+
+/* 1. Khi chọn nền Trong Suốt (transparent hoặc chưa chọn màu nền) */
+.studio-custom-styled-widget.is-transparent-bg,
+.studio-custom-styled-widget.is-transparent-bg > div:first-child {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* 2. Khi chọn có màu nền tuỳ chỉnh (Đỏ rượu, Kính mờ, Hồng phấn...) - Triệt tiêu nền card con để màu cha hiển thị */
+.studio-custom-styled-widget.has-custom-bg > div:first-child {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* 3. Khi chọn Không Viền (borderWidth: 0 hoặc undefined) */
+.studio-custom-styled-widget.is-borderless,
+.studio-custom-styled-widget.is-borderless > div:first-child {
+  border: none !important;
+  border-width: 0 !important;
+  box-shadow: none !important;
+}
+
+.studio-custom-styled-widget.is-borderless > div:first-child .border-b,
+.studio-custom-styled-widget.is-borderless > div:first-child .border-t {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 4. Khi có đường viền tuỳ chỉnh từ người dùng */
+.studio-custom-styled-widget.has-custom-border > div:first-child {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* 5. Tự động tương thích nền tối (Dark Background Auto-adaptations) */
+.studio-custom-styled-widget.is-dark-bg {
+  color: #ffffff !important;
+}
+
+.studio-custom-styled-widget.is-dark-bg h2,
+.studio-custom-styled-widget.is-dark-bg h3,
+.studio-custom-styled-widget.is-dark-bg h4,
+.studio-custom-styled-widget.is-dark-bg h5,
+.studio-custom-styled-widget.is-dark-bg strong,
+.studio-custom-styled-widget.is-dark-bg b {
+  color: #ffffff !important;
+}
+
+.studio-custom-styled-widget.is-dark-bg p,
+.studio-custom-styled-widget.is-dark-bg span:not(.qr-keep-white span),
+.studio-custom-styled-widget.is-dark-bg label {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.studio-custom-styled-widget.is-dark-bg > div:first-child div[class*="bg-"]:not(.qr-keep-white) {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+.studio-custom-styled-widget.is-dark-bg input,
+.studio-custom-styled-widget.is-dark-bg textarea {
+  background-color: rgba(0, 0, 0, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+}
+
+.studio-custom-styled-widget.is-dark-bg input::placeholder,
+.studio-custom-styled-widget.is-dark-bg textarea::placeholder {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* 6. Custom Text Color Override */
+.studio-custom-styled-widget.has-custom-text-color,
+.studio-custom-styled-widget.has-custom-text-color h2,
+.studio-custom-styled-widget.has-custom-text-color h3,
+.studio-custom-styled-widget.has-custom-text-color h4,
+.studio-custom-styled-widget.has-custom-text-color h5,
+.studio-custom-styled-widget.has-custom-text-color p,
+.studio-custom-styled-widget.has-custom-text-color span,
+.studio-custom-styled-widget.has-custom-text-color strong,
+.studio-custom-styled-widget.has-custom-text-color b,
+.studio-custom-styled-widget.has-custom-text-color label {
+  color: var(--custom-text-color) !important;
+}

@@ -48,6 +48,61 @@ import { resolveStudioAssetUrl } from '@/lib/studioUtils';
 import StudioFontPicker from './StudioFontPicker';
 import StudioColorPalette from './StudioColorPalette';
 
+const WIDGET_STYLES_MAP: Record<string, { id: string; name: string; desc: string }[]> = {
+  wishes: [
+    { id: 'bubble-wall', name: 'Tường Bong Bóng', desc: 'Bong bóng tin nhắn mềm mại' },
+    { id: 'glass-card', name: 'Pha Lê Kính Mờ', desc: 'Kính mờ ánh kim sang trọng' },
+    { id: 'vintage-scroll', name: 'Thiệp Giấy Thư Tay', desc: 'Giấy Kraft hoài niệm' },
+    { id: 'minimal-list', name: 'Danh Sách Tinh Gọn', desc: 'Giao diện phẳng tối giản' },
+  ],
+  rsvp: [
+    { id: 'elegant-form', name: 'Form Sang Trọng', desc: 'Form bo góc cao cấp' },
+    { id: 'compact-modal', name: 'Thanh Nút Bật Nhanh', desc: 'Thanh nút xác nhận mini' },
+    { id: 'classic-card', name: 'Thẻ Cổ Điển', desc: 'Hoàng gia viền vàng' },
+    { id: 'glass-morphism', name: 'Kính Mờ Hiện Đại', desc: 'Kính mờ xuyên thấu' },
+  ],
+  giftbox: [
+    { id: 'qr-card', name: 'Thẻ Mã QR VietQR', desc: 'Mã QR ngân hàng 1-chạm' },
+    { id: 'dual-qr', name: '2 Mã QR Nhà Trai & Gái', desc: 'Tách biệt tài khoản 2 họ' },
+    { id: 'red-envelope', name: 'Bao Lì Xì May Mắn', desc: 'Phong bao đỏ chữ Hỷ' },
+    { id: 'bank-card', name: 'Thẻ Ngân Hàng VIP', desc: 'Thẻ kim loại sang trọng' },
+  ],
+  calendar: [
+    { id: 'classic-grid', name: 'Lưới Tháng Cổ Điển', desc: 'Lưới 31 ngày truyền thống' },
+    { id: 'mini-strip', name: 'Thanh Ngang Tối Giản', desc: 'Tuần lễ đám cưới mini' },
+    { id: 'card-pin', name: 'Bưu Thiếp Vintage', desc: 'Giấy Kraft cổ điển đính ghim' },
+    { id: 'frosted-glass', name: 'Pha Lê Kính Mờ', desc: 'Kính mờ viền ánh kim' },
+  ],
+  countdown: [
+    { id: 'boxes', name: 'Hộp Số Hiện Đại', desc: 'Khối hộp số bo góc nổi bật' },
+    { id: 'minimal', name: 'Tối Giản Tinh Tế', desc: 'Dãy số thanh mảnh không viền hộp' },
+    { id: 'circles', name: 'Vòng Tròn Đồng Hồ', desc: 'Hình tròn hiển thị thời gian' },
+    { id: 'flip-card', name: 'Thẻ Lật Cổ Điển', desc: 'Hiệu ứng đồng hồ lật vintage' },
+    { id: 'glass', name: 'Pha Lê Kính Mờ', desc: 'Khối kính mờ bóng bẩy' },
+    { id: 'romantic', name: 'Trái Tim Lãng Mạn', desc: 'Hộp số nhịp đập trái tim tình yêu' },
+  ],
+  family_info: [
+    { id: 'two-column-card', name: 'Hai Cột Trang Trọng', desc: 'Nhà trai & gái cân xứng' },
+    { id: 'crest-classic', name: 'Huy Hiệu Hoàng Gia', desc: 'Khung vòm hoàng gia cổ điển' },
+    { id: 'minimalist-row', name: 'Dòng Tối Giản', desc: 'Thẻ ngang tối giản thanh lịch' },
+  ],
+  map: [
+    { id: 'interactive-card', name: 'Thẻ Tương Tác Kèm Nút', desc: 'Bản đồ kèm Google Maps & Hotline' },
+    { id: 'minimal-pin', name: 'Ghim Vị Trí Tối Giản', desc: 'Tên địa điểm và nút mở bản đồ' },
+    { id: 'directions-card', name: 'Chỉ Đường Chi Tiết', desc: 'Thẻ thông tin lộ trình GPS' },
+  ],
+  music_player: [
+    { id: 'vinyl-retro', name: 'Đĩa Than Retro Xoay 360', desc: 'Đĩa than vinyl có cần gạt' },
+    { id: 'cassette', name: 'Băng Cassette Vintage', desc: 'Băng từ cổ điển cuộn băng quay' },
+    { id: 'compact-bar', name: 'Thanh Mini Nổi Tối Giản', desc: 'Thanh sóng âm waveform' },
+  ],
+  guest_name: [
+    { id: 'gold-badge', name: 'Huy Hiệu Mạ Vàng', desc: 'Khung mạ vàng trang trọng' },
+    { id: 'calligraphy', name: 'Thư Pháp Bay Bổng', desc: 'Chữ viết tay nghệ thuật' },
+    { id: 'ticket-seal', name: 'Vé Mời Vintage Đóng Dấu', desc: 'Vé mời có tem niêm phong' },
+  ],
+};
+
 export default function StudioRightInspector() {
   const {
     canvas,
@@ -1862,15 +1917,504 @@ export default function StudioRightInspector() {
                   </div>
                 )}
               </div>
+
+              {/* Luxury Metallic Foil Shimmer Effect */}
+              <div className="pt-2 border-t border-stone-200 dark:border-stone-700 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-semibold text-stone-700 dark:text-stone-300 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Hiệu ứng Ép Kim Lấp Lánh</span>
+                  </span>
+                  {selectedElement.foilEffect && selectedElement.foilEffect !== 'none' && (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-bold uppercase tracking-wider">
+                      Đang bật
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-4 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => updateElement(selectedElement.id, { foilEffect: 'none' }, true)}
+                    className={`py-1.5 px-1 rounded-lg text-[10px] font-medium border text-center transition-all ${
+                      !selectedElement.foilEffect || selectedElement.foilEffect === 'none'
+                        ? 'border-stone-900 bg-stone-900 text-white dark:border-white dark:bg-white dark:text-stone-900'
+                        : 'border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-400'
+                    }`}
+                  >
+                    Tắt
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => updateElement(selectedElement.id, { foilEffect: 'gold' }, true)}
+                    className={`py-1.5 px-1 rounded-lg text-[10px] font-bold border text-center transition-all ${
+                      selectedElement.foilEffect === 'gold'
+                        ? 'border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-2 ring-amber-400/40'
+                        : 'border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-amber-700 dark:text-amber-400'
+                    }`}
+                  >
+                    👑 Vàng Gold
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => updateElement(selectedElement.id, { foilEffect: 'rosegold' }, true)}
+                    className={`py-1.5 px-1 rounded-lg text-[10px] font-bold border text-center transition-all ${
+                      selectedElement.foilEffect === 'rosegold'
+                        ? 'border-rose-400 bg-rose-500/10 text-rose-600 dark:text-rose-400 ring-2 ring-rose-400/40'
+                        : 'border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-rose-700 dark:text-rose-400'
+                    }`}
+                  >
+                    🌸 Vàng Hồng
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => updateElement(selectedElement.id, { foilEffect: 'silver' }, true)}
+                    className={`py-1.5 px-1 rounded-lg text-[10px] font-bold border text-center transition-all ${
+                      selectedElement.foilEffect === 'silver'
+                        ? 'border-cyan-400 bg-cyan-500/10 text-cyan-600 dark:text-cyan-300 ring-2 ring-cyan-400/40'
+                        : 'border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300'
+                    }`}
+                  >
+                    💎 Ánh Bạc
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
           {/* WIDGET SPECIFIC CONTROLS */}
           {selectedElement.type === 'widget' && (
-            <div className="space-y-3 p-3.5 bg-stone-50 dark:bg-stone-800/80 rounded-2xl border border-stone-200 dark:border-stone-700">
-              <span className="text-[11px] font-bold text-rose-500 uppercase tracking-wider block">
-                Cài đặt tiện ích: {selectedElement.widgetType}
-              </span>
+            <div className="space-y-3.5 p-3.5 bg-stone-50 dark:bg-stone-800/80 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-2xs">
+              {/* Tiêu đề tiện ích */}
+              <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-700">
+                <span className="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-rose-500" />
+                  <span>
+                    {selectedElement.widgetType === 'countdown'
+                      ? 'Đếm Ngược Ngày Cưới'
+                      : selectedElement.widgetType === 'calendar'
+                      ? 'Lịch Ngày Cưới'
+                      : selectedElement.widgetType === 'family_info'
+                      ? 'Thông Tin Hai Bên Gia Đình'
+                      : selectedElement.widgetType === 'album' || selectedElement.widgetType === 'slideshow'
+                      ? 'Album Ảnh Cưới'
+                      : selectedElement.widgetType === 'rsvp'
+                      ? 'Xác Nhận Tham Dự (RSVP)'
+                      : selectedElement.widgetType === 'map'
+                      ? 'Bản Đồ & Chỉ Đường'
+                      : selectedElement.widgetType === 'giftbox'
+                      ? 'Mừng Cưới & QR Code'
+                      : selectedElement.widgetType === 'call'
+                      ? 'Nút Gọi Nhanh'
+                      : selectedElement.widgetType === 'reminder'
+                      ? 'Lời Nhắc Lịch'
+                      : selectedElement.widgetType === 'guest_name'
+                      ? 'Tên Khách Mời Tự Động'
+                      : selectedElement.widgetType === 'wishes'
+                      ? 'Sổ Lưu Bút & Lời Chúc'
+                      : selectedElement.widgetType === 'music_player'
+                      ? 'Trình Phát Nhạc Nền'
+                      : selectedElement.widgetType === 'story_timeline'
+                      ? 'Dòng Thời Gian Tình Yêu'
+                      : selectedElement.widgetType === 'dresscode'
+                      ? 'Bảng Màu Trang Phục'
+                      : `Tiện ích: ${selectedElement.widgetType}`}
+                  </span>
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold uppercase tracking-wider">
+                  Tiện ích
+                </span>
+              </div>
+
+              {/* BỘ CHỌN KIỂU DÁNG GIAO DIỆN (Layout Styles) */}
+              {selectedElement.widgetType && WIDGET_STYLES_MAP[selectedElement.widgetType] && (() => {
+                const stylesList = WIDGET_STYLES_MAP[selectedElement.widgetType!];
+                return (
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 space-y-2 shadow-2xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <Layers className="w-3 h-3 text-rose-500" />
+                        <span>Kiểu dáng bố cục ({stylesList.length})</span>
+                      </span>
+                      <span className="text-[10px] font-mono text-stone-400">
+                        {selectedElement.widgetConfig?.style || stylesList[0]?.id}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {stylesList.map((st) => {
+                        const isCurrent =
+                          (selectedElement.widgetConfig?.style || stylesList[0]?.id) === st.id;
+                        return (
+                          <button
+                            key={st.id}
+                            type="button"
+                            onClick={() =>
+                              updateElement(
+                                selectedElement.id,
+                                {
+                                  widgetConfig: {
+                                    ...selectedElement.widgetConfig,
+                                    style: st.id,
+                                  },
+                                },
+                                true
+                              )
+                            }
+                            className={`p-2 rounded-xl text-left border transition-all cursor-pointer ${
+                              isCurrent
+                                ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-500 text-rose-700 dark:text-rose-300 font-bold shadow-xs'
+                                : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-stone-400'
+                            }`}
+                          >
+                            <span className="block text-xs font-semibold truncate">{st.name}</span>
+                            <span className="text-[9px] text-stone-400 truncate block mt-0.5">{st.desc}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* TUỲ BIẾN MÀU SẮC & GIAO DIỆN TIỆN ÍCH (Widget Custom Appearance) */}
+              <div className="p-2.5 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 space-y-2.5 shadow-2xs">
+                <span className="text-[11px] font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Palette className="w-3 h-3 text-amber-500" />
+                  <span>Tuỳ biến thiết kế & màu sắc</span>
+                </span>
+
+                {/* 1. Màu nền tiện ích */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-stone-500 font-medium">Màu nền:</span>
+                    <span className="font-mono text-stone-400">
+                      {!selectedElement.widgetConfig?.backgroundColor || selectedElement.widgetConfig.backgroundColor === 'transparent'
+                        ? 'Trong suốt'
+                        : selectedElement.widgetConfig.backgroundColor}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {[
+                      { val: 'transparent', label: 'Trong suốt' },
+                      { val: '#ffffff', label: 'Trắng' },
+                      { val: 'rgba(255, 255, 255, 0.75)', label: 'Kính mờ' },
+                      { val: '#faf6f0', label: 'Kraft' },
+                      { val: '#fdf8f0', label: 'Kem' },
+                      { val: '#fff1f2', label: 'Hồng' },
+                      { val: '#4c0519', label: 'Đỏ rượu' },
+                      { val: '#0f172a', label: 'Navy' },
+                      { val: '#1c1917', label: 'Đen' },
+                    ].map((bg) => (
+                      <button
+                        key={bg.val}
+                        type="button"
+                        onClick={() =>
+                          updateElement(
+                            selectedElement.id,
+                            {
+                              widgetConfig: {
+                                ...selectedElement.widgetConfig,
+                                backgroundColor: bg.val,
+                              },
+                            },
+                            true
+                          )
+                        }
+                        className={`px-2 py-0.5 rounded-lg text-[10px] font-medium border transition-all cursor-pointer ${
+                          (selectedElement.widgetConfig?.backgroundColor || 'transparent') === bg.val
+                            ? 'bg-rose-500 text-white border-rose-500 font-bold'
+                            : 'bg-stone-50 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-stone-200 dark:border-stone-700'
+                        }`}
+                      >
+                        {bg.label}
+                      </button>
+                    ))}
+                    <input
+                      type="color"
+                      value={selectedElement.widgetConfig?.backgroundColor && selectedElement.widgetConfig.backgroundColor.startsWith('#') ? selectedElement.widgetConfig.backgroundColor : '#4c0519'}
+                      onChange={(e) =>
+                        updateElement(
+                          selectedElement.id,
+                          {
+                            widgetConfig: {
+                              ...selectedElement.widgetConfig,
+                              backgroundColor: e.target.value,
+                            },
+                          },
+                          true
+                        )
+                      }
+                      className="w-5 h-5 rounded cursor-pointer border border-stone-300"
+                      title="Chọn màu nền tự do"
+                    />
+                  </div>
+                </div>
+
+                {/* 2. Màu điểm nhấn (Accent) & Màu chữ */}
+                <div className="grid grid-cols-2 gap-2 text-[10px]">
+                  <div>
+                    <label className="text-stone-500 font-medium block mb-1">Màu điểm nhấn:</label>
+                    <div className="flex items-center gap-1">
+                      {['#e11d48', '#d97706', '#be185d', '#059669', '#2563eb', '#7c3aed'].map((col) => (
+                        <button
+                          key={col}
+                          type="button"
+                          onClick={() =>
+                            updateElement(
+                              selectedElement.id,
+                              {
+                                widgetConfig: {
+                                  ...selectedElement.widgetConfig,
+                                  accentColor: col,
+                                  markerColor: col,
+                                },
+                              },
+                              true
+                            )
+                          }
+                          className={`w-4 h-4 rounded-full border cursor-pointer ${
+                            selectedElement.widgetConfig?.accentColor === col ? 'scale-125 border-stone-900 shadow-xs' : 'border-transparent'
+                          }`}
+                          style={{ backgroundColor: col }}
+                        />
+                      ))}
+                      <input
+                        type="color"
+                        value={selectedElement.widgetConfig?.accentColor || '#e11d48'}
+                        onChange={(e) =>
+                          updateElement(
+                            selectedElement.id,
+                            {
+                              widgetConfig: {
+                                ...selectedElement.widgetConfig,
+                                accentColor: e.target.value,
+                                markerColor: e.target.value,
+                              },
+                            },
+                            true
+                          )
+                        }
+                        className="w-4 h-4 rounded cursor-pointer border border-stone-300 ml-0.5"
+                        title="Chọn màu điểm nhấn tự do"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-stone-500 font-medium block mb-1">Màu chữ chính:</label>
+                    <div className="flex items-center gap-1">
+                      {['#1c1917', '#ffffff', '#854d0e', '#d97706', '#be185d'].map((col) => (
+                        <button
+                          key={col}
+                          type="button"
+                          onClick={() =>
+                            updateElement(
+                              selectedElement.id,
+                              {
+                                widgetConfig: {
+                                  ...selectedElement.widgetConfig,
+                                  textColor: col,
+                                },
+                              },
+                              true
+                            )
+                          }
+                          className={`w-4 h-4 rounded-full border cursor-pointer ${
+                            selectedElement.widgetConfig?.textColor === col ? 'scale-125 border-stone-900 shadow-xs' : 'border-stone-300'
+                          }`}
+                          style={{ backgroundColor: col }}
+                        />
+                      ))}
+                      <input
+                        type="color"
+                        value={selectedElement.widgetConfig?.textColor || '#1c1917'}
+                        onChange={(e) =>
+                          updateElement(
+                            selectedElement.id,
+                            {
+                              widgetConfig: {
+                                ...selectedElement.widgetConfig,
+                                textColor: e.target.value,
+                              },
+                            },
+                            true
+                          )
+                        }
+                        className="w-4 h-4 rounded cursor-pointer border border-stone-300 ml-0.5"
+                        title="Chọn màu chữ tự do"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Độ bo góc & Viền */}
+                <div className="grid grid-cols-2 gap-2 text-[10px]">
+                  <div>
+                    <label className="text-stone-500 font-medium block mb-1">
+                      Bo góc ({selectedElement.widgetConfig?.borderRadius ?? 16}px):
+                    </label>
+                    <div className="flex items-center gap-1">
+                      {[0, 8, 16, 24].map((r) => (
+                        <button
+                          key={r}
+                          type="button"
+                          onClick={() =>
+                            updateElement(
+                              selectedElement.id,
+                              {
+                                widgetConfig: {
+                                  ...selectedElement.widgetConfig,
+                                  borderRadius: r,
+                                },
+                              },
+                              true
+                            )
+                          }
+                          className={`px-1.5 py-0.5 rounded text-[9px] border font-semibold ${
+                            (selectedElement.widgetConfig?.borderRadius ?? 16) === r
+                              ? 'bg-stone-900 text-white border-stone-900'
+                              : 'bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-200'
+                          }`}
+                        >
+                          {r}px
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-stone-500 font-medium block mb-1">Đường viền:</label>
+                    <div className="flex items-center gap-1">
+                      {[
+                        { w: 0, s: 'solid', label: 'Không' },
+                        { w: 1, s: 'solid', label: '1px' },
+                        { w: 2, s: 'dashed', label: 'Đứt nét' },
+                      ].map((b, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() =>
+                            updateElement(
+                              selectedElement.id,
+                              {
+                                widgetConfig: {
+                                  ...selectedElement.widgetConfig,
+                                  borderWidth: b.w,
+                                  borderStyle: b.s,
+                                },
+                              },
+                              true
+                            )
+                          }
+                          className={`px-1.5 py-0.5 rounded text-[9px] border font-semibold ${
+                            (selectedElement.widgetConfig?.borderWidth ?? 0) === b.w
+                              ? 'bg-stone-900 text-white border-stone-900'
+                              : 'bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-200'
+                          }`}
+                        >
+                          {b.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* BỘ CHỌN HIỆU ỨNG TIỆN ÍCH (Animations & Effects) */}
+              <div className="p-2.5 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 space-y-2.5 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <Play className="w-3 h-3 text-purple-500" />
+                    <span>Hiệu ứng tiện ích</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // Trigger re-render to test entrance animation
+                      const cur = selectedElement.animation;
+                      updateElement(selectedElement.id, { animation: { type: 'none', duration: 0.1, delay: 0 } }, false);
+                      setTimeout(() => {
+                        updateElement(
+                          selectedElement.id,
+                          { animation: cur || { type: 'slide-up', duration: 1.0, delay: 0 } },
+                          true
+                        );
+                      }, 50);
+                    }}
+                    className="text-[10px] px-2 py-0.5 rounded-lg bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 font-semibold border border-purple-200 dark:border-purple-800 flex items-center gap-1 transition-all active:scale-95 shadow-2xs"
+                    title="Xem thử hiệu ứng xuất hiện ngay trên Canvas"
+                  >
+                    <Play className="w-2.5 h-2.5 fill-purple-600 dark:fill-purple-300" />
+                    <span>Xem thử</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {/* 1. Hiệu ứng xuất hiện */}
+                  <div>
+                    <label className="text-[10px] text-stone-400 block mb-1">Hiệu ứng xuất hiện:</label>
+                    <select
+                      value={selectedElement.animation?.type || 'none'}
+                      onChange={(e) =>
+                        updateElement(
+                          selectedElement.id,
+                          {
+                            animation: {
+                              type: e.target.value as any,
+                              duration: selectedElement.animation?.duration ?? 1.0,
+                              delay: selectedElement.animation?.delay ?? 0,
+                            },
+                          },
+                          true
+                        )
+                      }
+                      className="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg p-1.5 text-xs text-stone-800 dark:text-stone-200 font-semibold outline-none"
+                    >
+                      <option value="none">Không hiệu ứng</option>
+                      <option value="slide-up">Trượt từ dưới lên (Slide Up)</option>
+                      <option value="zoom-in">Phóng to êm dịu (Zoom In)</option>
+                      <option value="flip">Lật thẻ 3D (3D Flip)</option>
+                      <option value="fade-in">Hiện mờ dần (Fade In)</option>
+                      <option value="slide-left">Trượt từ trái sang</option>
+                      <option value="slide-right">Trượt từ phải sang</option>
+                      <option value="bounce-in">Nảy nhẹ (Bounce In)</option>
+                    </select>
+                  </div>
+
+                  {/* 2. Chuyển động liên tục */}
+                  <div>
+                    <label className="text-[10px] text-stone-400 block mb-1">Chuyển động liên tục:</label>
+                    <select
+                      value={selectedElement.continuousAnimation?.type || 'none'}
+                      onChange={(e) =>
+                        updateElement(
+                          selectedElement.id,
+                          {
+                            continuousAnimation: {
+                              type: e.target.value as any,
+                              duration: selectedElement.continuousAnimation?.duration ?? 2.0,
+                              delay: selectedElement.continuousAnimation?.delay ?? 0,
+                            },
+                          },
+                          true
+                        )
+                      }
+                      className="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg p-1.5 text-xs text-stone-800 dark:text-stone-200 font-semibold outline-none"
+                    >
+                      <option value="none">Tĩnh (Không chuyển động)</option>
+                      <option value="floating">Bồng bềnh (Floating)</option>
+                      <option value="heartbeat">Nhịp đập trái tim</option>
+                      <option value="pulse">Nhịp thở êm (Pulse)</option>
+                      <option value="glow">Hào quang phát sáng</option>
+                      <option value="wobble">Lắc lư nhẹ</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
 
               {/* 0. ALBUM & SLIDESHOW WIDGET INSPECTOR */}
               {(selectedElement.widgetType === 'album' || selectedElement.widgetType === 'slideshow') && (
@@ -2192,7 +2736,46 @@ export default function StudioRightInspector() {
 
               {/* 1. Countdown */}
               {selectedElement.widgetType === 'countdown' && (
-                <div className="space-y-2 text-xs">
+                <div className="space-y-3 text-xs">
+                  {/* Kiểu hiển thị Countdown (5 styles) */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-stone-700 dark:text-stone-300 block uppercase tracking-wider">
+                      Kiểu hiển thị ({selectedElement.widgetConfig?.style || 'boxes'})
+                    </label>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {[
+                        { id: 'boxes', label: 'Hộp Vàng Hoàng Gia', desc: '4 ô vuông viền vàng' },
+                        { id: 'glass', label: 'Kính Mờ Hiện Đại', desc: 'Frosted glassmorphism' },
+                        { id: 'circle', label: 'Huy Hiệu Tròn', desc: 'Vòng tròn thanh lịch' },
+                        { id: 'flip', label: 'Đồng Hồ Lật 3D', desc: 'Retro flip clock' },
+                        { id: 'romantic', label: 'Trái Tim Lãng Mạn', desc: 'Điểm nhấn hoa & tim' },
+                      ].map((item) => {
+                        const isCur = (selectedElement.widgetConfig?.style || 'boxes') === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() =>
+                              updateElement(
+                                selectedElement.id,
+                                { widgetConfig: { ...selectedElement.widgetConfig, style: item.id } },
+                                true
+                              )
+                            }
+                            className={`p-2 rounded-xl text-left border transition-all ${
+                              isCur
+                                ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-500 text-rose-700 dark:text-rose-300 font-bold shadow-xs'
+                                : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-stone-400'
+                            }`}
+                          >
+                            <span className="block text-xs">{item.label}</span>
+                            <span className="block text-[9px] text-stone-400 font-normal">{item.desc}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <div>
                     <label className="text-[10px] text-stone-400 block mb-1">Câu đề tựa đếm ngược</label>
                     <input
@@ -2218,40 +2801,423 @@ export default function StudioRightInspector() {
 
               {/* 2. Calendar */}
               {selectedElement.widgetType === 'calendar' && (
-                <div className="space-y-2 text-xs">
+                <div className="space-y-3 text-xs">
+                  {/* Kiểu hiển thị Lịch (4 styles) */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-stone-700 dark:text-stone-300 block uppercase tracking-wider">
+                      Kiểu hiển thị ({selectedElement.widgetConfig?.style || 'classic-grid'})
+                    </label>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {[
+                        { id: 'classic-grid', label: 'Lưới Tháng Cổ Điển', desc: 'Trọn vẹn 31 ngày' },
+                        { id: 'mini-strip', label: 'Thanh Ngang Tối Giản', desc: 'Tuần lễ đám cưới mini' },
+                        { id: 'card-pin', label: 'Bưu Thiếp Vintage', desc: 'Giấy Kraft & tem thư' },
+                        { id: 'frosted-glass', label: 'Pha Lê Kính Mờ', desc: 'Mạ vàng sang trọng' },
+                      ].map((item) => {
+                        const isCur = (selectedElement.widgetConfig?.style || 'classic-grid') === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() =>
+                              updateElement(
+                                selectedElement.id,
+                                {
+                                  widgetConfig: { ...selectedElement.widgetConfig, style: item.id },
+                                  height: item.id === 'mini-strip' ? Math.min(selectedElement.height, 160) : Math.max(selectedElement.height, 310),
+                                },
+                                true
+                              )
+                            }
+                            className={`p-2 rounded-xl text-left border transition-all ${
+                              isCur
+                                ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-500 text-rose-700 dark:text-rose-300 font-bold shadow-xs'
+                                : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-stone-400'
+                            }`}
+                          >
+                            <span className="block text-xs">{item.label}</span>
+                            <span className="block text-[9px] text-stone-400 font-normal">{item.desc}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[10px] text-stone-400 block mb-1">Tháng / Năm</label>
+                      <input
+                        type="text"
+                        value={selectedElement.widgetConfig?.monthYear || 'Tháng 12 / 2026'}
+                        onChange={(e) =>
+                          updateElement(selectedElement.id, {
+                            widgetConfig: { ...selectedElement.widgetConfig, monthYear: e.target.value },
+                          })
+                        }
+                        onBlur={(e) =>
+                          updateElement(
+                            selectedElement.id,
+                            { widgetConfig: { ...selectedElement.widgetConfig, monthYear: e.target.value } },
+                            true
+                          )
+                        }
+                        className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-2 text-xs outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-stone-400 block mb-1">Ngày cưới (1 - 31)</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="31"
+                        value={selectedElement.widgetConfig?.selectedDay ?? 28}
+                        onChange={(e) =>
+                          updateElement(selectedElement.id, {
+                            widgetConfig: { ...selectedElement.widgetConfig, selectedDay: Number(e.target.value) },
+                          }, true)
+                        }
+                        className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-2 text-xs outline-none font-mono font-bold text-rose-600"
+                      />
+                    </div>
+                  </div>
+
                   <div>
-                    <label className="text-[10px] text-stone-400 block mb-1">Tháng / Năm</label>
+                    <label className="text-[10px] text-stone-400 block mb-1">Tiêu đề lịch</label>
                     <input
                       type="text"
-                      value={selectedElement.widgetConfig?.monthYear || 'Tháng 12 / 2026'}
+                      value={selectedElement.widgetConfig?.weddingTitle || 'Ngày Trọng Đại'}
                       onChange={(e) =>
                         updateElement(selectedElement.id, {
-                          widgetConfig: { ...selectedElement.widgetConfig, monthYear: e.target.value },
+                          widgetConfig: { ...selectedElement.widgetConfig, weddingTitle: e.target.value },
                         })
                       }
                       onBlur={(e) =>
                         updateElement(
                           selectedElement.id,
-                          { widgetConfig: { ...selectedElement.widgetConfig, monthYear: e.target.value } },
+                          { widgetConfig: { ...selectedElement.widgetConfig, weddingTitle: e.target.value } },
                           true
                         )
                       }
                       className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-2 text-xs outline-none"
                     />
                   </div>
+
                   <div>
-                    <label className="text-[10px] text-stone-400 block mb-1">Ngày cưới (1 - 31)</label>
+                    <label className="text-[10px] text-stone-400 block mb-1">Màu đánh dấu ngày cưới</label>
+                    <div className="flex items-center gap-2">
+                      {['#f43f5e', '#dc2626', '#d97706', '#8b5cf6', '#059669', '#1e293b'].map((color) => (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() =>
+                            updateElement(
+                              selectedElement.id,
+                              { widgetConfig: { ...selectedElement.widgetConfig, markerColor: color } },
+                              true
+                            )
+                          }
+                          className={`w-6 h-6 rounded-full border-2 transition-transform ${
+                            (selectedElement.widgetConfig?.markerColor || '#f43f5e') === color
+                              ? 'scale-110 border-stone-900 dark:border-white shadow-xs'
+                              : 'border-transparent hover:scale-105'
+                          }`}
+                          style={{ backgroundColor: color }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 3. Family Info / Thông tin hai bên gia đình (as in user screenshot) */}
+              {selectedElement.widgetType === 'family_info' && (
+                <div className="space-y-3 text-xs">
+                  {/* Kiểu hiển thị Family Info (4 styles) */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-stone-700 dark:text-stone-300 block uppercase tracking-wider">
+                      Kiểu bố cục ({selectedElement.widgetConfig?.style || 'two-column-card'})
+                    </label>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {[
+                        { id: 'two-column-card', label: '2 Cột Song Song', desc: 'Thẻ Xanh & Hồng chuẩn mẫu' },
+                        { id: 'royal-arch', label: 'Khung Vòm Hoàng Gia', desc: 'Vòm đối xứng Châu Âu' },
+                        { id: 'minimal-divider', label: 'Tối Giản Hiện Đại', desc: 'Đường kẻ thanh lịch' },
+                        { id: 'stacked-flow', label: 'Xếp Tầng Đứng', desc: 'Nhà Trai trên - Gái dưới' },
+                      ].map((item) => {
+                        const isCur = (selectedElement.widgetConfig?.style || 'two-column-card') === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() =>
+                              updateElement(
+                                selectedElement.id,
+                                {
+                                  widgetConfig: { ...selectedElement.widgetConfig, style: item.id },
+                                  height: item.id === 'stacked-flow' ? Math.max(selectedElement.height, 260) : selectedElement.height,
+                                },
+                                true
+                              )
+                            }
+                            className={`p-2 rounded-xl text-left border transition-all ${
+                              isCur
+                                ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-500 text-rose-700 dark:text-rose-300 font-bold shadow-xs'
+                                : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-stone-400'
+                            }`}
+                          >
+                            <span className="block text-xs">{item.label}</span>
+                            <span className="block text-[9px] text-stone-400 font-normal">{item.desc}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Header text */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[10px] text-stone-400 block mb-1">Tựa đề trên</label>
+                      <input
+                        type="text"
+                        value={selectedElement.widgetConfig?.headerText || 'HÔN PHỐI TRÂN TRỌNG KÍNH BÁO'}
+                        onChange={(e) =>
+                          updateElement(selectedElement.id, {
+                            widgetConfig: { ...selectedElement.widgetConfig, headerText: e.target.value },
+                          })
+                        }
+                        onBlur={(e) =>
+                          updateElement(
+                            selectedElement.id,
+                            { widgetConfig: { ...selectedElement.widgetConfig, headerText: e.target.value } },
+                            true
+                          )
+                        }
+                        className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-2 text-xs outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-stone-400 block mb-1">Tiêu đề phụ</label>
+                      <input
+                        type="text"
+                        value={selectedElement.widgetConfig?.subHeader || 'Gia Đình Hai Bên'}
+                        onChange={(e) =>
+                          updateElement(selectedElement.id, {
+                            widgetConfig: { ...selectedElement.widgetConfig, subHeader: e.target.value },
+                          })
+                        }
+                        onBlur={(e) =>
+                          updateElement(
+                            selectedElement.id,
+                            { widgetConfig: { ...selectedElement.widgetConfig, subHeader: e.target.value } },
+                            true
+                          )
+                        }
+                        className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-2 text-xs outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* NHÀ TRAI */}
+                  <div className="p-2.5 rounded-xl bg-blue-50/60 dark:bg-stone-900/60 border border-blue-200/80 space-y-2">
+                    <span className="text-[10px] font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wider block">
+                      ♂ Thông tin Nhà Trai
+                    </span>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[9px] text-stone-500 block mb-0.5">Tên Bố:</label>
+                        <input
+                          type="text"
+                          value={selectedElement.widgetConfig?.groomFather || 'Ông: Nguyễn Văn An'}
+                          onChange={(e) =>
+                            updateElement(selectedElement.id, {
+                              widgetConfig: { ...selectedElement.widgetConfig, groomFather: e.target.value },
+                            })
+                          }
+                          onBlur={(e) =>
+                            updateElement(
+                              selectedElement.id,
+                              { widgetConfig: { ...selectedElement.widgetConfig, groomFather: e.target.value } },
+                              true
+                            )
+                          }
+                          className="w-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded p-1.5 text-xs outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[9px] text-stone-500 block mb-0.5">Tên Mẹ:</label>
+                        <input
+                          type="text"
+                          value={selectedElement.widgetConfig?.groomMother || 'Bà: Trần Thị Mai'}
+                          onChange={(e) =>
+                            updateElement(selectedElement.id, {
+                              widgetConfig: { ...selectedElement.widgetConfig, groomMother: e.target.value },
+                            })
+                          }
+                          onBlur={(e) =>
+                            updateElement(
+                              selectedElement.id,
+                              { widgetConfig: { ...selectedElement.widgetConfig, groomMother: e.target.value } },
+                              true
+                            )
+                          }
+                          className="w-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded p-1.5 text-xs outline-none"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[9px] text-stone-500 block mb-0.5">Thứ tự / Danh xưng:</label>
+                        <input
+                          type="text"
+                          value={selectedElement.widgetConfig?.groomTitle || 'Trưởng Nam'}
+                          onChange={(e) =>
+                            updateElement(selectedElement.id, {
+                              widgetConfig: { ...selectedElement.widgetConfig, groomTitle: e.target.value },
+                            })
+                          }
+                          onBlur={(e) =>
+                            updateElement(
+                              selectedElement.id,
+                              { widgetConfig: { ...selectedElement.widgetConfig, groomTitle: e.target.value } },
+                              true
+                            )
+                          }
+                          className="w-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded p-1.5 text-xs outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[9px] text-stone-500 block mb-0.5">Tên Chú Rể:</label>
+                        <input
+                          type="text"
+                          value={selectedElement.widgetConfig?.groomName || 'Minh Trí'}
+                          onChange={(e) =>
+                            updateElement(selectedElement.id, {
+                              widgetConfig: { ...selectedElement.widgetConfig, groomName: e.target.value },
+                            })
+                          }
+                          onBlur={(e) =>
+                            updateElement(
+                              selectedElement.id,
+                              { widgetConfig: { ...selectedElement.widgetConfig, groomName: e.target.value } },
+                              true
+                            )
+                          }
+                          className="w-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded p-1.5 text-xs outline-none font-bold text-blue-900 dark:text-blue-200"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* NHÀ GÁI */}
+                  <div className="p-2.5 rounded-xl bg-rose-50/60 dark:bg-stone-900/60 border border-rose-200/80 space-y-2">
+                    <span className="text-[10px] font-bold text-rose-700 dark:text-rose-300 uppercase tracking-wider block">
+                      ♀ Thông tin Nhà Gái
+                    </span>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[9px] text-stone-500 block mb-0.5">Tên Bố:</label>
+                        <input
+                          type="text"
+                          value={selectedElement.widgetConfig?.brideFather || 'Ông: Lê Hoàng Long'}
+                          onChange={(e) =>
+                            updateElement(selectedElement.id, {
+                              widgetConfig: { ...selectedElement.widgetConfig, brideFather: e.target.value },
+                            })
+                          }
+                          onBlur={(e) =>
+                            updateElement(
+                              selectedElement.id,
+                              { widgetConfig: { ...selectedElement.widgetConfig, brideFather: e.target.value } },
+                              true
+                            )
+                          }
+                          className="w-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded p-1.5 text-xs outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[9px] text-stone-500 block mb-0.5">Tên Mẹ:</label>
+                        <input
+                          type="text"
+                          value={selectedElement.widgetConfig?.brideMother || 'Bà: Phạm Thu Cúc'}
+                          onChange={(e) =>
+                            updateElement(selectedElement.id, {
+                              widgetConfig: { ...selectedElement.widgetConfig, brideMother: e.target.value },
+                            })
+                          }
+                          onBlur={(e) =>
+                            updateElement(
+                              selectedElement.id,
+                              { widgetConfig: { ...selectedElement.widgetConfig, brideMother: e.target.value } },
+                              true
+                            )
+                          }
+                          className="w-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded p-1.5 text-xs outline-none"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[9px] text-stone-500 block mb-0.5">Thứ tự / Danh xưng:</label>
+                        <input
+                          type="text"
+                          value={selectedElement.widgetConfig?.brideTitle || 'Út Nữ'}
+                          onChange={(e) =>
+                            updateElement(selectedElement.id, {
+                              widgetConfig: { ...selectedElement.widgetConfig, brideTitle: e.target.value },
+                            })
+                          }
+                          onBlur={(e) =>
+                            updateElement(
+                              selectedElement.id,
+                              { widgetConfig: { ...selectedElement.widgetConfig, brideTitle: e.target.value } },
+                              true
+                            )
+                          }
+                          className="w-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded p-1.5 text-xs outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[9px] text-stone-500 block mb-0.5">Tên Cô Dâu:</label>
+                        <input
+                          type="text"
+                          value={selectedElement.widgetConfig?.brideName || 'Ngọc Anh'}
+                          onChange={(e) =>
+                            updateElement(selectedElement.id, {
+                              widgetConfig: { ...selectedElement.widgetConfig, brideName: e.target.value },
+                            })
+                          }
+                          onBlur={(e) =>
+                            updateElement(
+                              selectedElement.id,
+                              { widgetConfig: { ...selectedElement.widgetConfig, brideName: e.target.value } },
+                              true
+                            )
+                          }
+                          className="w-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded p-1.5 text-xs outline-none font-bold text-rose-900 dark:text-rose-200"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Lời mời */}
+                  <div>
+                    <label className="text-[10px] text-stone-400 block mb-1">Lời mời kết</label>
                     <input
-                      type="number"
-                      min="1"
-                      max="31"
-                      value={selectedElement.widgetConfig?.selectedDay ?? 28}
+                      type="text"
+                      value={selectedElement.widgetConfig?.invitationNote || 'Kính mời quý quan viên hai họ và bạn bè thân hữu tới dự'}
                       onChange={(e) =>
                         updateElement(selectedElement.id, {
-                          widgetConfig: { ...selectedElement.widgetConfig, selectedDay: Number(e.target.value) },
-                        }, true)
+                          widgetConfig: { ...selectedElement.widgetConfig, invitationNote: e.target.value },
+                        })
                       }
-                      className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-2 text-xs outline-none font-mono"
+                      onBlur={(e) =>
+                        updateElement(
+                          selectedElement.id,
+                          { widgetConfig: { ...selectedElement.widgetConfig, invitationNote: e.target.value } },
+                          true
+                        )
+                      }
+                      className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-2 text-xs outline-none"
                     />
                   </div>
                 </div>

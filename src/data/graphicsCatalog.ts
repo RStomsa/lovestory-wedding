@@ -7,6 +7,7 @@ export interface GraphicSticker {
   src: string;
   category: string;
   subCategory?: string;
+  folder?: string;
   defaultWidth?: number;
   defaultHeight?: number;
 }

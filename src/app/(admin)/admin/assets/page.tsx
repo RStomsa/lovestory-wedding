@@ -3,6 +3,7 @@ import { requireAdmin } from '@/lib/auth/guard';
 import {
   getAllSystemFonts,
   getAllSystemGraphics,
+  getGraphicFolders,
   getAllSystemMusic,
 } from '@/lib/systemAssetsService';
 import AssetsManagerClient from './AssetsManagerClient';
@@ -10,14 +11,17 @@ import AssetsManagerClient from './AssetsManagerClient';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Quản Lý Tài Nguyên Studio (Font, Đồ Họa, Nhạc) — LoveStory Admin',
+  title: 'Quản Lý Tài Nguyên Studio (Font, Đồ Họa, Thư Mục, Nhạc) — LoveStory Admin',
 };
 
 export default async function AdminAssetsPage() {
   await requireAdmin();
 
-  const fonts = await getAllSystemFonts();
-  const graphics = await getAllSystemGraphics();
+  const [fonts, graphics, folders] = await Promise.all([
+    getAllSystemFonts(),
+    getAllSystemGraphics(),
+    getGraphicFolders(),
+  ]);
   const music = getAllSystemMusic();
 
   return (
@@ -25,6 +29,7 @@ export default async function AdminAssetsPage() {
       <AssetsManagerClient
         initialFonts={fonts}
         initialGraphics={graphics}
+        initialFolders={folders}
         initialMusic={music}
       />
     </div>

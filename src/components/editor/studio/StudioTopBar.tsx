@@ -547,104 +547,64 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
         </div>
 
         {/* Center: Contextual Status Indicator */}
-        <div className="hidden lg:flex items-center gap-3 text-xs">
+        <div className="hidden lg:flex items-center gap-2.5 text-xs">
           {/* Active Loaded Template Badge */}
           {currentTemplateSlug ? (
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/30 shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse shrink-0" />
-              <span className="text-[11px] font-medium text-stone-500 dark:text-stone-400">Đang mở:</span>
-              <span className="font-bold truncate max-w-[200px]" title={canvas.title || currentTemplateSlug}>
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span className="font-medium truncate max-w-[200px]" title={canvas.title || currentTemplateSlug}>
                 {canvas.title || currentTemplateSlug}
-              </span>
-              <span className="text-[10px] font-mono bg-purple-200/60 dark:bg-purple-950 px-1.5 py-0.5 rounded text-purple-800 dark:text-purple-300">
-                /{currentTemplateSlug}
               </span>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs text-stone-400 border border-dashed border-stone-300 dark:border-stone-700">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs text-stone-400 border border-dashed border-stone-200 dark:border-stone-800">
               <span>Chưa nạp mẫu từ kho</span>
             </div>
           )}
 
-          {mode === 'admin' ? (
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700 flex items-center gap-1.5 shrink-0">
-                <Sparkles className="w-3.5 h-3.5 text-purple-500" />
-                <span>Soạn Mẫu</span>
-              </span>
-
-              {/* Admin test profile button */}
-              <button
-                onClick={() => setProfileModalOpen(true)}
-                className={`hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium transition-colors shrink-0 ${
-                  weddingProfile.isLinked
-                    ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
-                    : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800 border border-stone-700'
-                }`}
-                title="Tạo nhanh hồ sơ cưới để thử nghiệm mẫu"
-              >
-                <UserCheck className="w-3.5 h-3.5 text-purple-400" />
-                <span>
-                  {weddingProfile.isLinked
-                    ? `Hồ sơ: ${weddingProfile.groom.shortName || 'Bảo'} & ${weddingProfile.bride.shortName || 'Vy'}`
-                    : 'Tạo hồ sơ cưới'}
-                </span>
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 shrink-0">
-              {/* Save status */}
-              <div className="flex items-center gap-1.5" title="Thiết kế đã được lưu tạm thời trên trình duyệt">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                <span className="text-stone-500 dark:text-stone-400 text-[11px] font-medium hidden 2xl:inline">
-                  Đã lưu tạm
-                </span>
-              </div>
-
-              {/* Wedding Profile Link Button */}
-              <button
-                onClick={() => setProfileModalOpen(true)}
-                className={`hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors shrink-0 ${
-                  weddingProfile.isLinked
-                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300'
-                    : 'text-stone-600 dark:text-stone-300 hover:text-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-700'
-                }`}
-                title="Hồ sơ cô dâu chú rể điền nhanh"
-              >
-                {weddingProfile.isLinked ? (
-                  <>
-                    <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="truncate max-w-[140px]">
-                      {weddingProfile.groom.shortName || weddingProfile.groom.fullName || 'Bảo'} &{' '}
-                      {weddingProfile.bride.shortName || weddingProfile.bride.fullName || 'Vy'}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className="w-3.5 h-3.5 text-stone-500" />
-                    <span>Gắn hồ sơ cưới</span>
-                  </>
-                )}
-              </button>
-            </div>
-          )}
+          {/* Wedding Profile Link Button */}
+          <button
+            onClick={() => setProfileModalOpen(true)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors shrink-0 ${
+              weddingProfile.isLinked
+                ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+                : 'text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-700'
+            }`}
+            title="Gắn thông tin cô dâu chú rể để tự động điền nhanh"
+          >
+            <UserCheck className="w-3.5 h-3.5 text-rose-500" />
+            <span className="max-w-[130px] truncate">
+              {weddingProfile.isLinked
+                ? `${weddingProfile.groom.shortName || 'Bảo'} & ${weddingProfile.bride.shortName || 'Vy'}`
+                : 'Hồ sơ cưới'}
+            </span>
+          </button>
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-2">
-          {/* Realtime Sync Status Indicator */}
-          <div
-            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Realtime Sync Status: compact dot with tooltip & instant sync */}
+          <button
+            onClick={() => dispatchRealtimeUpdate('update')}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
               realtimeStatus === 'connected'
-                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                ? 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30'
                 : realtimeStatus === 'syncing'
-                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
-                : 'bg-stone-500/10 text-stone-500 border-stone-500/20'
+                ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/30'
+                : 'text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
             }`}
-            title="Tự động đồng bộ 2 chiều thời gian thực giữa Web và Desktop App"
+            title={
+              realtimeStatus === 'connected'
+                ? lastSyncedFrom === 'desktop'
+                  ? 'Realtime: Đồng bộ Web ↔ Desktop (Bấm để đồng bộ ngay)'
+                  : 'Realtime: Đã kết nối (Bấm để đồng bộ ngay)'
+                : realtimeStatus === 'syncing'
+                ? 'Đang đồng bộ...'
+                : 'Offline (Bấm để kết nối lại)'
+            }
           >
             <span
-              className={`w-2 h-2 rounded-full ${
+              className={`w-2 h-2 rounded-full shrink-0 ${
                 realtimeStatus === 'connected'
                   ? 'bg-emerald-500 animate-pulse'
                   : realtimeStatus === 'syncing'
@@ -652,64 +612,53 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
                   : 'bg-stone-400'
               }`}
             />
-            <span className="hidden md:inline text-[11px]">
-              {realtimeStatus === 'connected'
-                ? lastSyncedFrom === 'desktop'
-                  ? 'Realtime: Web ↔ Desktop'
-                  : 'Realtime: Đã kết nối'
-                : realtimeStatus === 'syncing'
-                ? 'Đang đồng bộ...'
-                : 'Offline'}
+            <span className="hidden 2xl:inline text-[11px]">
+              {realtimeStatus === 'connected' ? 'Đã kết nối' : 'Đang kết nối'}
             </span>
-            <button
-              onClick={() => dispatchRealtimeUpdate('update')}
-              className="ml-0.5 hover:opacity-80 transition-opacity p-0.5 cursor-pointer"
-              title="Bấm để đồng bộ tức thì sang các thiết bị khác"
-            >
-              <Sparkles className="w-3 h-3 text-emerald-500" />
-            </button>
-          </div>
+          </button>
 
           {/* Toggle Inspector Button */}
           <button
             onClick={toggleInspector}
-            className={`hidden md:flex px-3 py-1.5 rounded-xl border text-xs font-semibold items-center gap-1.5 transition-colors ${
+            className={`p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border text-xs font-medium items-center gap-1.5 transition-colors hidden md:flex ${
               isInspectorOpen
-                ? 'border-purple-500/40 bg-purple-500/10 text-purple-400 hover:bg-purple-500/20'
-                : 'border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300'
+                ? 'border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300'
+                : 'border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300'
             }`}
-            title={isInspectorOpen ? 'Thu gọn bảng thuộc tính công cụ' : 'Hiện bảng thuộc tính công cụ'}
+            title={isInspectorOpen ? 'Thu gọn bảng thuộc tính' : 'Mở bảng thuộc tính'}
           >
             <Sliders className="w-3.5 h-3.5" />
-            <span className="hidden xl:inline">{isInspectorOpen ? 'Ẩn công cụ' : 'Hiện công cụ'}</span>
+            <span className="hidden xl:inline">{isInspectorOpen ? 'Ẩn thuộc tính' : 'Hiện thuộc tính'}</span>
           </button>
 
+          {/* Export PNG */}
           <button
             onClick={handleExportPNG}
             disabled={isExporting}
-            className="hidden sm:flex px-3 py-1.5 rounded-xl border border-stone-300 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-200 text-xs font-semibold items-center gap-1.5 transition-colors"
-            title="Xuất thiệp thành ảnh PNG"
+            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 text-xs font-medium items-center gap-1.5 transition-colors hidden sm:flex"
+            title="Xuất thiệp thành ảnh PNG sắc nét"
           >
             {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-500" /> : <Download className="w-3.5 h-3.5" />}
-            <span>Xuất ảnh</span>
+            <span className="hidden xl:inline">Xuất ảnh</span>
           </button>
 
           {/* ✨ AI Studio Designer Button */}
           <button
             onClick={() => setAiDesignerModalOpen(true)}
-            className="px-3 sm:px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:from-purple-500 hover:to-amber-400 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-purple-600/25 transition-transform active:scale-95 shrink-0"
+            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-rose-500 hover:opacity-90 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-transform active:scale-95 shrink-0"
             title="Trợ lý AI thiết kế mẫu thiệp & phối bảng màu thông minh"
           >
             <Sparkles className="w-3.5 h-3.5 text-white animate-pulse shrink-0" />
-            <span className="hidden sm:inline">AI Thiết Kế</span>
+            <span>AI Thiết Kế</span>
           </button>
 
+          {/* Preview Button */}
           <button
             onClick={() => setShowPreviewModal(true)}
-            className="p-2 sm:px-3.5 sm:py-1.5 rounded-xl border border-stone-300 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-200 text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0"
-            title="Xem trước trực tiếp thiệp cưới"
+            className="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-200 text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0"
+            title="Xem trước trực tiếp thiệp cưới trên điện thoại"
           >
-            <Eye className="w-4 h-4 text-rose-500 shrink-0" />
+            <Eye className="w-3.5 h-3.5 text-rose-500 shrink-0" />
             <span className="hidden sm:inline">Xem trước</span>
           </button>
 
@@ -717,17 +666,19 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
             /* ADMIN: Save To Master Template Warehouse Button */
             <button
               onClick={handleOpenSavePresetModal}
-              className="px-3 sm:px-4 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-purple-600/25 transition-transform active:scale-95 whitespace-nowrap shrink-0"
+              className="px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 dark:bg-white dark:hover:bg-stone-100 text-white dark:text-stone-900 text-xs font-bold flex items-center gap-1.5 shadow-xs transition-transform active:scale-95 whitespace-nowrap shrink-0"
+              title="Lưu mẫu vào kho thiệp LoveStory"
             >
-              <FolderPlus className="w-3.5 h-3.5 text-white shrink-0" />
-              <span className="hidden sm:inline">Lưu Vào Kho Mẫu Thiệp</span>
+              <FolderPlus className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden sm:inline">Lưu Vào Kho Mẫu</span>
               <span className="sm:hidden">Lưu Mẫu</span>
             </button>
           ) : (
             /* USER: Publish personal wedding card */
             <button
               onClick={handleOpenUserPublish}
-              className="px-3 sm:px-4 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-rose-600/25 transition-transform active:scale-95 shrink-0"
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-transform active:scale-95 shrink-0"
+              title="Xuất bản thiệp cưới để chia sẻ cho khách mời"
             >
               <Rocket className="w-3.5 h-3.5 text-white shrink-0" />
               <span className="hidden sm:inline">Xuất Bản Thiệp</span>
@@ -739,7 +690,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
           {isAdmin && mode !== 'admin' && (
             <Link
               href="/admin"
-              className="px-2.5 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-700 dark:text-purple-300 border border-purple-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0"
+              className="px-2.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/20 text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0"
               title="Mở Bảng Điều Khiển Quản Trị Admin"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-purple-500" />
@@ -748,7 +699,7 @@ export default function StudioTopBar({ mode = 'user' }: StudioTopBarProps) {
           )}
 
           {/* Profile badge */}
-          <div className="w-8 h-8 rounded-full bg-rose-100 border border-rose-200 overflow-hidden flex items-center justify-center text-rose-600 font-bold text-xs ml-1 cursor-pointer shadow-xs">
+          <div className="w-8 h-8 rounded-full bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/40 overflow-hidden flex items-center justify-center text-rose-600 dark:text-rose-400 font-bold text-xs ml-0.5 cursor-pointer shadow-2xs">
             <span>{mode === 'admin' ? 'AD' : 'LS'}</span>
           </div>
         </div>

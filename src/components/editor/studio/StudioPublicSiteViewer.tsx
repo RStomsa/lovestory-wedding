@@ -196,19 +196,35 @@ export default function StudioPublicSiteViewer({
             );
           }
 
+          const isFoilGold = el.foilEffect === 'gold';
+          const isFoilRoseGold = el.foilEffect === 'rosegold';
+          const isFoilSilver = el.foilEffect === 'silver';
+          const foilClass = isFoilGold
+            ? 'foil-text-gold'
+            : isFoilRoseGold
+            ? 'foil-text-rosegold'
+            : isFoilSilver
+            ? 'foil-text-silver'
+            : '';
+
+          let renderedText = el.text || '';
+          if (guestName) {
+            renderedText = renderedText.replace(/\{\{?\s*(guestName|guest|tenKhach|khach)\s*\}?\}/gi, guestName);
+          }
+
           return (
             <div
-              className={`w-full h-full flex flex-col justify-center select-none ${animClass}`}
+              className={`w-full h-full flex flex-col justify-center items-center select-none ${animClass}`}
               style={{
                 fontFamily: resolveFontFamily(el.fontFamily),
                 fontSize: `${el.fontSize || 16}px`,
                 fontWeight: el.fontWeight || 'normal',
                 fontStyle: el.fontStyle || 'normal',
-                color: el.color || '#000',
+                color: foilClass ? undefined : el.color || '#000',
                 textAlign: el.textAlign || 'center',
                 letterSpacing: el.letterSpacing ? `${el.letterSpacing}px` : 'normal',
-                lineHeight: el.lineHeight || 1.2,
-                padding: el.padding ? `${el.padding}px` : undefined,
+                lineHeight: el.lineHeight || 1.35,
+                padding: el.padding !== undefined ? `${el.padding}px` : '4px 6px',
                 boxShadow: boxShadow !== 'none' ? boxShadow : undefined,
                 textShadow: textShadow !== 'none' ? textShadow : undefined,
                 transform: flipStyle || undefined,
@@ -216,7 +232,13 @@ export default function StudioPublicSiteViewer({
                 wordBreak: 'break-word',
               }}
             >
-              {el.text}
+              {foilClass ? (
+                <span className={foilClass}>
+                  {renderedText}
+                </span>
+              ) : (
+                renderedText
+              )}
             </div>
           );
 
@@ -316,7 +338,7 @@ export default function StudioPublicSiteViewer({
           );
 
         case 'widget':
-          return <StudioWidgetRenderer element={el} isSelected={false} />;
+          return <StudioWidgetRenderer element={el} isSelected={false} canvasBackground={canvas.background} />;
 
         default:
           return null;
@@ -355,7 +377,20 @@ export default function StudioPublicSiteViewer({
           guestName={guestName}
           groomName={groomName}
           brideName={brideName}
+          coverId={canvas.envelopeCover?.coverId || 'default'}
+          autoOpen={canvas.envelopeCover?.autoOpen ?? false}
+          onOpen={() => setEnvelopeDismissed(true)}
         />
+      )}
+
+      {/* 1.1. Personalized Guest Welcoming Pill */}
+      {guestName && (
+        <div className="fixed top-3 z-40 px-4 py-1.5 rounded-full bg-white/95 dark:bg-stone-900/95 backdrop-blur-md shadow-xl border border-rose-200 dark:border-rose-900/50 text-xs font-serif text-stone-800 dark:text-stone-200 flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-500">
+          <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse shrink-0" />
+          <span>
+            Trân trọng kính mời: <strong className="font-bold text-rose-600 dark:text-rose-400">{guestName}</strong>
+          </span>
+        </div>
       )}
 
       {/* 2. Floating Action Controls (Sound & Share) */}

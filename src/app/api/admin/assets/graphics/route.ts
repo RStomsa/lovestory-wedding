@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/session';
 import {
   getAllSystemGraphics,
+  getGraphicFolders,
   addCustomGraphic,
   deleteCustomGraphic,
 } from '@/lib/systemAssetsService';
@@ -15,8 +16,12 @@ export async function GET() {
       return NextResponse.json({ error: 'Không có quyền truy cập' }, { status: 403 });
     }
 
-    const graphics = await getAllSystemGraphics();
-    return NextResponse.json({ success: true, graphics });
+    const [graphics, folders] = await Promise.all([
+      getAllSystemGraphics(),
+      getGraphicFolders(),
+    ]);
+
+    return NextResponse.json({ success: true, graphics, folders });
   } catch (error) {
     console.error('Fetch graphics error:', error);
     return NextResponse.json({ error: 'Lỗi nạp danh sách đồ họa' }, { status: 500 });
@@ -31,17 +36,20 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, src, category, subCategory, defaultWidth, defaultHeight } = body;
+    const { name, src, category, subCategory, folder, defaultWidth, defaultHeight } = body;
 
     if (!name || !name.trim() || !src || !src.trim()) {
       return NextResponse.json({ error: 'Vui lòng nhập tên đồ họa và đường dẫn hình ảnh/SVG' }, { status: 400 });
     }
 
+    const targetFolder = folder?.trim() || subCategory?.trim() || category || 'Yếu tố đám cưới';
+
     const graphic = await addCustomGraphic({
       name: name.trim(),
       src: src.trim(),
-      category: category || 'Yếu tố đám cưới',
-      subCategory: subCategory?.trim(),
+      category: category || targetFolder,
+      subCategory: targetFolder,
+      folder: targetFolder,
       defaultWidth: Number(defaultWidth) || 100,
       defaultHeight: Number(defaultHeight) || 100,
       userId: user?.id,
@@ -49,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Đã thêm đồ họa "${graphic.name}" thành công!`,
+      message: `Đã thêm đồ họa "${graphic.name}" vào thư mục "${targetFolder}" thành công!`,
       graphic,
     });
   } catch (error) {

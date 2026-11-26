@@ -184,24 +184,36 @@ export default function EnvelopeOpeningEffect({
           : 'bg-stone-950/85 backdrop-blur-md'
       }`}
     >
-      {/* Container Envelope */}
-      <div className="relative w-full max-w-[420px] aspect-[4/3] flex items-center justify-center">
+      {/* Container Envelope with 3D perspective */}
+      <div className="relative w-full max-w-[420px] aspect-[4/3] flex items-center justify-center" style={{ perspective: '1200px' }}>
         {/* Envelope Body (Background Pocket) */}
         <div
-          className="absolute inset-0 rounded-2xl shadow-2xl border border-black/10 overflow-hidden flex flex-col justify-end p-6"
+          className="absolute inset-0 rounded-2xl shadow-2xl border border-black/20 overflow-hidden flex flex-col justify-end p-6"
           style={{ background: theme.pocketBg }}
         >
           {/* Subtle Paper Texture Lines */}
           <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]" />
 
+          {/* Exterior Personalized Guest Address Label */}
+          {guestName && !isOpen && (
+            <div className="absolute top-5 inset-x-6 z-25 flex flex-col items-center justify-center text-center pointer-events-none animate-in fade-in duration-500">
+              <span className="text-[9px] uppercase tracking-[0.3em] text-white/80 font-mono">
+                Trân Trọng Kính Mời
+              </span>
+              <span className="font-serif text-xl sm:text-2xl font-bold text-amber-200 mt-0.5 tracking-wide foil-text-gold drop-shadow-md">
+                {guestName}
+              </span>
+            </div>
+          )}
+
           {/* Invitation Card Peek (Slides up when opening) */}
           <div
-            className={`absolute inset-x-4 bottom-4 top-8 bg-white dark:bg-stone-900 rounded-xl p-5 shadow-lg border border-stone-200 dark:border-stone-800 flex flex-col items-center justify-between text-center transition-all duration-700 ease-out ${
+            className={`absolute inset-x-4 bottom-4 top-8 bg-white dark:bg-stone-900 rounded-xl p-5 shadow-2xl border border-stone-200 dark:border-stone-800 flex flex-col items-center justify-between text-center transition-all duration-700 ease-out ${
               isOpen ? '-translate-y-36 opacity-100 scale-105' : 'translate-y-2 opacity-90'
             }`}
           >
             <div className="space-y-1">
-              <span className="text-[10px] uppercase tracking-[0.25em] text-[#8C7355] font-semibold block">
+              <span className="text-[10px] uppercase tracking-[0.25em] text-[#8C7355] font-semibold block foil-text-gold">
                 Wedding Invitation
               </span>
               <h2 className="font-serif text-2xl font-bold text-stone-900 dark:text-stone-100">
@@ -213,14 +225,14 @@ export default function EnvelopeOpeningEffect({
             </div>
 
             {guestName && (
-              <div className="py-2 px-4 rounded-full bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-xs font-serif text-stone-800 dark:text-stone-200">
-                Kính gửi: <strong className="font-bold">{guestName}</strong>
+              <div className="py-2 px-4 rounded-full bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-xs font-serif text-stone-800 dark:text-stone-200 shadow-xs">
+                Kính gửi: <strong className="font-bold text-rose-600 dark:text-rose-400">{guestName}</strong>
               </div>
             )}
 
-            <div className="flex items-center gap-1 text-[10px] text-[#8C7355] dark:text-amber-400">
-              <Sparkles className="w-3 h-3" />
-              <span>Chạm con dấu để mở thiệp</span>
+            <div className="flex items-center gap-1.5 text-[10px] text-[#8C7355] dark:text-amber-400 font-medium">
+              <Sparkles className="w-3.5 h-3.5 animate-pulse text-amber-500" />
+              <span>Chạm con dấu sáp để mở thiệp</span>
             </div>
           </div>
 
@@ -263,26 +275,28 @@ export default function EnvelopeOpeningEffect({
                 className="group relative flex flex-col items-center justify-center focus:outline-none transition-transform active:scale-95 hover:scale-105 cursor-pointer"
               >
                 {/* Glowing Aura Ring */}
-                <div className="absolute w-20 h-20 rounded-full bg-amber-400/30 blur-md animate-pulse" />
+                <div className="absolute w-24 h-24 rounded-full bg-amber-400/35 blur-md animate-pulse" />
 
-                {/* Wax Seal Circle */}
+                {/* Physical 3D Wax Seal Circle with relief stamp */}
                 <div
-                  className={`relative w-16 h-16 rounded-full bg-gradient-to-br ${theme.sealGradient} shadow-xl border-2 flex flex-col items-center justify-center text-white`}
-                  style={{ borderColor: theme.sealBorder }}
+                  className={`relative w-18 h-18 rounded-full bg-gradient-to-br ${theme.sealGradient} shadow-2xl flex flex-col items-center justify-center text-white`}
+                  style={{
+                    border: `2px solid ${theme.sealBorder}`,
+                    boxShadow: '0 12px 28px -4px rgba(0,0,0,0.55), inset 0 2px 4px rgba(255,255,255,0.45), inset 0 -3px 6px rgba(0,0,0,0.45)',
+                  }}
                 >
-                  <Heart className="w-5 h-5 fill-white/90 group-hover:scale-110 transition-transform" />
-                  <span className="text-[9px] font-serif font-black tracking-widest mt-0.5">
-                    {theme.sealText}
-                  </span>
-
-                  {/* Stamp Ring Texture */}
-                  <div className="absolute inset-1.5 rounded-full border border-dashed border-white/40 pointer-events-none" />
+                  <div className="w-14 h-14 rounded-full border border-dashed border-white/50 flex flex-col items-center justify-center p-1">
+                    <Heart className="w-5 h-5 fill-white/95 text-white group-hover:scale-110 transition-transform drop-shadow-xs" />
+                    <span className="text-[9px] font-serif font-black tracking-widest mt-0.5 text-white/95 drop-shadow-xs">
+                      {theme.sealText}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Hint Pill */}
-                <div className="mt-4 px-3.5 py-1 rounded-full bg-stone-900/90 backdrop-blur-sm text-white text-[10px] font-medium tracking-wide shadow-lg border border-stone-700 flex items-center gap-1.5 animate-bounce">
+                <div className="mt-4 px-3.5 py-1 rounded-full bg-stone-900/90 backdrop-blur-sm text-white text-[10px] font-medium tracking-wide shadow-xl border border-stone-700 flex items-center gap-1.5 animate-bounce">
                   <Mail className="w-3 h-3 text-amber-300" />
-                  <span>Chạm vào con dấu để mở thiệp</span>
+                  <span>Bấm con dấu sáp để mở thiệp</span>
                 </div>
               </button>
             </div>

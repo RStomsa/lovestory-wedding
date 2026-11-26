@@ -9,6 +9,7 @@ import defaultStockCatalog from '@/data/stockGraphicsCatalog.json';
 const DATA_DIR = path.join(process.cwd(), 'src', 'data');
 const CUSTOM_FONTS_FILE = path.join(DATA_DIR, 'customFonts.json');
 const CUSTOM_GRAPHICS_FILE = path.join(DATA_DIR, 'customGraphics.json');
+const CUSTOM_GRAPHICS_FOLDERS_FILE = path.join(DATA_DIR, 'customGraphicFolders.json');
 const CUSTOM_MUSIC_FILE = path.join(DATA_DIR, 'customMusic.json');
 
 export interface MusicTrack {
@@ -171,8 +172,123 @@ export async function deleteCustomFont(id: string): Promise<boolean> {
 }
 
 // ==========================================
-// 2. GRAPHICS SERVICE (Prisma SQLite with JSON fallback)
+// 2. GRAPHICS & FOLDERS SERVICE (Prisma SQLite with JSON fallback)
 // ==========================================
+
+export interface GraphicFolder {
+  id: string;
+  name: string;
+  icon?: string;
+  description?: string;
+  createdAt?: string;
+  isDefault?: boolean;
+  count?: number;
+}
+
+export const DEFAULT_GRAPHIC_FOLDERS: GraphicFolder[] = [
+  { id: 'folder-nen-thiep', name: 'Nền thiệp', icon: '🖼️', description: 'Các họa tiết texture nền thiệp hoa văn nhã nhặn', isDefault: true },
+  { id: 'folder-khung-vien', name: 'Khung viền', icon: '🔲', description: 'Khung viền vàng, góc hoa, đường biên thanh lịch', isDefault: true },
+  { id: 'folder-no-hoa', name: 'Nơ & Ruy băng', icon: '🎀', description: 'Nơ lụa thắt, ruy băng trang trí sang trọng', isDefault: true },
+  { id: 'folder-hoa-cuoi', name: 'Hoa & Họa tiết', icon: '🌸', description: 'Hoa cưới nghệ thuật, cành ô liu, hoa hồng pastel', isDefault: true },
+  { id: 'folder-yeu-to-cuoi', name: 'Yếu tố đám cưới', icon: '💍', description: 'Nhẫn cưới, ly rượu champagne, bánh cưới, chân nến', isDefault: true },
+  { id: 'folder-chu-hy', name: 'Chữ Hỷ & Thư pháp', icon: '囍', description: 'Chữ Song Hỷ đỏ kim, chữ thư pháp chúc phúc', isDefault: true },
+  { id: 'folder-con-dau-sap', name: 'Con dấu sáp & Phong bì', icon: '💌', description: 'Con dấu sáp nổi 3D, tem thư vintage, bao thư', isDefault: true },
+  { id: 'folder-trai-tim', name: 'Trái tim', icon: '❤️', description: 'Trái tim lãng mạn, đôi cánh tình yêu', isDefault: true },
+  { id: 'folder-van-hoa-viet', name: 'Văn hóa Việt', icon: '🏮', description: 'Áo dài cưới, nón quai thao, họa tiết truyền thống', isDefault: true },
+  { id: 'folder-nhan-vat', name: 'Nhân vật', icon: '👫', description: 'Chibi cô dâu chú rể, hình vẽ phác thảo', isDefault: true },
+  { id: 'folder-bieu-tuong', name: 'Biểu tượng & Icon', icon: '✨', description: 'Ngôi sao, hoa tuyết, icon phụ trợ trang trí', isDefault: true },
+];
+
+export async function getGraphicFolders(): Promise<GraphicFolder[]> {
+  const customFolders = readJsonFile<GraphicFolder[]>(CUSTOM_GRAPHICS_FOLDERS_FILE, []);
+  const allGraphics = await getAllSystemGraphics();
+
+  // Map to count graphics in each folder
+  const folderCounts: Record<string, number> = {};
+  for (const g of allGraphics) {
+    const folderKey = (g.folder || g.subCategory || g.category || '').trim();
+    if (folderKey) {
+      folderCounts[folderKey] = (folderCounts[folderKey] || 0) + 1;
+    }
+  }
+
+  const combinedMap = new Map<string, GraphicFolder>();
+
+  // Add default folders
+  for (const df of DEFAULT_GRAPHIC_FOLDERS) {
+    combinedMap.set(df.name.toLowerCase(), {
+      ...df,
+      count: folderCounts[df.name] || 0,
+    });
+  }
+
+  // Add custom folders
+  for (const cf of customFolders) {
+    combinedMap.set(cf.name.toLowerCase(), {
+      ...cf,
+      count: folderCounts[cf.name] || 0,
+    });
+  }
+
+  // Also collect any dynamic folder names used in custom graphics
+  for (const [folderName, count] of Object.entries(folderCounts)) {
+    if (folderName && !combinedMap.has(folderName.toLowerCase())) {
+      combinedMap.set(folderName.toLowerCase(), {
+        id: `folder-dyn-${encodeURIComponent(folderName.toLowerCase())}`,
+        name: folderName,
+        icon: '📁',
+        description: 'Thư mục tự tạo từ đồ họa',
+        isDefault: false,
+        count,
+      });
+    }
+  }
+
+  return Array.from(combinedMap.values());
+}
+
+export async function createGraphicFolder(folderData: {
+  name: string;
+  icon?: string;
+  description?: string;
+}): Promise<GraphicFolder> {
+  const name = folderData.name.trim();
+  if (!name) throw new Error('Tên thư mục không được để trống');
+
+  const customFolders = readJsonFile<GraphicFolder[]>(CUSTOM_GRAPHICS_FOLDERS_FILE, []);
+  const existing = customFolders.find((f) => f.name.toLowerCase() === name.toLowerCase());
+  if (existing) {
+    return existing;
+  }
+
+  const newFolder: GraphicFolder = {
+    id: `folder-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
+    name,
+    icon: folderData.icon?.trim() || '📁',
+    description: folderData.description?.trim() || 'Thư mục đồ họa',
+    createdAt: new Date().toISOString(),
+    isDefault: false,
+    count: 0,
+  };
+
+  customFolders.push(newFolder);
+  writeJsonFile(CUSTOM_GRAPHICS_FOLDERS_FILE, customFolders);
+  return newFolder;
+}
+
+export async function deleteGraphicFolder(folderIdOrName: string): Promise<boolean> {
+  const customFolders = readJsonFile<GraphicFolder[]>(CUSTOM_GRAPHICS_FOLDERS_FILE, []);
+  const filtered = customFolders.filter(
+    (f) => f.id !== folderIdOrName && f.name.toLowerCase() !== folderIdOrName.toLowerCase()
+  );
+
+  if (filtered.length !== customFolders.length) {
+    writeJsonFile(CUSTOM_GRAPHICS_FOLDERS_FILE, filtered);
+    return true;
+  }
+  return false;
+}
+
 export async function getCustomGraphics(): Promise<(GraphicSticker & { isCustom?: boolean })[]> {
   try {
     const dbGfx = await prisma.customGraphic.findMany({
@@ -185,6 +301,7 @@ export async function getCustomGraphics(): Promise<(GraphicSticker & { isCustom?
         src: g.src,
         category: g.category as GraphicSticker['category'],
         subCategory: g.subCategory || undefined,
+        folder: g.subCategory || g.category,
         defaultWidth: g.defaultWidth,
         defaultHeight: g.defaultHeight,
         isCustom: true,
@@ -193,12 +310,26 @@ export async function getCustomGraphics(): Promise<(GraphicSticker & { isCustom?
   } catch (err) {
     console.warn('Error querying Prisma custom graphics, falling back to JSON:', err);
   }
-  return readJsonFile<(GraphicSticker & { isCustom?: boolean })[]>(CUSTOM_GRAPHICS_FILE, []);
+
+  const jsonCustom = readJsonFile<(GraphicSticker & { isCustom?: boolean })[]>(CUSTOM_GRAPHICS_FILE, []);
+  return jsonCustom.map((g) => ({
+    ...g,
+    folder: g.folder || g.subCategory || g.category,
+    isCustom: true,
+  }));
 }
 
 export async function getAllSystemGraphics(): Promise<(GraphicSticker & { isCustom?: boolean })[]> {
   const custom = await getCustomGraphics();
-  return [...custom, ...(defaultStockCatalog as GraphicSticker[]), ...GRAPHICS_CATALOG];
+  const stockWithFolders = (defaultStockCatalog as GraphicSticker[]).map((g) => ({
+    ...g,
+    folder: g.folder || g.subCategory || g.category,
+  }));
+  const catalogWithFolders = GRAPHICS_CATALOG.map((g) => ({
+    ...g,
+    folder: g.folder || g.subCategory || g.category,
+  }));
+  return [...custom, ...stockWithFolders, ...catalogWithFolders];
 }
 
 export async function addCustomGraphic(graphicData: {
@@ -206,17 +337,29 @@ export async function addCustomGraphic(graphicData: {
   src: string;
   category: GraphicSticker['category'];
   subCategory?: string;
+  folder?: string;
   defaultWidth?: number;
   defaultHeight?: number;
   userId?: string;
 }): Promise<GraphicSticker & { isCustom: boolean }> {
+  const folderName = (graphicData.folder || graphicData.subCategory || graphicData.category || '').trim();
+
+  // If new folder is specified, automatically persist it into custom folders if not default
+  if (folderName) {
+    try {
+      await createGraphicFolder({ name: folderName });
+    } catch {
+      // Ignored if already exists
+    }
+  }
+
   try {
     const created = await prisma.customGraphic.create({
       data: {
         name: graphicData.name.trim(),
         src: graphicData.src.trim(),
         category: graphicData.category,
-        subCategory: graphicData.subCategory?.trim() || null,
+        subCategory: folderName || null,
         defaultWidth: graphicData.defaultWidth || 100,
         defaultHeight: graphicData.defaultHeight || 100,
         userId: graphicData.userId || null,
@@ -228,7 +371,8 @@ export async function addCustomGraphic(graphicData: {
       name: created.name,
       src: created.src,
       category: created.category as GraphicSticker['category'],
-      subCategory: created.subCategory || undefined,
+      subCategory: folderName || undefined,
+      folder: folderName || undefined,
       defaultWidth: created.defaultWidth,
       defaultHeight: created.defaultHeight,
       isCustom: true,
@@ -241,7 +385,8 @@ export async function addCustomGraphic(graphicData: {
       name: graphicData.name.trim(),
       src: graphicData.src.trim(),
       category: graphicData.category,
-      subCategory: graphicData.subCategory?.trim(),
+      subCategory: folderName || undefined,
+      folder: folderName || undefined,
       defaultWidth: graphicData.defaultWidth || 100,
       defaultHeight: graphicData.defaultHeight || 100,
       isCustom: true,

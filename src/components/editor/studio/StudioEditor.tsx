@@ -24,6 +24,8 @@ interface StudioEditorProps {
 function StudioEditorInner({ mode = 'user' }: StudioEditorProps) {
   const searchParams = useSearchParams();
   const templateSlug = searchParams.get('template') || searchParams.get('preset');
+  const widgetParam = searchParams.get('widget');
+  const styleParam = searchParams.get('style');
   const loadTemplateData = useStudioStore((state) => state.loadTemplateData);
   const isInspectorOpen = useStudioStore((state) => state.isInspectorOpen);
   const toggleInspector = useStudioStore((state) => state.toggleInspector);
@@ -43,6 +45,62 @@ function StudioEditorInner({ mode = 'user' }: StudioEditorProps) {
       unsubscribe();
     };
   }, [templateSlug, initRealtimeSync, setCurrentTemplateSlug]);
+
+  // Handle ?widget=wishes&style=bubble-wall parameter to focus/seed widget for direct editing
+  useEffect(() => {
+    if (!widgetParam) return;
+
+    const timer = setTimeout(() => {
+      const state = useStudioStore.getState();
+      const existing = state.elements.find((el) => el.type === 'widget' && el.widgetType === widgetParam);
+
+      if (existing) {
+        state.selectElement(existing.id);
+        if (styleParam && existing.widgetConfig?.style !== styleParam) {
+          state.updateElement(existing.id, {
+            widgetConfig: { ...existing.widgetConfig, style: styleParam },
+          }, true);
+        }
+        if (!state.isInspectorOpen) {
+          state.toggleInspector();
+        }
+        setLoadedNotification(`✨ Đã chọn tiện ích [${widgetParam}] trên canvas để chỉnh sửa!`);
+      } else {
+        const defaultHeightMap: Record<string, number> = {
+          calendar: 330,
+          countdown: 120,
+          rsvp: 340,
+          wishes: 340,
+          giftbox: 280,
+          map: 250,
+          family_info: 220,
+          music_player: 240,
+          guest_name: 100,
+        };
+        const h = defaultHeightMap[widgetParam] || 250;
+        state.addElementWithPush({
+          type: 'widget',
+          widgetType: widgetParam as any,
+          x: 0,
+          y: 60,
+          width: 420,
+          height: h,
+          rotation: 0,
+          opacity: 1,
+          widgetConfig: {
+            style: styleParam || undefined,
+          },
+        });
+        if (!state.isInspectorOpen) {
+          state.toggleInspector();
+        }
+        setLoadedNotification(`✨ Đã thêm tiện ích [${widgetParam}] lên canvas để tự do chỉnh sửa!`);
+      }
+      setTimeout(() => setLoadedNotification(null), 4000);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [widgetParam, styleParam]);
 
   // Notify when a realtime sync update was received from another client
   useEffect(() => {

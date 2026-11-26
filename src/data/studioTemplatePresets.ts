@@ -20,7 +20,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
     "name": "Thiệp Cưới Kem Chữ Vàng Save The Date (C165)",
     "category": "wedding",
     "tier": "PREMIUM",
-    "thumbnail": "/assets/wedding/samples/sample_01.jpg",
+    "thumbnail": "/assets/uploads/thumbnails/thiep-cuoi-165.png",
     "imagesCount": 10,
     "description": "Phong cách kem chữ vàng sang trọng, bố cục 14 ảnh thời trang cao cấp kết hợp hiệu ứng bay lơ lửng đầy chất thơ.",
     "config": {
@@ -324,7 +324,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
     "name": "Thiệp Cưới Tạp Chí Our Love Begins (C61)",
     "category": "wedding",
     "tier": "BASIC",
-    "thumbnail": "/assets/wedding/samples/sample_02.jpg",
+    "thumbnail": "/assets/uploads/thumbnails/our-love-begins.png",
     "imagesCount": 13,
     "description": "Phong cách bìa tạp chí thời trang hiện đại, tôn vinh trọn vẹn từng khoảnh khắc tình yêu của cặp đôi.",
     "config": {
@@ -687,7 +687,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
     "name": "Thiệp Cưới Hoa Hồng Đỏ Our Love Story (C39)",
     "category": "wedding",
     "tier": "BASIC",
-    "thumbnail": "/assets/wedding/samples/sample_01.jpg",
+    "thumbnail": "/assets/uploads/thumbnails/our-love-story-rose.png",
     "imagesCount": 5,
     "description": "Tông đỏ nhung quyến rũ kết hợp hoa hồng tươi thắm, mang lại cảm giác nồng nàn và hạnh phúc ngập tràn.",
     "config": {
@@ -921,7 +921,7 @@ export const STUDIO_TEMPLATE_PRESETS: StudioTemplatePreset[] = [
     "name": "Thiệp Cưới Phong Bì Kem Hoa Cúc (C44)",
     "category": "wedding",
     "tier": "PREMIUM",
-    "thumbnail": "/assets/wedding/samples/sample_01.jpg",
+    "thumbnail": "/assets/uploads/thumbnails/envelope-chamomile.png",
     "imagesCount": 16,
     "description": "Hiệu ứng mở phong bì thư thanh tao, họa tiết hoa cúc dại tinh khôi trên nền giấy mỹ thuật cao cấp.",
     "config": {

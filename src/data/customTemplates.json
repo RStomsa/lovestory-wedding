@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "id": "ai-mwwxrjf2",
+    "name": "Thiệp Cưới Đỏ Rượu Hoàng Gia & Vàng Gold — Đặng Quốc Bảo & Nguyễn Thảo Vy",
+    "slug": "ai-mwwxrjf2",
+    "category": "wedding",
+    "tier": "PREMIUM",
+    "price": 30000,
+    "badge": "Hot VIP",
+    "longThumbnail": "/assets/uploads/thumbnails/ai-mwwxrjf2-1795660294280.png",
+    "baseTemplateId": "ai-mwwxrjf2",
+    "description": "Mẫu thiệp cưới scrollytelling hoàng gia sang trọng được thiết kế bởi LoveStory Studio.",
+    "isCustom": true,
+    "views": 0,
+    "likes": 0
+  },
+  {
+    "id": "thiep-cuoi-165",
+    "name": "Thiệp Cưới Hoàng Gia LoveStory",
+    "slug": "thiep-cuoi-165",
+    "category": "wedding",
+    "tier": "PREMIUM",
+    "price": 30000,
+    "badge": "Hot VIP",
+    "longThumbnail": "/assets/uploads/thumbnails/thiep-cuoi-165-1795581091457.png",
+    "baseTemplateId": "thiep-cuoi-165",
+    "description": "Mẫu thiệp cưới scrollytelling hoàng gia sang trọng được thiết kế bởi LoveStory Studio.",
+    "isCustom": true,
+    "views": 0,
+    "likes": 0
+  }
+]

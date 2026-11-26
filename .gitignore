@@ -57,4 +57,8 @@ scratch/
 
 # Rust build artifacts
 tools/**/target/
+src-tauri/target/
+
+# Windows desktop shortcuts
+*.lnk
 

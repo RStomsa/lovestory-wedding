@@ -158,23 +158,23 @@ export default function TemplatesManagerClient({
   const [formDescription, setFormDescription] = useState('Mẫu thiệp scrollytelling điện ảnh sang trọng và hiện đại.');
   const [formIsPublished, setFormIsPublished] = useState(true);
 
-  // Quick Preset Sample Images
+  // Quick Preset Sample Images (Chụp thật từ 4 mẫu flagship chuẩn)
   const SAMPLE_PRESETS = [
     {
-      name: 'Váy Cưới Trắng & Đồi Cỏ',
-      url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+      name: 'Mẫu 01 — C165 Chữ Vàng Hoàng Gia',
+      url: '/assets/uploads/thumbnails/thiep-cuoi-165.png',
     },
     {
-      name: 'Hoàng Hôn Lãng Mạn Bờ Biển',
-      url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
+      name: 'Mẫu 02 — Tạp Chí Our Love Begins',
+      url: '/assets/uploads/thumbnails/our-love-begins.png',
     },
     {
-      name: 'Vintage Đèn Lồng Cổ Điển',
-      url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80',
+      name: 'Mẫu 03 — Hoa Hồng Đỏ Our Love Story',
+      url: '/assets/uploads/thumbnails/our-love-story-rose.png',
     },
     {
-      name: 'Hoa Hồng & Pastel Tối Giản',
-      url: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=800&q=80',
+      name: 'Mẫu 04 — Phong Bì Kem Hoa Cúc',
+      url: '/assets/uploads/thumbnails/envelope-chamomile.png',
     },
   ];
 
@@ -449,7 +449,7 @@ export default function TemplatesManagerClient({
     setFormSlug('');
     setFormPrice(30000);
     setFormBadge('Mới');
-    setFormThumbnail('/assets/wedding/samples/sample_01.jpg');
+    setFormThumbnail('/assets/uploads/thumbnails/thiep-cuoi-165.png');
     setFormDescription('Mẫu thiệp cưới scrollytelling điện ảnh sang trọng được thiết kế bởi LoveStory.');
     setFormIsPublished(true);
     setShowCreateModal(true);

@@ -858,6 +858,15 @@ export default function StudioCanvas() {
           );
         }
 
+        const foilClass =
+          el.foilEffect === 'gold'
+            ? 'foil-text-gold'
+            : el.foilEffect === 'rosegold'
+            ? 'foil-text-rosegold'
+            : el.foilEffect === 'silver'
+            ? 'foil-text-silver'
+            : '';
+
         return (
           <div
             onDoubleClick={(e) => {
@@ -865,17 +874,17 @@ export default function StudioCanvas() {
               setEditingTextId(el.id);
               setMoveableTarget(null);
             }}
-            className={`w-full h-full flex flex-col justify-center select-none ${animClass}`}
+            className={`w-full h-full flex flex-col justify-center items-center select-none ${animClass}`}
             style={{
               fontFamily: resolveFontFamily(el.fontFamily),
               fontSize: `${el.fontSize || 16}px`,
               fontWeight: el.fontWeight || 'normal',
               fontStyle: el.fontStyle || 'normal',
-              color: el.color || '#000',
+              color: foilClass ? undefined : el.color || '#000',
               textAlign: el.textAlign || 'center',
               letterSpacing: el.letterSpacing ? `${el.letterSpacing}px` : 'normal',
-              lineHeight: el.lineHeight || 1.2,
-              padding: el.padding ? `${el.padding}px` : undefined,
+              lineHeight: el.lineHeight || 1.35,
+              padding: el.padding !== undefined ? `${el.padding}px` : '4px 6px',
               boxShadow: boxShadow !== 'none' ? boxShadow : undefined,
               textShadow: textShadow !== 'none' ? textShadow : undefined,
               transform: flipStyle || undefined,
@@ -886,7 +895,13 @@ export default function StudioCanvas() {
             }}
             title="Nháy đúp chuột để chỉnh sửa chữ trực tiếp trên thiệp"
           >
-            {el.text}
+            {foilClass ? (
+              <span className={foilClass}>
+                {el.text}
+              </span>
+            ) : (
+              el.text
+            )}
           </div>
         );
 
@@ -1020,7 +1035,11 @@ export default function StudioCanvas() {
       case 'widget':
         return (
           <div className={`w-full h-full ${animClass}`}>
-            <StudioWidgetRenderer element={el} isSelected={selectedId === el.id} />
+            <StudioWidgetRenderer
+              element={el}
+              isSelected={selectedId === el.id}
+              canvasBackground={canvas.background}
+            />
           </div>
         );
 
@@ -1069,6 +1088,44 @@ export default function StudioCanvas() {
           transition: 'transform 0.15s ease-out',
         }}
       >
+        {/* Floating Screen 1 Toolbar Above Canvas (100% clean, does not obstruct design) */}
+        {showScreenGuides && (
+          <div
+            data-export-ignore="true"
+            className="flex items-center justify-between pb-2 px-1 text-xs select-none"
+            style={{ width: `${canvas.width}px` }}
+          >
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-[11px] text-stone-700 dark:text-stone-300 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
+                Màn 1: Trang bìa &amp; Mở đầu
+              </span>
+              <span className="text-[10px] text-stone-400 font-mono">(0px - 850px)</span>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setActiveScreenPickerIndex(0)}
+                className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-[11px] shadow-sm flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+                title="Đổi kiểu trang bìa Màn 1"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-white" />
+                <span>Đổi Kiểu Bìa Màn 1</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => centerInScreenFold(0)}
+                className="px-2.5 py-1 rounded-full bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-100 text-[11px] font-medium border border-stone-200 dark:border-stone-700 flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                title="Canh giữa các phần tử đang chọn vào Màn 1"
+              >
+                <span>🎯 Canh giữa</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         <div
           ref={canvasRef}
           id="studio-main-canvas"
@@ -1142,30 +1199,30 @@ export default function StudioCanvas() {
                     {/* Top Divider Line (from screen 2 onwards) */}
                     {i > 0 && (
                       <div
-                        className="absolute left-0 right-0 border-b-2 border-dashed border-rose-400/70 flex items-center justify-between px-3"
+                        className="absolute left-0 right-0 border-b border-dashed border-rose-300/60 dark:border-rose-900/40 flex items-center justify-between px-2.5 z-20 pointer-events-none"
                         style={{ top: `${foldTop}px` }}
                       >
                         {/* Left Badge */}
-                        <div className="bg-stone-900/90 text-white text-[10px] font-mono font-medium px-2.5 py-1 rounded-md shadow-md flex items-center gap-1.5 -translate-y-1/2">
-                          <span>📱 {label}</span>
-                          <span className="text-stone-400">({foldTop}px - {foldBottom}px)</span>
+                        <div className="bg-stone-900/80 backdrop-blur-xs text-white text-[9px] font-mono px-2 py-0.5 rounded-md shadow-xs -translate-y-1/2 flex items-center gap-1">
+                          <span>📱 Màn {i + 1}</span>
                         </div>
 
                         {/* Right Actions */}
-                        <div className="flex items-center gap-1.5 -translate-y-1/2">
+                        <div className="flex items-center gap-1 -translate-y-1/2 pointer-events-auto bg-white/95 dark:bg-stone-900/95 backdrop-blur-xs p-0.5 rounded-lg border border-stone-200 dark:border-stone-700 shadow-xs">
                           <button
                             type="button"
                             onClick={() => setActiveScreenPickerIndex(i)}
-                            className="pointer-events-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-md flex items-center gap-1 active:scale-95 transition-all"
+                            className="px-2 py-0.5 rounded-md hover:bg-purple-50 dark:hover:bg-purple-950/40 text-purple-700 dark:text-purple-300 text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer"
                             title={`Đổi kiểu thiết kế cho ${label}`}
                           >
-                            <Sparkles className="w-3 h-3 text-white" />
+                            <Sparkles className="w-3 h-3 text-purple-600" />
                             <span>Đổi Kiểu Màn {i + 1}</span>
                           </button>
+                          <span className="w-[1px] h-3 bg-stone-200 dark:bg-stone-700" />
                           <button
                             type="button"
                             onClick={() => centerInScreenFold(i)}
-                            className="pointer-events-auto bg-white/95 hover:bg-rose-50 text-stone-700 hover:text-rose-600 border border-stone-200 text-[10px] font-semibold px-2 py-1 rounded-md shadow-md flex items-center gap-1 active:scale-95 transition-all"
+                            className="px-1.5 py-0.5 rounded-md hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 text-[10px] font-medium transition-all cursor-pointer"
                             title={`Canh giữa phần tử đang chọn vào ${label}`}
                           >
                             <span>🎯 Canh giữa</span>
@@ -1174,46 +1231,14 @@ export default function StudioCanvas() {
                       </div>
                     )}
 
-                    {/* Screen 1 top label & center button */}
+                    {/* Screen 1 Phone Notch / Safe Area Indicator: clean & subtle, never blocks text */}
                     {i === 0 && (
                       <div
-                        className="absolute left-0 right-0 flex items-center justify-between px-3"
-                        style={{ top: '8px' }}
-                      >
-                        <div className="bg-stone-900/90 text-white text-[10px] font-mono font-medium px-2.5 py-1 rounded-md shadow-md flex items-center gap-1.5">
-                          <span>📱 {label}</span>
-                          <span className="text-stone-400">(0px - {foldBottom}px)</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => setActiveScreenPickerIndex(0)}
-                            className="pointer-events-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-md flex items-center gap-1 active:scale-95 transition-all"
-                            title="Đổi kiểu trang bìa Màn 1"
-                          >
-                            <Sparkles className="w-3 h-3 text-white" />
-                            <span>Đổi Kiểu Bìa Màn 1</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => centerInScreenFold(0)}
-                            className="pointer-events-auto bg-white/95 hover:bg-rose-50 text-stone-700 hover:text-rose-600 border border-stone-200 text-[10px] font-semibold px-2 py-1 rounded-md shadow-md flex items-center gap-1 active:scale-95 transition-all"
-                            title="Canh giữa phần tử đang chọn vào Màn 1"
-                          >
-                            <span>🎯 Canh giữa</span>
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Screen 1 Phone Notch / Safe Area Indicator */}
-                    {i === 0 && (
-                      <div
-                        className="absolute left-0 right-0 border-b border-dotted border-amber-400/50 flex items-center justify-center pointer-events-none"
+                        className="absolute left-0 right-0 border-b border-dotted border-stone-300/30 flex items-center justify-end pr-3 pointer-events-none z-10"
                         style={{ top: '44px' }}
                       >
-                        <span className="bg-amber-100/90 text-amber-800 text-[9px] font-medium px-2 py-0.5 rounded-full shadow-xs -translate-y-1/2">
-                          ⚡ Vùng tai thỏ / Dynamic Island điện thoại (44px)
+                        <span className="text-stone-400/60 text-[8px] font-mono tracking-wider uppercase -translate-y-1/2">
+                          Safe Area 44px
                         </span>
                       </div>
                     )}

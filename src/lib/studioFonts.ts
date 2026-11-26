@@ -187,6 +187,14 @@ export const STUDIO_FONTS: StudioFont[] = [
     category: 'sans',
   },
   {
+    id: 'be-vietnam-pro',
+    name: 'Be Vietnam Pro',
+    family: "'Be Vietnam Pro', sans-serif",
+    googleFont: 'Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400',
+    desc: 'Hiện đại chuẩn tiếng Việt sắc nét',
+    category: 'sans',
+  },
+  {
     id: 'sans-serif',
     name: 'Mặc định (Sans)',
     family: 'var(--font-sans), system-ui, -apple-system, sans-serif',
@@ -204,77 +212,81 @@ export function resolveFontFamily(family?: string): string {
     return 'var(--font-sans), system-ui, -apple-system, sans-serif';
   }
   const clean = family.trim().replace(/^['"]+|['"]+$/g, '');
+  const norm = clean.toLowerCase().replace(/^font-/, '').replace(/[-_]/g, ' ').trim();
 
-  if (clean === 'sans-serif') {
+  if (norm === 'sans serif' || norm === 'sans') {
     return 'var(--font-sans), system-ui, -apple-system, sans-serif';
   }
-  if (clean === 'serif') {
+  if (norm === 'serif') {
     return 'var(--font-playfair), Georgia, serif';
   }
-  if (clean === 'Paris Regular' || clean === 'Parisienne') {
+  if (norm === 'paris regular' || norm === 'parisienne') {
     return "'Parisienne', 'Paris Regular', cursive, serif";
   }
-  if (clean === 'Chillatos') {
+  if (norm === 'chillatos') {
     return "'Alex Brush', 'Chillatos', cursive, serif";
   }
-  if (clean === 'EdwardianKT' || clean === 'Edwardian') {
+  if (norm === 'edwardiankt' || norm === 'edwardian') {
     return "'Great Vibes', 'EdwardianKT', cursive, serif";
   }
-  if (clean === 'Pinyon Script') {
+  if (norm === 'pinyon script' || norm === 'pinyon') {
     return "'Pinyon Script', cursive, serif";
   }
-  if (clean === 'Playfair Display') {
+  if (norm === 'playfair display' || norm === 'playfair') {
     return "'Playfair Display', serif";
   }
-  if (clean === 'Great Vibes') {
+  if (norm === 'great vibes') {
     return "'Great Vibes', cursive, serif";
   }
-  if (clean === 'Cormorant Garamond') {
+  if (norm === 'cormorant garamond' || norm === 'cormorant') {
     return "'Cormorant Garamond', serif";
   }
-  if (clean === 'Alex Brush') {
+  if (norm === 'alex brush') {
     return "'Alex Brush', cursive, serif";
   }
-  if (clean === 'Cinzel Decorative') {
-    return "'Cinzel Decorative', serif";
+  if (norm === 'cinzel decorative' || norm === 'cinzel') {
+    return "'Cinzel Decorative', 'Cinzel', serif";
   }
-  if (clean === 'Dancing Script') {
+  if (norm === 'dancing script') {
     return "'Dancing Script', cursive, serif";
   }
-  if (clean === 'Montserrat') {
+  if (norm === 'montserrat') {
     return "'Montserrat', sans-serif";
   }
-  if (clean === 'Allura') {
+  if (norm === 'be vietnam pro' || norm === 'vietnam pro') {
+    return "'Be Vietnam Pro', var(--font-sans), sans-serif";
+  }
+  if (norm === 'allura') {
     return "'Allura', cursive, serif";
   }
-  if (clean === 'MonteCarlo') {
+  if (norm === 'montecarlo' || norm === 'monte carlo') {
     return "'MonteCarlo', cursive, serif";
   }
-  if (clean === 'Ephesis') {
+  if (norm === 'ephesis') {
     return "'Ephesis', cursive, serif";
   }
-  if (clean === 'Lovers Quarrel') {
+  if (norm === 'lovers quarrel') {
     return "'Lovers Quarrel', cursive, serif";
   }
-  if (clean === 'Marck Script') {
+  if (norm === 'marck script') {
     return "'Marck Script', cursive, serif";
   }
-  if (clean === 'Italianno') {
+  if (norm === 'italianno') {
     return "'Italianno', cursive, serif";
   }
-  if (clean === 'Rouge Script') {
+  if (norm === 'rouge script') {
     return "'Rouge Script', cursive, serif";
   }
-  if (clean === 'Sacramento') {
+  if (norm === 'sacramento') {
     return "'Sacramento', cursive, serif";
   }
-  if (clean === 'WindSong') {
+  if (norm === 'windsong') {
     return "'WindSong', cursive, serif";
   }
-  if (clean === 'Prata') {
+  if (norm === 'prata') {
     return "'Prata', serif";
   }
-  if (clean === 'Bodoni Moda') {
+  if (norm === 'bodoni moda' || norm === 'bodoni') {
     return "'Bodoni Moda', serif";
   }
 

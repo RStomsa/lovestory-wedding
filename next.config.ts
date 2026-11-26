@@ -25,7 +25,13 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+      '@prisma/client',
+      'canvas-confetti',
+      'zustand',
+    ],
   },
   async redirects() {
     return [

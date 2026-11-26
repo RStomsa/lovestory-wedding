@@ -92,6 +92,7 @@ export interface CanvasElement {
   padding?: number;
   isCurved?: boolean;
   curvature?: number; // -100 to 100, default 40
+  foilEffect?: 'gold' | 'rosegold' | 'silver' | 'none';
   // Specific for image & graphic
   src?: string;
   alt?: string;

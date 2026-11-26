@@ -299,7 +299,7 @@ export default function StudioAiDesignerModal({
       opacity: 1,
       text: wordingResult,
       fontSize: 14,
-      fontFamily: 'font-montserrat',
+      fontFamily: 'Montserrat',
       color: '#4A3E3D',
       textAlign: 'center',
     });
